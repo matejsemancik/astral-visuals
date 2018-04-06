@@ -3,3 +3,4 @@
 build/
 library/
 !library/minim/library
+!library/*.jar
