@@ -1,6 +1,3 @@
-/**
- * Created by matsem on 21/03/2018.
- */
 
 fun Float.toRad(): Float {
     if (this < 0f) {
