@@ -5,20 +5,39 @@ import processing.core.PConstants
 import processing.core.PShape
 import processing.core.PVector
 
-class Triangloid(private val sketch: PApplet, private val x: Float, private val y: Float) {
+class Triangloid(private val sketch: PApplet, private val x: Float, private val y: Float, centerAverage: Boolean = false) {
 
     private val vectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
+    lateinit var offset: PVector
 
     companion object {
         const val NUMBER_VECTORS = 4
     }
 
+    val xAvg = mutableListOf<Float>()
+    val yAvg = mutableListOf<Float>()
+    val zAvg = mutableListOf<Float>()
+
     init {
+        offset = PVector.random3D().mult(200f)
+
         repeat(NUMBER_VECTORS, action = {
             val vector = PVector.random3D().mult(sketch.width / 4.5f)
+            xAvg.add(vector.x)
+            yAvg.add(vector.y)
+            zAvg.add(vector.z)
+
             vectors.add(vector)
         })
+
+        if (centerAverage) {
+            val midpoint = PVector(xAvg.average().toFloat(), yAvg.average().toFloat(), zAvg.average().toFloat())
+
+            repeat(NUMBER_VECTORS, action = { i ->
+                vectors[i] = vectors[i].sub(midpoint)
+            })
+        }
 
         vectors.add(vectors[0])
         vectors.add(vectors[1])
@@ -42,9 +61,6 @@ class Triangloid(private val sketch: PApplet, private val x: Float, private val 
             polygon.endShape(PConstants.CLOSE)
 
             group.addChild(polygon)
-
-            val box = sketch.createShape(PConstants.BOX, 20f)
-            group.addChild(box)
         }
     }
 
