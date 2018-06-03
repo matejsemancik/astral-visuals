@@ -50,11 +50,11 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     private fun regenerate() {
         triangloids.removeAt(0)
-        triangloids.add(Triangloid(this, width / 2f, height / 2f))
+        triangloids.add(Triangloid(this))
     }
 
     override fun setup() {
-        repeat(3, action = { triangloids.add(Triangloid(this, width / 2f, height / 2f)) })
+        repeat(3, action = { triangloids.add(Triangloid(this)) })
 
         minim = Minim(this)
 
@@ -103,7 +103,8 @@ class PolygonalSketch : PApplet(), AudioListener {
     }
 
     fun debugWindow() {
-        val str = StringBuilder()
+        // debug values
+        val debugStr = StringBuilder()
                 .append("resolution: ${width}x${height}").newLine()
                 .append("frameRate: ${frameRate.toInt()}").newLine()
                 .append("mouseX: ${mouseX - width / 2}").newLine()
@@ -113,7 +114,18 @@ class PolygonalSketch : PApplet(), AudioListener {
         noStroke()
         fill(0f, 255f, 100f)
         textSize(14f)
-        text(str, 12f, 24f)
+        text(debugStr, 12f, 24f)
+
+        // menu
+        val menuStr = StringBuilder()
+                .append("[d] debug")
+                .append(", [1] flicker")
+                .toString()
+
+        noStroke()
+        fill(0f, 255f, 100f)
+        textSize(14f)
+        text(menuStr, 12f, height - 12f)
 
         // audio RMS
         val rectHeight = 5

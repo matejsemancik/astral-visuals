@@ -5,7 +5,7 @@ import processing.core.PConstants
 import processing.core.PShape
 import processing.core.PVector
 
-class Triangloid(private val sketch: PApplet, private val x: Float, private val y: Float, centerAverage: Boolean = false) {
+class Triangloid(private val sketch: PApplet, centerAverage: Boolean = false) {
 
     private val vectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
