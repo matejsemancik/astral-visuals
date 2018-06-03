@@ -27,7 +27,13 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     // endregion
 
-    var showDebugWindow = true
+    // region modes
+
+    var debugWindowEnabled = true
+    var flickerEnabled = true
+
+    // endregion
+
     val triangloids = mutableListOf<Triangloid>()
     lateinit var minim: Minim
     lateinit var audioIn: AudioInput
@@ -37,7 +43,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     var rmsSum = 0f
 
     override fun settings() {
-        size(1600, 900, PConstants.P3D)
+        size(1280, 800, PConstants.P3D)
 //        fullScreen(PConstants.P3D)
         smooth(4)
     }
@@ -64,18 +70,19 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     override fun draw() {
         rmsSum += audioIn.mix.level()
-        rmsSum *= 0.8f
+        rmsSum *= 0.2f
 
         if (beatDetect.isSnare) {
             regenerate()
         }
 
         background(0f)
-        if (showDebugWindow) {
+
+        if (debugWindowEnabled) {
             debugWindow()
         }
 
-        if (frameCount % 4 == 0) {
+        if (flickerEnabled && frameCount % 4 == 0) {
             return
         }
 
@@ -89,7 +96,6 @@ class PolygonalSketch : PApplet(), AudioListener {
             pushMatrix()
             translate(width / 2f, height / 2f)
             scale(map(rmsSum, 0f, 1f, 0.5f, 1.5f))
-
             triangloid.draw()
 
             popMatrix()
@@ -139,8 +145,11 @@ class PolygonalSketch : PApplet(), AudioListener {
     }
 
     override fun keyPressed(event: KeyEvent?) {
-        if (event?.key == 'd') {
-            showDebugWindow = !showDebugWindow
+        event?.let {
+            when (event.key) {
+                'd' -> debugWindowEnabled = !debugWindowEnabled
+                '1' -> flickerEnabled = !flickerEnabled
+            }
         }
 
         super.keyPressed(event)
