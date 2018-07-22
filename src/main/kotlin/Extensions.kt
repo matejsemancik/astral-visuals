@@ -1,3 +1,4 @@
+import processing.core.PApplet
 
 fun Float.toRad(): Float {
     if (this < 0f) {
@@ -23,3 +24,6 @@ fun StringBuilder.newLine(): StringBuilder {
     this.apply { append("\n") }
     return this
 }
+
+fun PApplet.centerX() = this.width / 2
+fun PApplet.centerY() = this.height / 2

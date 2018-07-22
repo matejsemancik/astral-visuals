@@ -1,5 +1,7 @@
 package sketches.polygonal
 
+import centerX
+import centerY
 import ddf.minim.AudioInput
 import ddf.minim.AudioListener
 import ddf.minim.Minim
@@ -17,11 +19,15 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     override fun samples(p0: FloatArray?) {
         beatDetect.detect(audioIn.mix)
+        fft.forward(audioIn.mix)
+
         audioLevelObservable.onNext(audioIn.mix.level())
     }
 
     override fun samples(p0: FloatArray?, p1: FloatArray?) {
         beatDetect.detect(audioIn.mix)
+        fft.forward(audioIn.mix)
+
         audioLevelObservable.onNext(audioIn.mix.level())
     }
 
@@ -31,6 +37,10 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     var debugWindowEnabled = true
     var flickerEnabled = true
+    var scaleByAudioEnabled = true
+    var centerWeightEnabled = false
+    var beatDetectEnabled = true
+    var wiggleEnabled = true;
 
     // endregion
 
@@ -39,6 +49,8 @@ class PolygonalSketch : PApplet(), AudioListener {
     lateinit var audioIn: AudioInput
     lateinit var fft: FFT
     lateinit var beatDetect: BeatDetect
+    lateinit var autoMouse: AutoMouse
+
     val audioLevelObservable: PublishSubject<Float> = PublishSubject.create()
     var rmsSum = 0f
 
@@ -50,11 +62,11 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     private fun regenerate() {
         triangloids.removeAt(0)
-        triangloids.add(Triangloid(this))
+        triangloids.add(Triangloid(this, centerWeightEnabled))
     }
 
     override fun setup() {
-        repeat(3, action = { triangloids.add(Triangloid(this)) })
+        repeat(3, action = { triangloids.add(Triangloid(this, centerWeightEnabled)) })
 
         minim = Minim(this)
 
@@ -66,15 +78,19 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         beatDetect = BeatDetect(audioIn.bufferSize(), audioIn.sampleRate())
         beatDetect.setSensitivity(150)
+
+        autoMouse = AutoMouse(this, centerX(), centerY())
     }
 
     override fun draw() {
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
 
-        if (beatDetect.isSnare) {
+        if (beatDetectEnabled && beatDetect.isSnare) {
             regenerate()
         }
+
+        autoMouse.move()
 
         background(0f)
 
@@ -87,15 +103,21 @@ class PolygonalSketch : PApplet(), AudioListener {
         }
 
         for (triangloid in triangloids) {
-            triangloid.getShape().rotateY(0.000f + map(mouseX.toFloat(), width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateX(0.000f - map(mouseY.toFloat(), height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
+            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
+            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
             triangloid.getShape().rotateZ(0.002f)
 
-            triangloid.wiggle()
+            if (wiggleEnabled) {
+                triangloid.wiggle();
+            }
 
             pushMatrix()
             translate(width / 2f, height / 2f)
-            scale(map(rmsSum, 0f, 1f, 0.5f, 1.5f))
+            if (scaleByAudioEnabled) {
+                scale(map(rmsSum, 0f, 1f, 0.5f, 1.5f))
+            } else {
+                scale(0.5f)
+            }
             triangloid.draw()
 
             popMatrix()
@@ -119,7 +141,11 @@ class PolygonalSketch : PApplet(), AudioListener {
         // menu
         val menuStr = StringBuilder()
                 .append("[d] debug")
-                .append(", [1] flicker")
+                .append(", [f] flicker: $flickerEnabled")
+                .append(", [s] scale by audio: $scaleByAudioEnabled")
+                .append(", [c] center-weighted triangloids: $centerWeightEnabled")
+                .append(", [b] beat detect: $beatDetectEnabled")
+                .append(", [w] wiggle: $wiggleEnabled")
                 .toString()
 
         noStroke()
@@ -128,7 +154,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         text(menuStr, 12f, height - 12f)
 
         // audio RMS
-        val rectHeight = 5
+        val rectHeight = 2
 
         pushMatrix()
         translate(12f, 100f)
@@ -144,12 +170,14 @@ class PolygonalSketch : PApplet(), AudioListener {
         // FFT
         pushMatrix()
         translate(12f, 130f)
-        fft.forward(audioIn.mix)
         for (i in 0 until fft.specSize()) {
-            rect(0f, i + rectHeight.toFloat(), fft.getBand(i) * 10, rectHeight.toFloat())
+            rect(0f, i + rectHeight.toFloat(), fft.getBand(i) * 2, rectHeight.toFloat())
         }
 
         popMatrix()
+
+        // AutoMouse
+        autoMouse.draw()
     }
 
     override fun mouseClicked() {
@@ -160,7 +188,11 @@ class PolygonalSketch : PApplet(), AudioListener {
         event?.let {
             when (event.key) {
                 'd' -> debugWindowEnabled = !debugWindowEnabled
-                '1' -> flickerEnabled = !flickerEnabled
+                'f' -> flickerEnabled = !flickerEnabled
+                's' -> scaleByAudioEnabled = !scaleByAudioEnabled
+                'c' -> centerWeightEnabled = !centerWeightEnabled
+                'b' -> beatDetectEnabled = !beatDetectEnabled
+                'w' -> wiggleEnabled = !wiggleEnabled
             }
         }
 
