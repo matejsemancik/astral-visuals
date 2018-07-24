@@ -39,8 +39,8 @@ class PolygonalSketch : PApplet(), AudioListener {
     var flickerEnabled = true
     var scaleByAudioEnabled = true
     var centerWeightEnabled = false
-    var beatDetectEnabled = true
-    var wiggleEnabled = true;
+    var beatDetectEnabled = false
+    var wiggleEnabled = false
 
     // endregion
 
@@ -53,6 +53,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     val audioLevelObservable: PublishSubject<Float> = PublishSubject.create()
     var rmsSum = 0f
+    var bassSum = 0f
 
     override fun settings() {
         size(1280, 800, PConstants.P3D)
@@ -74,7 +75,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         audioIn.addListener(this)
 
         fft = FFT(audioIn.bufferSize(), audioIn.sampleRate())
-        fft.logAverages(4, 1)
+        fft.logAverages(22, 1)
 
         beatDetect = BeatDetect(audioIn.bufferSize(), audioIn.sampleRate())
         beatDetect.setSensitivity(150)
@@ -85,6 +86,11 @@ class PolygonalSketch : PApplet(), AudioListener {
     override fun draw() {
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
+
+        if (fft.avgSize() > 0) {
+            bassSum += fft.getAvg(0)
+            bassSum *= 0.2f
+        }
 
         if (beatDetectEnabled && beatDetect.isSnare) {
             regenerate()
@@ -103,12 +109,13 @@ class PolygonalSketch : PApplet(), AudioListener {
         }
 
         for (triangloid in triangloids) {
-            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateZ(0.002f)
+//            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
+//            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
+            triangloid.getShape().rotateY(0f + map(bassSum, 0f, 50f, 0f, 0.15f))
+            triangloid.getShape().rotateZ(0.005f)
 
             if (wiggleEnabled) {
-                triangloid.wiggle();
+                triangloid.wiggle()
             }
 
             pushMatrix()
@@ -135,6 +142,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         noStroke()
         fill(0f, 255f, 100f)
+
         textSize(14f)
         text(debugStr, 12f, 24f)
 
@@ -153,25 +161,33 @@ class PolygonalSketch : PApplet(), AudioListener {
         textSize(14f)
         text(menuStr, 12f, height - 12f)
 
-        // audio RMS
-        val rectHeight = 2
+        var rectHeight = 8
 
         pushMatrix()
         translate(12f, 100f)
-        rect(0f, 0f * rectHeight, audioIn.left.level() * 200, rectHeight.toFloat())
 
+        // audio RMS
         fill(255f, 255f, 255f)
         rect(0f, 1f * rectHeight, rmsSum * 200, rectHeight.toFloat())
 
-        fill(0f, 255f, 100f)
-        rect(0f, 2f * rectHeight, audioIn.right.level() * 200, rectHeight.toFloat())
+        // bass RMS
+        fill(255f, 0f, 0f)
+        rect(0f, 2f * rectHeight, bassSum, rectHeight.toFloat())
+
         popMatrix()
 
         // FFT
         pushMatrix()
         translate(12f, 130f)
-        for (i in 0 until fft.specSize()) {
-            rect(0f, i + rectHeight.toFloat(), fft.getBand(i) * 2, rectHeight.toFloat())
+        for (i in 0 until fft.avgSize()) {
+            // Draw frequency band
+            fill(0f, 255f, 100f)
+            rect(0f, i.toFloat() * rectHeight, fft.getAvg(i), rectHeight.toFloat())
+
+            // Draw band frequency value
+            fill(255f, 0f, 0f)
+            textSize(10f)
+            text("${fft.getAverageCenterFrequency(i)} Hz", 0f, i.toFloat() * rectHeight + rectHeight)
         }
 
         popMatrix()
