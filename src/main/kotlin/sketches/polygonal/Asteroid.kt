@@ -5,11 +5,10 @@ import processing.core.PConstants
 import processing.core.PShape
 import processing.core.PVector
 
-class Triangloid(private val sketch: PApplet, centerAverage: Boolean = false) {
+class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false) {
 
     private val vectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
-    lateinit var offset: PVector
 
     companion object {
         const val NUMBER_VECTORS = 4
@@ -20,15 +19,13 @@ class Triangloid(private val sketch: PApplet, centerAverage: Boolean = false) {
     val zAvg = mutableListOf<Float>()
 
     init {
-        offset = PVector.random3D().mult(200f)
-
         repeat(NUMBER_VECTORS, action = {
-            val vector = PVector.random3D().mult(sketch.width / 4.5f)
-            xAvg.add(vector.x)
-            yAvg.add(vector.y)
-            zAvg.add(vector.z)
+            val random3D = PVector.random3D().mult(sketch.width / 4.5f)
+            xAvg.add(random3D.x)
+            yAvg.add(random3D.y)
+            zAvg.add(random3D.z)
 
-            vectors.add(vector)
+            vectors.add(random3D)
         })
 
         if (centerAverage) {

@@ -44,7 +44,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     // endregion
 
-    val triangloids = mutableListOf<Triangloid>()
+    val triangloids = mutableListOf<Asteroid>()
     lateinit var minim: Minim
     lateinit var audioIn: AudioInput
     lateinit var fft: FFT
@@ -63,11 +63,11 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     private fun regenerate() {
         triangloids.removeAt(0)
-        triangloids.add(Triangloid(this, centerWeightEnabled))
+        triangloids.add(Asteroid(this, centerWeightEnabled))
     }
 
     override fun setup() {
-        repeat(3, action = { triangloids.add(Triangloid(this, centerWeightEnabled)) })
+        repeat(1, action = { triangloids.add(Asteroid(this, centerWeightEnabled)) })
 
         minim = Minim(this)
 
@@ -109,10 +109,10 @@ class PolygonalSketch : PApplet(), AudioListener {
         }
 
         for (triangloid in triangloids) {
-//            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
-//            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateY(0f + map(bassSum, 0f, 50f, 0f, 0.15f))
-            triangloid.getShape().rotateZ(0.005f)
+            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
+            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
+            triangloid.getShape().rotateZ(0f + map(bassSum, 0f, 50f, 0f, 0.15f))
+//            triangloid.getShape().rotateZ(0.005f)
 
             if (wiggleEnabled) {
                 triangloid.wiggle()
