@@ -17,6 +17,10 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     // region AudioListener for input signal
 
+    companion object {
+        const val NUMBER_ASTEROIDS = 3
+    }
+
     override fun samples(p0: FloatArray?) {
         beatDetect.detect(audioIn.mix)
         fft.forward(audioIn.mix)
@@ -37,10 +41,11 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     var debugWindowEnabled = true
     var flickerEnabled = true
-    var scaleByAudioEnabled = true
+    var scaleByAudioEnabled = false
     var centerWeightEnabled = false
     var beatDetectEnabled = false
     var wiggleEnabled = false
+    var autoMouseEnabled = true
 
     // endregion
 
@@ -63,12 +68,10 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     private fun regenerate() {
         triangloids.removeAt(0)
-        triangloids.add(Asteroid(this, centerWeightEnabled))
+        triangloids.add(Asteroid(this, centerWeightEnabled, fft))
     }
 
     override fun setup() {
-        repeat(1, action = { triangloids.add(Asteroid(this, centerWeightEnabled)) })
-
         minim = Minim(this)
 
         audioIn = minim.getLineIn()
@@ -81,6 +84,8 @@ class PolygonalSketch : PApplet(), AudioListener {
         beatDetect.setSensitivity(150)
 
         autoMouse = AutoMouse(this, centerX(), centerY())
+
+        repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
     }
 
     override fun draw() {
@@ -96,7 +101,9 @@ class PolygonalSketch : PApplet(), AudioListener {
             regenerate()
         }
 
-        autoMouse.move()
+        if (autoMouseEnabled) {
+            autoMouse.move()
+        }
 
         background(0f)
 
@@ -111,7 +118,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         for (triangloid in triangloids) {
             triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
             triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateZ(0f + map(bassSum, 0f, 50f, 0f, 0.15f))
+//            triangloid.getShape().rotateZ(0f + map(bassSum, 0f, 50f, 0f, 0.15f))
 //            triangloid.getShape().rotateZ(0.005f)
 
             if (wiggleEnabled) {
@@ -154,6 +161,7 @@ class PolygonalSketch : PApplet(), AudioListener {
                 .append(", [c] center-weighted triangloids: $centerWeightEnabled")
                 .append(", [b] beat detect: $beatDetectEnabled")
                 .append(", [w] wiggle: $wiggleEnabled")
+                .append(", [a] automouse: $autoMouseEnabled")
                 .toString()
 
         noStroke()
@@ -209,6 +217,7 @@ class PolygonalSketch : PApplet(), AudioListener {
                 'c' -> centerWeightEnabled = !centerWeightEnabled
                 'b' -> beatDetectEnabled = !beatDetectEnabled
                 'w' -> wiggleEnabled = !wiggleEnabled
+                'a' -> autoMouseEnabled = !autoMouseEnabled
             }
         }
 
