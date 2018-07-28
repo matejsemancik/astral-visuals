@@ -61,7 +61,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     var bassSum = 0f
 
     override fun settings() {
-        size(1280, 800, PConstants.P3D)
+        size(1280, 720, PConstants.P3D)
 //        fullScreen(PConstants.P3D)
         smooth(4)
     }
@@ -92,7 +92,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
 
-        if (fft.avgSize() > 0) {
+        if (fft.avgSize() >= 2) {
             bassSum += fft.getAvg(0)
             bassSum *= 0.2f
         }
@@ -115,11 +115,11 @@ class PolygonalSketch : PApplet(), AudioListener {
             return
         }
 
-        for (triangloid in triangloids) {
-            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
-//            triangloid.getShape().rotateZ(0f + map(bassSum, 0f, 50f, 0f, 0.15f))
-//            triangloid.getShape().rotateZ(0.005f)
+        for ((index, triangloid) in triangloids.withIndex()) {
+//            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
+//            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
+            triangloid.getShape().rotateX(0f + map(bassSum, 0f, 50f, 0f, 0.08f))
+//            triangloid.getShape().rotateZ(0.005f * (index + 1))
 
             if (wiggleEnabled) {
                 triangloid.wiggle()

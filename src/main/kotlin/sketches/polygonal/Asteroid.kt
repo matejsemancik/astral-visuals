@@ -10,6 +10,7 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
 
     private val skeletonVectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
+    private val fftAverages = mutableListOf<Float>(0f, 0f, 0f, 0f)
 
     companion object {
         const val NUMBER_VECTORS = 4
@@ -74,7 +75,10 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
 
         for (i in 0 until shapeVectors.size) {
             // scale by FFT
-            shapeVectors[i].add(shapeVectors[i].copy().mult(PApplet.map(fft.getAvg(i), 0f, 300f, 0f, 0.5f)))
+            fftAverages[i] += fft.getAvg(i)
+            fftAverages[i] = fftAverages[i] * 0.2f
+
+            shapeVectors[i].add(shapeVectors[i].copy().mult(PApplet.map(fftAverages[i], 0f, 50f, 0f, 0.5f)))
         }
 
         shapeVectors.apply {
