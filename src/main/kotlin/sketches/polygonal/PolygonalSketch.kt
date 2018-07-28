@@ -12,6 +12,8 @@ import newLine
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.event.KeyEvent
+import sketches.polygonal.asteroid.Asteroid
+import sketches.polygonal.starfield.Star
 
 class PolygonalSketch : PApplet(), AudioListener {
 
@@ -19,6 +21,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     companion object {
         const val NUMBER_ASTEROIDS = 3
+        const val NUMBER_STARS = 800
     }
 
     override fun samples(p0: FloatArray?) {
@@ -40,7 +43,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     // region modes
 
     var debugWindowEnabled = true
-    var flickerEnabled = true
+    var flickerEnabled = false
     var scaleByAudioEnabled = false
     var centerWeightEnabled = false
     var beatDetectEnabled = false
@@ -49,6 +52,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     // endregion
 
+    val stars = mutableListOf<Star>()
     val triangloids = mutableListOf<Asteroid>()
     lateinit var minim: Minim
     lateinit var audioIn: AudioInput
@@ -85,6 +89,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         autoMouse = AutoMouse(this, centerX(), centerY())
 
+        repeat(NUMBER_STARS, action = { stars.add(Star(this)) })
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
     }
 
@@ -115,11 +120,21 @@ class PolygonalSketch : PApplet(), AudioListener {
             return
         }
 
+        pushMatrix()
+        translate(centerX().toFloat(), centerY().toFloat())
+        rotateZ(map(bassSum, 0f, 50f, -0.05f, 0.05f))
+        for (star in stars) {
+            star.update()
+            star.draw()
+        }
+
+        popMatrix()
+
         for ((index, triangloid) in triangloids.withIndex()) {
 //            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
 //            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateX(0f + map(bassSum, 0f, 50f, 0f, 0.08f))
-//            triangloid.getShape().rotateZ(0.005f * (index + 1))
+            triangloid.getShape().rotateX(0f + map(bassSum, 0f, 50f, 0f, 0.05f))
+            triangloid.getShape().rotateY(0.005f * (index + 1))
 
             if (wiggleEnabled) {
                 triangloid.wiggle()

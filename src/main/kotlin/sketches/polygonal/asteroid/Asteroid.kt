@@ -1,4 +1,4 @@
-package sketches.polygonal
+package sketches.polygonal.asteroid
 
 import ddf.minim.analysis.FFT
 import processing.core.PApplet
