@@ -1,4 +1,4 @@
-package sketches.polygonal.starfield
+package sketches.polygonal.star
 
 import processing.core.PApplet
 import processing.core.PApplet.map

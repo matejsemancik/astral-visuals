@@ -13,7 +13,7 @@ import processing.core.PApplet
 import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
-import sketches.polygonal.starfield.Star
+import sketches.polygonal.star.Star
 
 class PolygonalSketch : PApplet(), AudioListener {
 
