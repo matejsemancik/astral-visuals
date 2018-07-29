@@ -156,7 +156,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     fun debugWindow() {
         // debug values
-        val debugStr = StringBuilder()
+        val basicInfoStr = StringBuilder()
                 .append("resolution: ${width}x${height}").newLine()
                 .append("frameRate: ${frameRate.toInt()}").newLine()
                 .append("mouseX: ${mouseX - width / 2}").newLine()
@@ -167,23 +167,24 @@ class PolygonalSketch : PApplet(), AudioListener {
         fill(0f, 255f, 100f)
 
         textSize(14f)
-        text(debugStr, 12f, 24f)
+        text(basicInfoStr, 12f, 24f)
 
         // menu
         val menuStr = StringBuilder()
-                .append("[d] debug")
-                .append(", [f] flicker: $flickerEnabled")
-                .append(", [s] scale by audio: $scaleByAudioEnabled")
-                .append(", [c] center-weighted triangloids: $centerWeightEnabled")
-                .append(", [b] beat detect: $beatDetectEnabled")
-                .append(", [w] wiggle: $wiggleEnabled")
-                .append(", [a] automouse: $autoMouseEnabled")
+                .append("[d] toggle debug mode").newLine()
+                .append("[f] flicker: $flickerEnabled").newLine()
+                .append("[s] scale by audio: $scaleByAudioEnabled").newLine()
+                .append("[c] center-weighted triangloids: $centerWeightEnabled").newLine()
+                .append("[b] beat detect: $beatDetectEnabled").newLine()
+                .append("[w] wiggle: $wiggleEnabled").newLine()
+                .append("[a] automouse: $autoMouseEnabled").newLine()
+                .append("ssup...")
                 .toString()
 
         noStroke()
         fill(0f, 255f, 100f)
         textSize(14f)
-        text(menuStr, 12f, height - 12f)
+        text(menuStr, 12f, height - menuStr.lines().size * 20f)
 
         var rectHeight = 8
 
