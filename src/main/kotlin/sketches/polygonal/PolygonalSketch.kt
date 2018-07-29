@@ -120,9 +120,10 @@ class PolygonalSketch : PApplet(), AudioListener {
             return
         }
 
+        // Stars
         pushMatrix()
         translate(centerX().toFloat(), centerY().toFloat())
-        rotateZ(map(bassSum, 0f, 50f, -0.05f, 0.05f))
+        rotateZ(map(bassSum, 0f, 50f, -0.02f, 0.02f))
         for (star in stars) {
             star.update()
             star.draw()
