@@ -46,6 +46,7 @@ class Star(private val sketch: PApplet) {
         val px = map(x / pz, 0f, 1f, 0f, sketch.width.toFloat())
         val py = map(y / pz, 0f, 1f, 0f, sketch.height.toFloat())
         sketch.stroke(0f, 255f, 100f)
+        sketch.strokeWeight(2f)
         sketch.line(sx, sy, px, py)
         pz = z
     }
