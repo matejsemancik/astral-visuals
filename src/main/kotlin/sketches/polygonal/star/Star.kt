@@ -7,7 +7,7 @@ class Star(private val sketch: PApplet) {
 
     companion object {
         const val ELLIPSE_SIZE = 10f
-        const val SPEED = 8
+        const val SPEED_DEFAULT = 8
     }
 
     var x: Float = 0f
@@ -22,8 +22,8 @@ class Star(private val sketch: PApplet) {
         pz = z
     }
 
-    fun update() {
-        z -= map(sketch.mouseX.toFloat(), 0f, sketch.width.toFloat(), 0f, 20f)
+    fun update(speed: Int = SPEED_DEFAULT) {
+        z -= speed
 
         if (z < 1) {
             x = sketch.random(-sketch.width.toFloat(), sketch.width.toFloat())
