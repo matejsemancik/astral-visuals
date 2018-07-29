@@ -115,12 +115,9 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
 
     fun wiggle() {
         // Wiggle wiggle wiggle
-        for (shape in group.children) {
-            for (i in 0 until shape.vertexCount) {
-                val offsetVector = PVector.random3D().mult(0.8f)
-                val originalVector = shape.getVertex(i)
-                shape.setVertex(i, originalVector.add(offsetVector))
-            }
+        for (index in 0 until skeletonVectors.size) {
+            val offsetVector = PVector.random3D().mult(1.5f)
+            skeletonVectors[index] = skeletonVectors[index].add(offsetVector)
         }
     }
 
