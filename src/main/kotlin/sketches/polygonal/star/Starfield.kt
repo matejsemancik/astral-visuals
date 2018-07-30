@@ -25,7 +25,7 @@ class Starfield(private val sketch: PApplet, private val starsNum: Int) {
 
     fun draw() {
         sketch.pushMatrix()
-        sketch.translate(sketch.centerX().toFloat(), sketch.centerY().toFloat())
+        sketch.translate(sketch.centerX().toFloat(), sketch.centerY().toFloat(), -sketch.height.toFloat())
         sketch.rotateZ(rotation)
 
         for (star in stars) {

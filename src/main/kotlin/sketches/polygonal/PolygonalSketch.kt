@@ -11,6 +11,7 @@ import io.reactivex.subjects.PublishSubject
 import newLine
 import processing.core.PApplet
 import processing.core.PConstants
+import processing.core.PShape
 import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
@@ -48,10 +49,13 @@ class PolygonalSketch : PApplet(), AudioListener {
     var beatDetectEnabled = false
     var wiggleEnabled = false
     var autoMouseEnabled = true
+    var starfieldRotationEnabled = false
 
     // endregion
 
-    lateinit var starfield: Starfield
+    lateinit var testShape: PShape
+
+    lateinit var starfield1: Starfield
     lateinit var starfield2: Starfield
     val triangloids = mutableListOf<Asteroid>()
 
@@ -90,9 +94,11 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         autoMouse = AutoMouse(this, centerX(), centerY())
 
-        starfield = Starfield(this, 800)
-        starfield2 = Starfield(this, 800)
+        starfield1 = Starfield(this, 300)
+        starfield2 = Starfield(this, 300)
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
+
+        testShape = loadShape("model.obj")
     }
 
     override fun draw() {
@@ -123,12 +129,15 @@ class PolygonalSketch : PApplet(), AudioListener {
         }
 
         // Stars
-        starfield.update(3)
-        starfield.rotate(map(bassSum, 0f, 50f, 0f, 0.04f))
-        starfield.draw()
+        if (starfieldRotationEnabled) {
+            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f))
+            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f))
+        }
 
-        starfield2.update(8)
-        starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f))
+        starfield1.update(2)
+        starfield2.update(4)
+
+        starfield1.draw()
         starfield2.draw()
 
         for ((index, triangloid) in triangloids.withIndex()) {
@@ -152,6 +161,12 @@ class PolygonalSketch : PApplet(), AudioListener {
 
             popMatrix()
         }
+
+        pushMatrix()
+        translate(centerX().toFloat(), centerY().toFloat())
+        shape(testShape)
+
+        popMatrix()
     }
 
     fun debugWindow() {
@@ -178,7 +193,7 @@ class PolygonalSketch : PApplet(), AudioListener {
                 .append("[b] beat detect: $beatDetectEnabled").newLine()
                 .append("[w] wiggle: $wiggleEnabled").newLine()
                 .append("[a] automouse: $autoMouseEnabled").newLine()
-                .append("ssup...")
+                .append("[r] starfield1 rotation: $starfieldRotationEnabled")
                 .toString()
 
         noStroke()
@@ -235,6 +250,7 @@ class PolygonalSketch : PApplet(), AudioListener {
                 'b' -> beatDetectEnabled = !beatDetectEnabled
                 'w' -> wiggleEnabled = !wiggleEnabled
                 'a' -> autoMouseEnabled = !autoMouseEnabled
+                'r' -> starfieldRotationEnabled = !starfieldRotationEnabled
             }
         }
 

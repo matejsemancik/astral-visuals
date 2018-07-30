@@ -6,7 +6,7 @@ import processing.core.PApplet.map
 class Star(private val sketch: PApplet) {
 
     companion object {
-        const val ELLIPSE_SIZE = 10f
+        const val ELLIPSE_SIZE = 20f
         const val SPEED_DEFAULT = 8
     }
 
@@ -16,21 +16,22 @@ class Star(private val sketch: PApplet) {
     var pz: Float = 0f
 
     init {
-        x = sketch.random(-sketch.width.toFloat(), sketch.width.toFloat())
-        y = sketch.random(-sketch.height.toFloat(), sketch.height.toFloat())
-        z = sketch.random(0f, sketch.width.toFloat())
-        pz = z
+        newLocation()
     }
 
     fun update(speed: Int = SPEED_DEFAULT) {
         z -= speed
 
         if (z < 1) {
-            x = sketch.random(-sketch.width.toFloat(), sketch.width.toFloat())
-            y = sketch.random(-sketch.height.toFloat(), sketch.height.toFloat())
-            z = sketch.random(0f, sketch.width.toFloat())
-            pz = z
+            newLocation()
         }
+    }
+
+    private fun newLocation() {
+        x = sketch.random(-sketch.width.toFloat(), sketch.width.toFloat())
+        y = sketch.random(-sketch.height.toFloat(), sketch.height.toFloat())
+        z = sketch.random(0f, sketch.width.toFloat())
+        pz = z
     }
 
     fun draw() {
