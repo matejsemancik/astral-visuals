@@ -6,7 +6,7 @@ import processing.core.PApplet.map
 class Star(private val sketch: PApplet) {
 
     companion object {
-        const val ELLIPSE_SIZE = 20f
+        const val ELLIPSE_SIZE = 15f
         const val SPEED_DEFAULT = 8
     }
 
@@ -19,11 +19,21 @@ class Star(private val sketch: PApplet) {
         newLocation()
     }
 
-    fun update(speed: Int = SPEED_DEFAULT) {
+    /**
+     * Updates star's location and returns whether star
+     * reached end of it's lifecycle or not
+     *
+     * @return true if star has ended it's lifecycle and generated new position,
+     * false otherwise
+     */
+    fun update(speed: Int = SPEED_DEFAULT): Boolean {
         z -= speed
 
         if (z < 1) {
             newLocation()
+            return true
+        } else {
+            return false
         }
     }
 
@@ -39,7 +49,7 @@ class Star(private val sketch: PApplet) {
         sketch.noStroke()
 
         val sx = map(x / z, 0f, 1f, 0f, sketch.width.toFloat())
-        val sy = map(y / z, 0f, 1f, 0f , sketch.height.toFloat())
+        val sy = map(y / z, 0f, 1f, 0f, sketch.height.toFloat())
 
         val r = map(z, 0f, sketch.width.toFloat(), ELLIPSE_SIZE, 0f)
         sketch.ellipse(sx, sy, r, r)

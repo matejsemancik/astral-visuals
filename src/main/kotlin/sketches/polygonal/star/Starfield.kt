@@ -4,19 +4,30 @@ import centerX
 import centerY
 import processing.core.PApplet
 
-class Starfield(private val sketch: PApplet, private val starsNum: Int) {
+class Starfield(private val sketch: PApplet, initialCount: Int) {
 
     private val stars = mutableListOf<Star>()
     private var rotation = 0f
+    private var desiredCount = initialCount
 
     init {
-        repeat(starsNum, { stars.add(Star(sketch)) })
+        repeat(initialCount, { addStar() })
+    }
+
+    private fun addStar() {
+        stars.add(Star(sketch))
     }
 
     fun update(speed: Int = Star.SPEED_DEFAULT) {
-        for (star in stars) {
-            star.update(speed)
+        stars.removeIf { star: Star -> star.update(speed) && stars.size > desiredCount }
+    }
+
+    fun setCount(count: Int) {
+        if (stars.size < count) {
+            repeat(count - stars.size, { stars.add(Star(sketch)) })
         }
+
+        desiredCount = count
     }
 
     fun rotate(rotation: Float) {

@@ -134,9 +134,16 @@ class PolygonalSketch : PApplet(), AudioListener {
             starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f))
         }
 
-        starfield1.update(2)
-        starfield2.update(4)
+        val starCount = map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 400f)
+        noStroke()
+        fill(255f, 255f, 255f)
+        textSize(14f)
+        text("Star count: ${starCount}", mouseX.toFloat(), mouseY.toFloat())
 
+        starfield1.setCount(starCount.toInt())
+        starfield2.setCount(starCount.toInt())
+        starfield1.update(speed = 2)
+        starfield2.update(speed = 4)
         starfield1.draw()
         starfield2.draw()
 
