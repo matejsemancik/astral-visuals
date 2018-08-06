@@ -22,14 +22,15 @@ class TerrainSketch : PApplet(), AudioListener {
 
     // region prefs
 
+    var rotation = 0f
     var debugEnabled = false
 
     // endregion
 
     // region Terrain
-    val w = 800f
-    val h = 800f
-    var scale = 20f
+    val w = 600f
+    val h = 600f
+    var scale = 18f
 
     var cols = (w / scale).toInt()
     var rows = (h / scale).toInt()
@@ -55,6 +56,7 @@ class TerrainSketch : PApplet(), AudioListener {
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
+//        fullScreen(PConstants.P3D)
         smooth(4)
     }
 
@@ -82,6 +84,8 @@ class TerrainSketch : PApplet(), AudioListener {
         pushMatrix()
         translate(width.toFloat() / 2, height.toFloat() / 2)
         rotateX(map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f))
+//        rotateZ(rotation)
+//        rotation += 0.001f
 
         translate(-w / 2, -h / 2)
 
@@ -112,7 +116,7 @@ class TerrainSketch : PApplet(), AudioListener {
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
             if (x < fft.avgSize()) {
-                buff[0][x] = map(fft.getAvg(x), 0f, 80f, 0f, 30f)
+                buff[0][x] = map(fft.getAvg(x), 0f, 80f, 0f, 20f)
             } else {
                 buff[0][x] = 0f
             }
