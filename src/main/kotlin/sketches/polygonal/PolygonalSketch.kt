@@ -11,7 +11,6 @@ import io.reactivex.subjects.PublishSubject
 import newLine
 import processing.core.PApplet
 import processing.core.PConstants
-import processing.core.PShape
 import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
@@ -50,10 +49,9 @@ class PolygonalSketch : PApplet(), AudioListener {
     var wiggleEnabled = false
     var autoMouseEnabled = true
     var starfieldRotationEnabled = false
+    var starCount = 0
 
     // endregion
-
-    lateinit var testShape: PShape
 
     lateinit var starfield1: Starfield
     lateinit var starfield2: Starfield
@@ -97,8 +95,6 @@ class PolygonalSketch : PApplet(), AudioListener {
         starfield1 = Starfield(this, 300)
         starfield2 = Starfield(this, 300)
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
-
-        testShape = loadShape("model.obj")
     }
 
     override fun draw() {
@@ -134,14 +130,9 @@ class PolygonalSketch : PApplet(), AudioListener {
             starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f))
         }
 
-        val starCount = map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 400f)
-        noStroke()
-        fill(255f, 255f, 255f)
-        textSize(14f)
-        text("Star count: ${starCount}", mouseX.toFloat(), mouseY.toFloat())
-
-        starfield1.setCount(starCount.toInt())
-        starfield2.setCount(starCount.toInt())
+        starCount = map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 400f).toInt()
+        starfield1.setCount(starCount)
+        starfield2.setCount(starCount)
         starfield1.update(speed = 2)
         starfield2.update(speed = 4)
         starfield1.draw()
@@ -171,8 +162,6 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         pushMatrix()
         translate(centerX().toFloat(), centerY().toFloat())
-        shape(testShape)
-
         popMatrix()
     }
 
@@ -241,6 +230,11 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         // AutoMouse
         autoMouse.draw()
+
+        // Star count noStroke()
+        fill(255f, 255f, 255f)
+        textSize(14f)
+        text("Star count: ${starCount}", mouseX.toFloat(), mouseY.toFloat())
     }
 
     override fun mouseClicked() {

@@ -1,7 +1,6 @@
 
 import processing.core.PApplet
 import sketches.polygonal.PolygonalSketch
-import sketches.test.TestSketch
 
 fun main(args: Array<String>) {
     val processingArgs = arrayOf("Sketch")
