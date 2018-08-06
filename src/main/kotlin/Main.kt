@@ -1,10 +1,10 @@
 
 import processing.core.PApplet
-import sketches.polygonal.PolygonalSketch
+import sketches.terrain.TerrainSketch
 
 fun main(args: Array<String>) {
     val processingArgs = arrayOf("Sketch")
-    val sketch = PolygonalSketch()
-//    val sketch = TestSketch()
+//    val sketch = PolygonalSketch()
+    val sketch = TerrainSketch()
     PApplet.runSketch(processingArgs, sketch)
 }
