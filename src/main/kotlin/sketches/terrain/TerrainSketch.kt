@@ -6,6 +6,7 @@ import ddf.minim.Minim
 import ddf.minim.analysis.FFT
 import processing.core.PApplet
 import processing.core.PConstants
+import processing.event.KeyEvent
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
 
@@ -19,6 +20,12 @@ class TerrainSketch : PApplet(), AudioListener {
         fft.forward(p0, p1)
     }
 
+    // region prefs
+
+    var debugEnabled = false
+
+    // endregion
+
     // region Terrain
     val w = 800f
     val h = 800f
@@ -27,8 +34,11 @@ class TerrainSketch : PApplet(), AudioListener {
     var cols = (w / scale).toInt()
     var rows = (h / scale).toInt()
 
+    //    val terrain = Array(rows, { FloatArray(cols) })
     val terrain = Array(rows, { FloatArray(cols) })
-    var flying = 0.06f
+    var musicTerrain = Array(rows, { FloatArray(cols) })
+
+    var flying = 0f
 
     // endregion
 
@@ -76,7 +86,7 @@ class TerrainSketch : PApplet(), AudioListener {
         translate(-w / 2, -h / 2)
 
         regenerate()
-        flying -= 0.1f
+        flying -= 0.05f
 
         for (y in 0 until rows - 1) {
             beginShape(PConstants.TRIANGLE_STRIP)
@@ -91,19 +101,46 @@ class TerrainSketch : PApplet(), AudioListener {
 
         popMatrix()
 
-        fftLogger.draw(12, 12)
+        if (debugEnabled) {
+            drawDebug()
+        }
     }
 
     private fun regenerate() {
+        val buff = musicTerrain.toMutableList()
+        buff.removeAt(buff.size - 1)
+        buff.add(0, FloatArray(cols))
+        for (x in 0 until cols) {
+            if (x < fft.avgSize()) {
+                buff[0][x] = map(fft.getAvg(x), 0f, 80f, 0f, 30f)
+            } else {
+                buff[0][x] = 0f
+            }
+        }
+
+        musicTerrain = buff.toTypedArray()
+
         var yoff = flying
         for (y in 0 until rows) {
             var xoff = 0f
             for (x in 0 until cols) {
-                terrain[y][x] = map(noise(xoff, yoff), 0f, 1f, -20f, 50f)
+                terrain[y][x] = map(noise(xoff, yoff), 0f, 1f, -20f, 50f) + musicTerrain[y][x]
                 xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f)
             }
 
             yoff += 0.2f
+        }
+    }
+
+    private fun drawDebug() {
+        fftLogger.draw(12, 12)
+    }
+
+    override fun keyPressed(event: KeyEvent?) {
+        event?.let {
+            when (event.key) {
+                'd' -> debugEnabled = !debugEnabled
+            }
         }
     }
 }
