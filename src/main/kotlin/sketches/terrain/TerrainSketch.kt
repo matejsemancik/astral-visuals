@@ -85,7 +85,7 @@ class TerrainSketch : PApplet(), AudioListener {
         translate(width.toFloat() / 2, height.toFloat() / 2)
         rotateX(map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f))
 //        rotateZ(rotation)
-//        rotation += 0.001f
+//        rotation += 0.002f
 
         translate(-w / 2, -h / 2)
 
@@ -115,11 +115,10 @@ class TerrainSketch : PApplet(), AudioListener {
         buff.removeAt(buff.size - 1)
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
-            if (x < fft.avgSize()) {
-                buff[0][x] = map(fft.getAvg(x), 0f, 80f, 0f, 20f)
-            } else {
-                buff[0][x] = 0f
-            }
+            val amp = if (x < fft.avgSize()) map(fft.getAvg(x), 0f, 80f, 0f, 20f) else 0f
+
+            buff[0][x] += amp
+            buff[0][cols - x - 1] += amp
         }
 
         musicTerrain = buff.toTypedArray()
