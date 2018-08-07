@@ -49,7 +49,7 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
             val polygon = sketch.createShape()
             polygon.beginShape()
 
-            polygon.fill(0f)
+            polygon.fill(32f, 32f, 32f)
             polygon.stroke(0f, 255f, 100f)
             polygon.strokeWeight(5f)
 
@@ -92,7 +92,7 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
             val polygon = sketch.createShape()
             polygon.beginShape()
 
-            polygon.fill(0f)
+            polygon.fill(32f, 32f, 32f)
             polygon.stroke(0f, 255f, 100f)
             polygon.strokeWeight(5f)
 

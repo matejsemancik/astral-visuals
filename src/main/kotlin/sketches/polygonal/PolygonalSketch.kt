@@ -114,7 +114,7 @@ class PolygonalSketch : PApplet(), AudioListener {
             autoMouse.move()
         }
 
-        background(0f)
+        background(32f, 32f, 32f)
 
         if (debugWindowEnabled) {
             debugWindow()
