@@ -74,7 +74,7 @@ class TerrainSketch : PApplet(), AudioListener {
     override fun draw() {
         background(32f, 32f, 32f)
 
-        starfield.update()
+        starfield.update(4)
         starfield.draw()
 
         stroke(0f, 255f, 100f)
