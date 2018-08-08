@@ -15,7 +15,14 @@ class TerrainSketch : PApplet(), AudioListener {
 
     companion object {
         val MODE_TRIANGLE_STRIP = "MODE_TRIANGLE_STRIP"
-        val MODE_LINES = "MODE_LINES"
+        val MODE_LINES_Z = "MODE_LINES_Z"
+        val MODE_LINES_ZY = "MODE_LINES_ZY"
+
+        val MODES = mapOf(
+                0 to MODE_TRIANGLE_STRIP,
+                1 to MODE_LINES_Z,
+                2 to MODE_LINES_ZY
+        )
     }
 
     override fun samples(p0: FloatArray?) {
@@ -30,7 +37,7 @@ class TerrainSketch : PApplet(), AudioListener {
 
     var debugEnabled = false
     var rotationZEnabled = false
-    var drawMode = MODE_TRIANGLE_STRIP
+    var drawMode = 0
     var rotationX = 0f
     var rotationZ = 0f
 
@@ -115,14 +122,18 @@ class TerrainSketch : PApplet(), AudioListener {
             beginShape(PConstants.TRIANGLE_STRIP)
 
             for (x in 0 until cols) {
-                when (drawMode) {
+                when (MODES[drawMode]) {
                     MODE_TRIANGLE_STRIP -> {
                         vertex(x * scale, y * scale, terrain[y][x])
                         vertex(x * scale, (y + 1) * scale, terrain[y + 1][x])
                     }
 
-                    MODE_LINES -> {
+                    MODE_LINES_Z -> {
                         vertex(x * scale, y * scale, terrain[y][x])
+                    }
+
+                    MODE_LINES_ZY -> {
+                        vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), terrain[y][x])
                     }
                 }
             }
@@ -183,7 +194,7 @@ class TerrainSketch : PApplet(), AudioListener {
         val menuStr = StringBuilder()
                 .append("[d] toggle debug mode").newLine()
                 .append("[r] Z rotation: $rotationZEnabled").newLine()
-                .append("[m] drawing mode: $drawMode")
+                .append("[m] drawing mode: ${MODES[drawMode]}")
                 .toString()
 
         noStroke()
@@ -197,7 +208,12 @@ class TerrainSketch : PApplet(), AudioListener {
             when (event.key) {
                 'd' -> debugEnabled = !debugEnabled
                 'r' -> rotationZEnabled = !rotationZEnabled
-                'm' -> drawMode = if (drawMode == MODE_TRIANGLE_STRIP) MODE_LINES else MODE_TRIANGLE_STRIP
+                'm' -> {
+                    drawMode++
+                    if (drawMode >= MODES.size) {
+                        drawMode = 0
+                    }
+                }
             }
         }
 
