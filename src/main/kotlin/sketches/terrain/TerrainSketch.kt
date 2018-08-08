@@ -16,12 +16,12 @@ class TerrainSketch : PApplet(), AudioListener {
     companion object {
         val MODE_TRIANGLE_STRIP = "MODE_TRIANGLE_STRIP"
         val MODE_LINES_Z = "MODE_LINES_Z"
-        val MODE_LINES_ZY = "MODE_LINES_ZY"
+        val MODE_LINES_Y = "MODE_LINES_Y"
 
         val MODES = mapOf(
                 0 to MODE_TRIANGLE_STRIP,
                 1 to MODE_LINES_Z,
-                2 to MODE_LINES_ZY
+                2 to MODE_LINES_Y
         )
     }
 
@@ -45,8 +45,8 @@ class TerrainSketch : PApplet(), AudioListener {
 
     // region Terrain
     val w = 600f
-    val h = 800f
-    var scale = 18f
+    val h = 720f
+    var scale = 20f
 
     var cols = (w / scale).toInt()
     var rows = (h / scale).toInt()
@@ -101,7 +101,7 @@ class TerrainSketch : PApplet(), AudioListener {
         translate(width.toFloat() / 2, height.toFloat() / 2)
 
         if (mousePressed) {
-            rotationX = map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f)
+            rotationX = map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI * 2, 0f)
         }
 
         if (rotationZEnabled) {
@@ -132,8 +132,8 @@ class TerrainSketch : PApplet(), AudioListener {
                         vertex(x * scale, y * scale, terrain[y][x])
                     }
 
-                    MODE_LINES_ZY -> {
-                        vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), terrain[y][x])
+                    MODE_LINES_Y -> {
+                        vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), 0f)
                     }
                 }
             }
