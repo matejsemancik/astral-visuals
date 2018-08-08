@@ -13,9 +13,9 @@ class FFTLogger(private val sketch: PApplet, private val fft: FFT) {
 
     }
 
-    fun draw(x: Int, y: Int) {
+    fun draw(x: Float, y: Float) {
         sketch.pushMatrix()
-        sketch.translate(x.toFloat(), y.toFloat())
+        sketch.translate(x, y)
         for (i in 0 until fft.avgSize()) {
             // Draw frequency band
             sketch.fill(0f, 255f, 100f)

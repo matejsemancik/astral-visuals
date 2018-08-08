@@ -25,5 +25,5 @@ fun StringBuilder.newLine(): StringBuilder {
     return this
 }
 
-fun PApplet.centerX() = this.width / 2
-fun PApplet.centerY() = this.height / 2
+fun PApplet.centerX() = this.width / 2f
+fun PApplet.centerY() = this.height / 2f

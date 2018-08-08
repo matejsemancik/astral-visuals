@@ -4,6 +4,7 @@ import ddf.minim.AudioInput
 import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.FFT
+import newLine
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.event.KeyEvent
@@ -22,14 +23,16 @@ class TerrainSketch : PApplet(), AudioListener {
 
     // region prefs
 
-    var rotation = 0f
     var debugEnabled = false
+    var rotationZEnabled = false
+    var rotationX = 0f
+    var rotationZ = 0f
 
     // endregion
 
     // region Terrain
-    val w = 600f
-    val h = 600f
+    val w = 800f
+    val h = 900f
     var scale = 18f
 
     var cols = (w / scale).toInt()
@@ -74,7 +77,7 @@ class TerrainSketch : PApplet(), AudioListener {
     override fun draw() {
         background(32f, 32f, 32f)
 
-        starfield.update(4)
+        starfield.update(3)
         starfield.draw()
 
         stroke(0f, 255f, 100f)
@@ -83,9 +86,19 @@ class TerrainSketch : PApplet(), AudioListener {
 
         pushMatrix()
         translate(width.toFloat() / 2, height.toFloat() / 2)
-        rotateX(map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f))
-//        rotateZ(rotation)
-//        rotation += 0.002f
+
+        if (mousePressed) {
+            rotationX = map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f)
+        }
+
+        if (rotationZEnabled) {
+            rotationZ += 0.002f
+        } else {
+            rotationZ = 0f
+        }
+
+        rotateX(rotationX)
+        rotateZ(rotationZ)
 
         translate(-w / 2, -h / 2)
 
@@ -106,7 +119,7 @@ class TerrainSketch : PApplet(), AudioListener {
         popMatrix()
 
         if (debugEnabled) {
-            drawDebug()
+            debugWindow()
         }
     }
 
@@ -135,15 +148,43 @@ class TerrainSketch : PApplet(), AudioListener {
         }
     }
 
-    private fun drawDebug() {
-        fftLogger.draw(12, 12)
+    private fun debugWindow() {
+        // debug values
+        val basicInfoStr = StringBuilder()
+                .append("resolution: ${width}x${height}").newLine()
+                .append("frameRate: ${frameRate.toInt()}").newLine()
+                .append("mouseX: ${mouseX - width / 2}").newLine()
+                .append("mouseY: ${mouseY - height / 2}").newLine()
+                .toString()
+
+        noStroke()
+        fill(0f, 255f, 100f)
+
+        textSize(14f)
+        text(basicInfoStr, 12f, 24f)
+
+        fftLogger.draw(12f, 96f)
+
+        // menu
+        val menuStr = StringBuilder()
+                .append("[d] toggle debug mode").newLine()
+                .append("[r] Z rotation: $rotationZEnabled")
+                .toString()
+
+        noStroke()
+        fill(0f, 255f, 100f)
+        textSize(14f)
+        text(menuStr, 12f, height - menuStr.lines().size * 20f)
     }
 
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             when (event.key) {
                 'd' -> debugEnabled = !debugEnabled
+                'r' -> rotationZEnabled = !rotationZEnabled
             }
         }
+
+        super.keyPressed(event)
     }
 }
