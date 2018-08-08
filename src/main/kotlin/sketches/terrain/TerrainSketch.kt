@@ -13,6 +13,11 @@ import tools.FFTLogger
 
 class TerrainSketch : PApplet(), AudioListener {
 
+    companion object {
+        val MODE_TRIANGLE_STRIP = "MODE_TRIANGLE_STRIP"
+        val MODE_LINES = "MODE_LINES"
+    }
+
     override fun samples(p0: FloatArray?) {
         fft.forward(p0)
     }
@@ -25,14 +30,15 @@ class TerrainSketch : PApplet(), AudioListener {
 
     var debugEnabled = false
     var rotationZEnabled = false
+    var drawMode = MODE_TRIANGLE_STRIP
     var rotationX = 0f
     var rotationZ = 0f
 
     // endregion
 
     // region Terrain
-    val w = 800f
-    val h = 900f
+    val w = 600f
+    val h = 800f
     var scale = 18f
 
     var cols = (w / scale).toInt()
@@ -82,7 +88,7 @@ class TerrainSketch : PApplet(), AudioListener {
 
         stroke(0f, 255f, 100f)
         strokeWeight(1.4f)
-        noFill()
+        fill(32f, 32f, 32f)
 
         pushMatrix()
         translate(width.toFloat() / 2, height.toFloat() / 2)
@@ -109,8 +115,16 @@ class TerrainSketch : PApplet(), AudioListener {
             beginShape(PConstants.TRIANGLE_STRIP)
 
             for (x in 0 until cols) {
-                vertex(x * scale, y * scale, terrain[y][x])
-                vertex(x * scale, (y + 1) * scale, terrain[y + 1][x])
+                when (drawMode) {
+                    MODE_TRIANGLE_STRIP -> {
+                        vertex(x * scale, y * scale, terrain[y][x])
+                        vertex(x * scale, (y + 1) * scale, terrain[y + 1][x])
+                    }
+
+                    MODE_LINES -> {
+                        vertex(x * scale, y * scale, terrain[y][x])
+                    }
+                }
             }
 
             endShape()
@@ -168,7 +182,8 @@ class TerrainSketch : PApplet(), AudioListener {
         // menu
         val menuStr = StringBuilder()
                 .append("[d] toggle debug mode").newLine()
-                .append("[r] Z rotation: $rotationZEnabled")
+                .append("[r] Z rotation: $rotationZEnabled").newLine()
+                .append("[m] drawing mode: $drawMode")
                 .toString()
 
         noStroke()
@@ -182,6 +197,7 @@ class TerrainSketch : PApplet(), AudioListener {
             when (event.key) {
                 'd' -> debugEnabled = !debugEnabled
                 'r' -> rotationZEnabled = !rotationZEnabled
+                'm' -> drawMode = if (drawMode == MODE_TRIANGLE_STRIP) MODE_LINES else MODE_TRIANGLE_STRIP
             }
         }
 
