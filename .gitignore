@@ -1,6 +1,4 @@
 .gradle
 .idea
 build/
-library/
-!library/minim/library
-!library/*.jar
+out/
