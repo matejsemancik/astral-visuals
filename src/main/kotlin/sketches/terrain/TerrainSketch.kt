@@ -1,5 +1,7 @@
 package sketches.terrain
 
+import centerX
+import centerY
 import ddf.minim.AudioInput
 import ddf.minim.AudioListener
 import ddf.minim.Minim
@@ -53,6 +55,7 @@ class TerrainSketch : PApplet(), AudioListener {
     var terrainMode = 0
     var rotationX = 0f
     var rotationZ = 0f
+    var ellSize = 0f
 
     // endregion
 
@@ -106,6 +109,15 @@ class TerrainSketch : PApplet(), AudioListener {
         starfield.update(3)
         starfield.draw()
 
+        pushMatrix()
+        noStroke()
+        fill(0f, 255f, 100f)
+        translate(centerX(), centerY())
+        translate(0f, 0f, -h / 2)
+        ellSize = lerp(ellSize, map(fft.getAvg(1), 0f, 50f, 500f, 600f), 0.4f)
+        ellipse(0f, 0f, ellSize, ellSize)
+        popMatrix()
+
         stroke(0f, 255f, 100f)
         strokeWeight(1.4f)
         fill(32f, 32f, 32f)
@@ -114,7 +126,7 @@ class TerrainSketch : PApplet(), AudioListener {
         translate(width.toFloat() / 2, height.toFloat() / 2)
 
         if (mousePressed) {
-            rotationX = map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI * 2, 0f)
+            rotationX = map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f)
         }
 
         if (rotationZEnabled) {
