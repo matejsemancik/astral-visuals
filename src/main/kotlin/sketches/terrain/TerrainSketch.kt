@@ -14,14 +14,26 @@ import tools.FFTLogger
 class TerrainSketch : PApplet(), AudioListener {
 
     companion object {
-        val MODE_TRIANGLE_STRIP = "MODE_TRIANGLE_STRIP"
-        val MODE_LINES_Z = "MODE_LINES_Z"
-        val MODE_LINES_Y = "MODE_LINES_Y"
+        val RENDER_MODE_TRIANGLE_STRIP = "RENDER_MODE_TRIANGLE_STRIP"
+        val RENDER_MODE_LINES_Z = "RENDER_MODE_LINES_Z"
+        val RENDER_MODE_LINES_Y = "RENDER_MODE_LINES_Y"
 
-        val MODES = mapOf(
-                0 to MODE_TRIANGLE_STRIP,
-                1 to MODE_LINES_Z,
-                2 to MODE_LINES_Y
+        val RENDER_MODES = mapOf(
+                0 to RENDER_MODE_TRIANGLE_STRIP,
+                1 to RENDER_MODE_LINES_Z,
+                2 to RENDER_MODE_LINES_Y
+        )
+
+        val TERRAIN_MODE_BASS_CORNER = "TERRAIN_MODE_BASS_CORNER"
+        val TERRAIN_MODE_BASS_CENTER = "TERRAIN_MODE_BASS_CENTER"
+        val TERRAIN_MODE_BASS_LEFT_ALIGNED = "TERRAIN_MODE_BASS_LEFT_ALIGNED"
+        val TERRAIN_MODE_BASS_RIGHT_ALIGNED = "TERRAIN_MODE_BASS_RIGHT_ALIGNED"
+
+        val TERRAIN_MODES = mapOf(
+                0 to TERRAIN_MODE_BASS_CORNER,
+                1 to TERRAIN_MODE_BASS_CENTER,
+                2 to TERRAIN_MODE_BASS_LEFT_ALIGNED,
+                3 to TERRAIN_MODE_BASS_RIGHT_ALIGNED
         )
     }
 
@@ -38,14 +50,15 @@ class TerrainSketch : PApplet(), AudioListener {
     var debugEnabled = false
     var rotationZEnabled = false
     var drawMode = 0
+    var terrainMode = 0
     var rotationX = 0f
     var rotationZ = 0f
 
     // endregion
 
     // region Terrain
-    val w = 600f
-    val h = 720f
+    val w = 720f
+    val h = 900f
     var scale = 20f
 
     var cols = (w / scale).toInt()
@@ -122,17 +135,17 @@ class TerrainSketch : PApplet(), AudioListener {
             beginShape(PConstants.TRIANGLE_STRIP)
 
             for (x in 0 until cols) {
-                when (MODES[drawMode]) {
-                    MODE_TRIANGLE_STRIP -> {
+                when (RENDER_MODES[drawMode]) {
+                    RENDER_MODE_TRIANGLE_STRIP -> {
                         vertex(x * scale, y * scale, terrain[y][x])
                         vertex(x * scale, (y + 1) * scale, terrain[y + 1][x])
                     }
 
-                    MODE_LINES_Z -> {
+                    RENDER_MODE_LINES_Z -> {
                         vertex(x * scale, y * scale, terrain[y][x])
                     }
 
-                    MODE_LINES_Y -> {
+                    RENDER_MODE_LINES_Y -> {
                         vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), 0f)
                     }
                 }
@@ -155,8 +168,33 @@ class TerrainSketch : PApplet(), AudioListener {
         for (x in 0 until cols) {
             val amp = if (x < fft.avgSize()) map(fft.getAvg(x), 0f, 80f, 0f, 20f) else 0f
 
-            buff[0][x] += amp
-            buff[0][cols - x - 1] += amp
+            when (TERRAIN_MODES[terrainMode]) {
+                TERRAIN_MODE_BASS_CORNER -> {
+                    buff[0][x] += amp
+                    buff[0][cols - x - 1] += amp
+                }
+
+                TERRAIN_MODE_BASS_CENTER -> {
+                    if (x < cols / 2) {
+                        buff[0][x + cols / 2] += amp
+                        buff[0][(cols / 2) - x] += amp
+                    }
+                }
+
+                TERRAIN_MODE_BASS_LEFT_ALIGNED -> {
+                    buff[0][x] += amp
+                    if (x < cols / 2) {
+                        buff[0][x + cols / 2] += amp
+                    }
+                }
+
+                TERRAIN_MODE_BASS_RIGHT_ALIGNED -> {
+                    buff[0][cols - x - 1] += amp
+                    if (x < cols / 2) {
+                        buff[0][(cols / 2) - x] += amp
+                    }
+                }
+            }
         }
 
         musicTerrain = buff.toTypedArray()
@@ -194,7 +232,8 @@ class TerrainSketch : PApplet(), AudioListener {
         val menuStr = StringBuilder()
                 .append("[d] toggle debug mode").newLine()
                 .append("[r] Z rotation: $rotationZEnabled").newLine()
-                .append("[m] drawing mode: ${MODES[drawMode]}")
+                .append("[m] drawing mode: ${RENDER_MODES[drawMode]}").newLine()
+                .append("[t] terrain mode: ${TERRAIN_MODES[terrainMode]}")
                 .toString()
 
         noStroke()
@@ -210,8 +249,14 @@ class TerrainSketch : PApplet(), AudioListener {
                 'r' -> rotationZEnabled = !rotationZEnabled
                 'm' -> {
                     drawMode++
-                    if (drawMode >= MODES.size) {
+                    if (drawMode >= RENDER_MODES.size) {
                         drawMode = 0
+                    }
+                }
+                't' -> {
+                    terrainMode++
+                    if (terrainMode >= TERRAIN_MODES.size) {
+                        terrainMode = 0
                     }
                 }
             }
