@@ -2,6 +2,8 @@ package sketches.terrain
 
 import centerX
 import centerY
+import controlP5.ControlP5
+import controlP5.Slider2D
 import ddf.minim.AudioInput
 import ddf.minim.AudioListener
 import ddf.minim.Minim
@@ -13,12 +15,14 @@ import processing.event.KeyEvent
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
 
-class TerrainSketch : PApplet(), AudioListener {
+class TerrainSketch : PApplet(), AudioListener, PConstants {
 
     companion object {
-        val RENDER_MODE_TRIANGLE_STRIP = "RENDER_MODE_TRIANGLE_STRIP"
-        val RENDER_MODE_LINES_Z = "RENDER_MODE_LINES_Z"
-        val RENDER_MODE_LINES_Y = "RENDER_MODE_LINES_Y"
+        const val PADDING = 12f
+
+        const val RENDER_MODE_TRIANGLE_STRIP = "RENDER_MODE_TRIANGLE_STRIP"
+        const val RENDER_MODE_LINES_Z = "RENDER_MODE_LINES_Z"
+        const val RENDER_MODE_LINES_Y = "RENDER_MODE_LINES_Y"
 
         val RENDER_MODES = mapOf(
                 0 to RENDER_MODE_TRIANGLE_STRIP,
@@ -26,10 +30,10 @@ class TerrainSketch : PApplet(), AudioListener {
                 2 to RENDER_MODE_LINES_Y
         )
 
-        val TERRAIN_MODE_BASS_CORNER = "TERRAIN_MODE_BASS_CORNER"
-        val TERRAIN_MODE_BASS_CENTER = "TERRAIN_MODE_BASS_CENTER"
-        val TERRAIN_MODE_BASS_LEFT_ALIGNED = "TERRAIN_MODE_BASS_LEFT_ALIGNED"
-        val TERRAIN_MODE_BASS_RIGHT_ALIGNED = "TERRAIN_MODE_BASS_RIGHT_ALIGNED"
+        const val TERRAIN_MODE_BASS_CORNER = "TERRAIN_MODE_BASS_CORNER"
+        const val TERRAIN_MODE_BASS_CENTER = "TERRAIN_MODE_BASS_CENTER"
+        const val TERRAIN_MODE_BASS_LEFT_ALIGNED = "TERRAIN_MODE_BASS_LEFT_ALIGNED"
+        const val TERRAIN_MODE_BASS_RIGHT_ALIGNED = "TERRAIN_MODE_BASS_RIGHT_ALIGNED"
 
         val TERRAIN_MODES = mapOf(
                 0 to TERRAIN_MODE_BASS_CORNER,
@@ -49,46 +53,53 @@ class TerrainSketch : PApplet(), AudioListener {
 
     // region prefs
 
-    var debugEnabled = false
-    var rotationZEnabled = false
-    var drawMode = 0
-    var terrainMode = 0
-    var rotationX = 0f
-    var rotationZ = 0f
-    var ellSize = 0f
+    private var debugEnabled = false
+    private var rotationZEnabled = false
+    private var drawMode = 0
+    private var terrainMode = 0
+    private var rotationX = 0f
+    private var rotationZ = 0f
+    private var ellSize = 0f
 
     // endregion
 
     // region Terrain
-    val w = 720f
-    val h = 900f
-    var scale = 20f
+    private val w = 720f
+    private val h = 900f
+    private var scale = 20f
 
-    var cols = (w / scale).toInt()
-    var rows = (h / scale).toInt()
+    private var cols = (w / scale).toInt()
+    private var rows = (h / scale).toInt()
 
     //    val terrain = Array(rows, { FloatArray(cols) })
-    val terrain = Array(rows, { FloatArray(cols) })
-    var musicTerrain = Array(rows, { FloatArray(cols) })
+    private val terrain = Array(rows) { FloatArray(cols) }
+    private var musicTerrain = Array(rows) { FloatArray(cols) }
 
-    var flying = 0f
-
-    // endregion
-
-    // region stars
-
-    lateinit var starfield: Starfield
+    private var flying = 0f
 
     // endregion
 
-    lateinit var minim: Minim
-    lateinit var audioIn: AudioInput
-    lateinit var fft: FFT
-    lateinit var fftLogger: FFTLogger
+    // region other shit
+
+    private lateinit var starfield: Starfield
+
+    // endregion
+
+    // region controls
+
+    private lateinit var control: ControlP5
+    private lateinit var slider2d: Slider2D
+
+    // endregion
+
+    private lateinit var minim: Minim
+    private lateinit var audioIn: AudioInput
+    private lateinit var fft: FFT
+    private lateinit var fftLogger: FFTLogger
 
     override fun settings() {
-        size(1280, 720, PConstants.P3D)
-//        fullScreen(PConstants.P3D)
+        size(1280, 720, P3D)
+//        fullScreen(P3D)
         smooth(4)
     }
 
@@ -101,6 +112,17 @@ class TerrainSketch : PApplet(), AudioListener {
         fftLogger = FFTLogger(this, fft)
 
         starfield = Starfield(this, 800)
+
+        // region controls
+
+        control = ControlP5(this)
+        slider2d = control.addSlider2D("pan")
+                .setPosition(width - 150 - PADDING, 0f + PADDING)
+                .setSize(150, 150)
+                .setMinMax(0f, 100f, PConstants.PI, -100f)
+                .setValue(0f, 0f)
+
+        // endregion
     }
 
     override fun draw() {
@@ -113,8 +135,9 @@ class TerrainSketch : PApplet(), AudioListener {
         noStroke()
         fill(0f, 255f, 100f)
         translate(centerX(), centerY())
-        translate(0f, 0f, -h / 2)
-        ellSize = lerp(ellSize, map(fft.getAvg(1), 0f, 50f, 500f, 600f), 0.4f)
+        translate(0f, 0f, -h / 2 + 50)
+
+        ellSize = lerp(ellSize, map(fft.getAvg(1), 0f, 50f, 500f, 600f), 0.1f)
         ellipse(0f, 0f, ellSize, ellSize)
         popMatrix()
 
@@ -125,9 +148,11 @@ class TerrainSketch : PApplet(), AudioListener {
         pushMatrix()
         translate(width.toFloat() / 2, height.toFloat() / 2)
 
-        if (mousePressed) {
-            rotationX = map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f)
-        }
+//        if (mousePressed) {
+//            rotationX = lerp(rotationX, map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f), 0.1f)
+//        }
+
+        rotationX = lerp(rotationX, slider2d.arrayValue[0], 0.1f)
 
         if (rotationZEnabled) {
             rotationZ += 0.002f
@@ -139,12 +164,13 @@ class TerrainSketch : PApplet(), AudioListener {
         rotateZ(rotationZ)
 
         translate(-w / 2, -h / 2)
+        translate(0f, 0f, slider2d.arrayValue[1])
 
         regenerate()
         flying -= 0.05f
 
         for (y in 0 until rows - 1) {
-            beginShape(PConstants.TRIANGLE_STRIP)
+            beginShape(TRIANGLE_STRIP)
 
             for (x in 0 until cols) {
                 when (RENDER_MODES[drawMode]) {
@@ -226,7 +252,7 @@ class TerrainSketch : PApplet(), AudioListener {
     private fun debugWindow() {
         // debug values
         val basicInfoStr = StringBuilder()
-                .append("resolution: ${width}x${height}").newLine()
+                .append("resolution: ${width}x$height").newLine()
                 .append("frameRate: ${frameRate.toInt()}").newLine()
                 .append("mouseX: ${mouseX - width / 2}").newLine()
                 .append("mouseY: ${mouseY - height / 2}").newLine()
