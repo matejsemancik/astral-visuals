@@ -12,6 +12,8 @@ import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
+import tools.KontrolF1
+import tools.midiRange
 
 class TerrainSketch : PApplet(), AudioListener, PConstants {
 
@@ -69,7 +71,6 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
     private var cols = (w / scale).toInt()
     private var rows = (h / scale).toInt()
 
-    //    val terrain = Array(rows, { FloatArray(cols) })
     private val terrain = Array(rows) { FloatArray(cols) }
     private var musicTerrain = Array(rows) { FloatArray(cols) }
 
@@ -89,6 +90,7 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
     private lateinit var audioIn: AudioInput
     private lateinit var fft: FFT
     private lateinit var fftLogger: FFTLogger
+    private val kontrol = KontrolF1()
 
     override fun settings() {
         size(1280, 720, P3D)
@@ -119,7 +121,12 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         translate(centerX(), centerY())
         translate(0f, 0f, -h / 2 + 50)
 
-        ellSize = lerp(ellSize, map(fft.getAvg(1), 0f, 50f, 500f, 600f), 0.1f)
+        ellSize = lerp(ellSize, map(
+                fft.getAvg(1),
+                0f,
+                50f,
+                500f + kontrol.knob1.midiRange(600f), 600f) + kontrol.knob1.midiRange(600f), 0.2f)
+
         ellipse(0f, 0f, ellSize, ellSize)
         popMatrix()
 
@@ -183,7 +190,7 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         buff.removeAt(buff.size - 1)
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
-            val amp = if (x < fft.avgSize()) map(fft.getAvg(x), 0f, 80f, 0f, 20f) else 0f
+            val amp = if (x < fft.avgSize()) map(fft.getAvg(x), 0f, 80f, 0f, 20f + kontrol.slider1.midiRange(200f)) else 0f
 
             when (TERRAIN_MODES[terrainMode]) {
                 TERRAIN_MODE_BASS_CORNER -> {
@@ -220,7 +227,13 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         for (y in 0 until rows) {
             var xoff = 0f
             for (x in 0 until cols) {
-                terrain[y][x] = map(noise(xoff, yoff), 0f, 1f, -20f, 50f) + musicTerrain[y][x]
+                terrain[y][x] = map(
+                        noise(xoff, yoff),
+                        0f,
+                        1f,
+                        -20f * kontrol.knob2.midiRange(2f),
+                        50f * kontrol.knob2.midiRange(2f)) + musicTerrain[y][x]
+
                 xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f)
             }
 

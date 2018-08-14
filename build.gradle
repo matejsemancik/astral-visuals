@@ -24,6 +24,7 @@ dependencies {
     compile fileTree(dir: 'library/minim/library', include: '*.jar')
     compile fileTree(dir: 'library/serial/library', include: '*.jar')
     compile fileTree(dir: 'library/controlP5/library', include: '*.jar')
+    compile fileTree(dir: 'library/themidibus/library', include: '*.jar')
 //    testCompile group: 'junit', name: 'junit', version: '4.11'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.7"
