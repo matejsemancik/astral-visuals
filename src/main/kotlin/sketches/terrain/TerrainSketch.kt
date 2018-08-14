@@ -2,8 +2,6 @@ package sketches.terrain
 
 import centerX
 import centerY
-import controlP5.ControlP5
-import controlP5.Slider2D
 import ddf.minim.AudioInput
 import ddf.minim.AudioListener
 import ddf.minim.Minim
@@ -85,11 +83,6 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
 
     // endregion
 
-    // region controls
-
-    private lateinit var control: ControlP5
-    private lateinit var slider2d: Slider2D
-
     // endregion
 
     private lateinit var minim: Minim
@@ -112,17 +105,6 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         fftLogger = FFTLogger(this, fft)
 
         starfield = Starfield(this, 800)
-
-        // region controls
-
-        control = ControlP5(this)
-        slider2d = control.addSlider2D("pan")
-                .setPosition(width - 150 - PADDING, 0f + PADDING)
-                .setSize(150, 150)
-                .setMinMax(0f, 100f, PConstants.PI, -100f)
-                .setValue(0f, 0f)
-
-        // endregion
     }
 
     override fun draw() {
@@ -148,11 +130,9 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         pushMatrix()
         translate(width.toFloat() / 2, height.toFloat() / 2)
 
-//        if (mousePressed) {
-//            rotationX = lerp(rotationX, map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f), 0.1f)
-//        }
-
-        rotationX = lerp(rotationX, slider2d.arrayValue[0], 0.1f)
+        if (mousePressed) {
+            rotationX = lerp(rotationX, map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f), 0.1f)
+        }
 
         if (rotationZEnabled) {
             rotationZ += 0.002f
@@ -164,7 +144,6 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         rotateZ(rotationZ)
 
         translate(-w / 2, -h / 2)
-        translate(0f, 0f, slider2d.arrayValue[1])
 
         regenerate()
         flying -= 0.05f
