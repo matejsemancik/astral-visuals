@@ -14,6 +14,8 @@ import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
+import tools.KontrolF1
+import tools.midiRange
 
 class PolygonalSketch : PApplet(), AudioListener {
 
@@ -62,6 +64,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     lateinit var fft: FFT
     lateinit var beatDetect: BeatDetect
     lateinit var autoMouse: AutoMouse
+    val kontrol = KontrolF1()
 
     val audioLevelObservable: PublishSubject<Float> = PublishSubject.create()
     var rmsSum = 0f
@@ -98,6 +101,15 @@ class PolygonalSketch : PApplet(), AudioListener {
     }
 
     override fun draw() {
+        flickerEnabled = kontrol.padsToggle[0][0]
+        scaleByAudioEnabled = kontrol.padsToggle[1][0]
+        centerWeightEnabled = kontrol.padsToggle[2][0]
+        beatDetectEnabled = kontrol.padsToggle[3][0]
+        wiggleEnabled = kontrol.padsToggle[0][1]
+        autoMouseEnabled = kontrol.padsToggle[1][1]
+        starfieldRotationEnabled = kontrol.padsToggle[2][1]
+        starCount = kontrol.knob1.midiRange(400f).toInt()
+
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
 
@@ -126,15 +138,15 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         // Stars
         if (starfieldRotationEnabled) {
-            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f))
-            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f))
+            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f * kontrol.knob2.midiRange(0.0f, 3.0f)))
+            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f * kontrol.knob2.midiRange(0.0f, 3.0f)))
         }
 
-        starCount = map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 400f).toInt()
+//        starCount = map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 400f).toInt()
         starfield1.setCount(starCount)
         starfield2.setCount(starCount)
-        starfield1.update(speed = 2)
-        starfield2.update(speed = 4)
+        starfield1.update(speed = (2 * kontrol.slider1.midiRange(1f, 5f)).toInt())
+        starfield2.update(speed = (4 * kontrol.slider1.midiRange(1f, 5f)).toInt())
         starfield1.draw()
         starfield2.draw()
 
