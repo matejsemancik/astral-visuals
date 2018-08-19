@@ -69,6 +69,8 @@ class KontrolF1 {
     var slider3 = 0
     var slider4 = 0
 
+    var encoder = 0
+
     val padsRaw = arrayOf(
             intArrayOf(0, 0, 0, 0),
             intArrayOf(0, 0, 0, 0),
@@ -87,7 +89,11 @@ class KontrolF1 {
     val midibus = MidiBus(this, "Traktor Kontrol F1 - 1 Input", "Traktor Kontrol F1 - 1 Output")
 
     init {
-        padsRaw.forEach { it.forEach { sendHSV(it, 0, 0, 0) } }
+        for (x in 0..3) {
+            for (y in 0..3) {
+                sendHSV(padCC(x to y), 0, 0, 0)
+            }
+        }
     }
 
     // MidiBus override
@@ -106,6 +112,7 @@ class KontrolF1 {
             SLIDER4 -> slider4 = value
 
             ENCODER -> {
+                encoder = value
                 buttonColorOn = value
 
                 for (x in 0..3) {
