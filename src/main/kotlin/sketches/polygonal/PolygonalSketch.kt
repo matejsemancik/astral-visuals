@@ -51,7 +51,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     var wiggleEnabled = false
     var autoMouseEnabled = true
     var starfieldRotationEnabled = false
-    var starCount = 0
+    var starCount = 400
 
     // endregion
 
@@ -97,6 +97,7 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         starfield1 = Starfield(this, 300)
         starfield2 = Starfield(this, 300)
+
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
     }
 
@@ -108,7 +109,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         wiggleEnabled = kontrol.padsToggle[0][1]
         autoMouseEnabled = kontrol.padsToggle[1][1]
         starfieldRotationEnabled = kontrol.padsToggle[2][1]
-        starCount = kontrol.knob1.midiRange(400f).toInt()
+        starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
 
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
