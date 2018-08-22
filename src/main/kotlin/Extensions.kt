@@ -27,3 +27,7 @@ fun StringBuilder.newLine(): StringBuilder {
 
 fun PApplet.centerX() = this.width / 2f
 fun PApplet.centerY() = this.height / 2f
+
+fun Float.mapp(start: Float, end: Float): Float {
+    return PApplet.map(this, 0f, 1f, start, end)
+}

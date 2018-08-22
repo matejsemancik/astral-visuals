@@ -53,6 +53,10 @@ class PolygonalSketch : PApplet(), AudioListener {
     var starfieldRotationEnabled = false
     var starCount = 400
 
+    var hue = 0f
+    var sat = 255f
+    var bri = 255f
+
     // endregion
 
     lateinit var starfield1: Starfield
@@ -82,6 +86,8 @@ class PolygonalSketch : PApplet(), AudioListener {
     }
 
     override fun setup() {
+        colorMode(HSB, 255f)
+
         minim = Minim(this)
 
         audioIn = minim.getLineIn()
@@ -110,6 +116,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         autoMouseEnabled = kontrol.padsToggle[1][1]
         starfieldRotationEnabled = kontrol.padsToggle[2][1]
         starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
+        hue = kontrol.encoder.midiRange(255f)
 
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
@@ -127,7 +134,7 @@ class PolygonalSketch : PApplet(), AudioListener {
             autoMouse.move()
         }
 
-        background(32f, 32f, 32f)
+        background(0f, 0f, 0f)
 
         if (debugWindowEnabled) {
             debugWindow()
@@ -148,6 +155,8 @@ class PolygonalSketch : PApplet(), AudioListener {
         starfield2.setCount(starCount)
         starfield1.update(speed = (2 * kontrol.slider1.midiRange(1f, 5f)).toInt())
         starfield2.update(speed = (4 * kontrol.slider1.midiRange(1f, 5f)).toInt())
+        starfield1.setColor(hue, sat, bri)
+        starfield2.setColor(hue, sat, bri)
         starfield1.draw()
         starfield2.draw()
 
@@ -168,6 +177,9 @@ class PolygonalSketch : PApplet(), AudioListener {
             } else {
                 scale(0.5f)
             }
+
+            triangloid.setStrokeColor(hue, sat, bri)
+            triangloid.setFillColor(0f, 0f, 0f)
             triangloid.draw()
 
             popMatrix()
@@ -188,7 +200,7 @@ class PolygonalSketch : PApplet(), AudioListener {
                 .toString()
 
         noStroke()
-        fill(0f, 255f, 100f)
+        fill(hue, sat, bri)
 
         textSize(14f)
         text(basicInfoStr, 12f, 24f)
@@ -206,7 +218,7 @@ class PolygonalSketch : PApplet(), AudioListener {
                 .toString()
 
         noStroke()
-        fill(0f, 255f, 100f)
+        fill(hue, sat, bri)
         textSize(14f)
         text(menuStr, 12f, height - menuStr.lines().size * 20f)
 
@@ -216,11 +228,11 @@ class PolygonalSketch : PApplet(), AudioListener {
         translate(12f, 100f)
 
         // audio RMS
-        fill(255f, 255f, 255f)
+        fill(hue, sat, bri)
         rect(0f, 1f * rectHeight, rmsSum * 200, rectHeight.toFloat())
 
         // bass RMS
-        fill(255f, 0f, 0f)
+        fill(hue, sat, bri)
         rect(0f, 2f * rectHeight, bassSum, rectHeight.toFloat())
 
         popMatrix()
@@ -230,11 +242,11 @@ class PolygonalSketch : PApplet(), AudioListener {
         translate(12f, 130f)
         for (i in 0 until fft.avgSize()) {
             // Draw frequency band
-            fill(0f, 255f, 100f)
+            fill(hue, sat, bri)
             rect(0f, i.toFloat() * rectHeight, fft.getAvg(i), rectHeight.toFloat())
 
             // Draw band frequency value
-            fill(255f, 0f, 0f)
+            fill(hue, sat, bri)
             textSize(10f)
             text("${fft.getAverageCenterFrequency(i)} Hz", 0f, i.toFloat() * rectHeight + rectHeight)
         }
@@ -245,7 +257,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         autoMouse.draw()
 
         // Star count noStroke()
-        fill(255f, 255f, 255f)
+        fill(hue, sat, bri)
         textSize(14f)
         text("Star count: ${starCount}", mouseX.toFloat(), mouseY.toFloat())
     }
