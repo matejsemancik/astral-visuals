@@ -15,8 +15,8 @@ class Pad constructor(private val kontrol: KontrolF1, val cc: Int, val x: Int, v
     var state = false
         private set
 
-    var colorOn = PVector(255f, 255f, 255f)
-    var colorOff = PVector(255f, 255f, 0f)
+    var colorOn = PVector(0f, 127f, 127f); private set
+    var colorOff = PVector(0f, 127f, 0f); private set
 
     fun onStateChanged(value: Int) {
         rawState = value
@@ -44,19 +44,21 @@ class Pad constructor(private val kontrol: KontrolF1, val cc: Int, val x: Int, v
         if (state) ledOn() else ledOff()
     }
 
-    fun ledColorOn(hue: Int, sat: Int, bri: Int) {
-        colorOn = PVector(hue.toFloat(), sat.toFloat(), bri.toFloat())
-    }
-
-    fun ledColorOff(hue: Int, sat: Int, bri: Int) {
-        colorOff = PVector(hue.toFloat(), sat.toFloat(), bri.toFloat())
-    }
-
     fun ledOn() {
         kontrol.sendHSV(cc, colorOn.x.toInt(), colorOn.y.toInt(), colorOn.z.toInt())
     }
 
     fun ledOff() {
         kontrol.sendHSV(cc, colorOff.x.toInt(), colorOff.y.toInt(), colorOff.z.toInt())
+    }
+
+    fun setColorOn(hue: Int, sat: Int, bri: Int) {
+        colorOn = PVector(hue.toFloat(), sat.toFloat(), bri.toFloat())
+        invalidate()
+    }
+
+    fun setColorOff(hue: Int, sat: Int, bri: Int) {
+        colorOff = PVector(hue.toFloat(), sat.toFloat(), bri.toFloat())
+        invalidate()
     }
 }
