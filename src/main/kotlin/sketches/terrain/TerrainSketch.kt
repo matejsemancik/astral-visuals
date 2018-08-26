@@ -12,8 +12,8 @@ import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
-import tools.KontrolF1
-import tools.midiRange
+import tools.kontrol.KontrolF1
+import tools.kontrol.midiRange
 
 class TerrainSketch : PApplet(), AudioListener, PConstants {
 

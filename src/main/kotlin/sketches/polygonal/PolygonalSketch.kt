@@ -14,8 +14,9 @@ import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
-import tools.KontrolF1
-import tools.midiRange
+import tools.kontrol.KontrolF1
+import tools.kontrol.Pad
+import tools.kontrol.midiRange
 
 class PolygonalSketch : PApplet(), AudioListener {
 
@@ -76,7 +77,6 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
-//        fullScreen(PConstants.P3D)
         smooth(4)
     }
 
@@ -105,16 +105,22 @@ class PolygonalSketch : PApplet(), AudioListener {
         starfield2 = Starfield(this, 300)
 
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
+
+        kontrol.pad(0, 0).setMode(Pad.Mode.TRIGGER)
+        kontrol.onEncoder { it ->
+            val hue = it
+            kontrol.pads.forEach { it.setColorOn(hue, 255, 255) }
+        }
     }
 
     override fun draw() {
-        flickerEnabled = kontrol.padsToggle[0][0]
-        scaleByAudioEnabled = kontrol.padsToggle[1][0]
-        centerWeightEnabled = kontrol.padsToggle[2][0]
-        beatDetectEnabled = kontrol.padsToggle[3][0]
-        wiggleEnabled = kontrol.padsToggle[0][1]
-        autoMouseEnabled = kontrol.padsToggle[1][1]
-        starfieldRotationEnabled = kontrol.padsToggle[2][1]
+        flickerEnabled = kontrol.pad(0, 0).state
+        scaleByAudioEnabled = kontrol.pad(0, 1).state
+        centerWeightEnabled = kontrol.pad(0, 2).state
+        beatDetectEnabled = kontrol.pad(0, 3).state
+        wiggleEnabled = kontrol.pad(1, 0).state
+        autoMouseEnabled = kontrol.pad(1, 1).state
+        starfieldRotationEnabled = kontrol.pad(1, 2).state
         starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
         hue = kontrol.encoder.midiRange(255f)
 
