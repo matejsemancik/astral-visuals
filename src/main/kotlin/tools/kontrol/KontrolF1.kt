@@ -56,7 +56,7 @@ class KontrolF1 {
     )
         private set
 
-    var buttonColorOn = 127
+    var onEncoder: (Int) -> Unit = {}
     val midibus = MidiBus(this, "Traktor Kontrol F1 - 1 Input", "Traktor Kontrol F1 - 1 Output")
 
     init {
@@ -81,6 +81,7 @@ class KontrolF1 {
 
             ENCODER -> {
                 encoder = value
+                onEncoder.invoke(value)
             }
         }
 
@@ -96,6 +97,10 @@ class KontrolF1 {
             } else {
                 pads[0]
             }
+
+    fun onEncoder(onEncoder: (Int) -> Unit) {
+        this.onEncoder = onEncoder
+    }
 
     fun sendHSV(cc: Int, hue: Int, sat: Int, brightness: Int) {
         midibus.sendControllerChange(0, cc, hue) // Hue

@@ -15,6 +15,7 @@ import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
 import tools.kontrol.KontrolF1
+import tools.kontrol.Pad
 import tools.kontrol.midiRange
 
 class PolygonalSketch : PApplet(), AudioListener {
@@ -76,7 +77,6 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
-//        fullScreen(PConstants.P3D)
         smooth(4)
     }
 
@@ -105,6 +105,12 @@ class PolygonalSketch : PApplet(), AudioListener {
         starfield2 = Starfield(this, 300)
 
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
+
+        kontrol.pad(0, 0).setMode(Pad.Mode.TRIGGER)
+        kontrol.onEncoder { it ->
+            val hue = it
+            kontrol.pads.forEach { it.setColorOn(hue, 255, 255) }
+        }
     }
 
     override fun draw() {
