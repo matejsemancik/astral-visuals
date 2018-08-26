@@ -12,9 +12,7 @@ class Pad constructor(private val kontrol: KontrolF1, val cc: Int, val x: Int, v
     private var mode = Mode.TOGGLE
     private var rawState = 0
 
-    var state = false
-        private set
-
+    var state = false; private set
     var colorOn = PVector(0f, 127f, 127f); private set
     var colorOff = PVector(0f, 127f, 0f); private set
 
