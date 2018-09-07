@@ -26,7 +26,7 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
     var gain = 1f
     private val ranges = mutableListOf<ClosedFloatingPointRange<Float>>()
 
-    fun addRange(range: ClosedFloatingPointRange<Float>) {
+    fun drawRange(range: ClosedFloatingPointRange<Float>) {
         ranges.add(range)
     }
 

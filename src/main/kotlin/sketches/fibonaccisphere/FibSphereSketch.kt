@@ -16,6 +16,11 @@ class FibSphereSketch : PApplet() {
         const val KMAX_POINTS = 2000
     }
 
+    enum class DrawMode {
+        MODE_1,
+        MODE_2
+    }
+
     val pts = Array(KMAX_POINTS) { SpherePoint(0f, 0f, 0f) }
     var numPoints = 100
     var radius = 0f
@@ -26,6 +31,9 @@ class FibSphereSketch : PApplet() {
     var velocityX = 0f
     var velocityY = 0f
     var pushBack = 0f
+
+    var drawMode = DrawMode.MODE_1
+    var bass = 0f
 
     lateinit var audioProcessor: AudioProcessor
 
@@ -53,13 +61,17 @@ class FibSphereSketch : PApplet() {
     override fun setup() {
         colorMode(HSB, 255f)
         audioProcessor = AudioProcessor(this)
+        audioProcessor.apply {
+            gain = 6f
+            drawRange(30f..200f)
+        }
 
         radius = height / 2f
         sphereDetail(8)
         initSphere(numPoints)
     }
 
-    fun renderGlobe() {
+    fun renderGlobe(mode: DrawMode) {
         pushMatrix()
         translate(centerX(), centerY(), pushBack)
 
@@ -69,16 +81,46 @@ class FibSphereSketch : PApplet() {
         rotateY(yradiusot)
 
         noStroke()
-        fill(110f, 255f, 255f)
+        fill(130f, 255f, 255f)
 
         val radius = (sin(millis() * 0.0005f) * this.radius) / 4f + this.radius / 1.5f
+        val bass = lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
         for (i in 0 until min(numPoints, pts.size)) {
             val pt = pts[i]
             pushMatrix()
-            rotateY(pt.lon)
-            rotateZ(-pt.lat)
-            translate(if (i % 2 == 0) radius else radius / 2f, 0f, 0f)
-            sphere(5f)
+
+            when (mode) {
+                DrawMode.MODE_1 -> {
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    translate(if (i % 2 == 1) {
+                        radius * map(bass, 0f, 300f, 1f, 2f)
+                    } else {
+                        radius * bass / 8f + radius * 2f
+                    }, 0f, 0f)
+
+                    sphere(5f)
+                }
+
+                DrawMode.MODE_2 -> {
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    translate(if (i % 2 == 0) {
+                        radius * 1f
+                    } else {
+                        radius * 2f
+                    }, 0f, 0f)
+
+                    if (i % 2 == 0) {
+                        sphere(5f)
+                    } else {
+                        sphere(map(bass, 0f, 300f, 5f, 15f))
+                    }
+                }
+            }
+
             popMatrix()
         }
 
@@ -93,7 +135,7 @@ class FibSphereSketch : PApplet() {
         }
 
         background(0f)
-        renderGlobe()
+        renderGlobe(DrawMode.MODE_1)
 
         rotationX += velocityX
         rotationY += velocityY
