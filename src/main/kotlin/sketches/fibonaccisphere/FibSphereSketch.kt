@@ -7,7 +7,7 @@ import processing.core.PConstants
 
 class FibSphereSketch : PApplet() {
 
-    data class SpherePoint(val lat: Float, val lon: Float)
+    data class SpherePoint(val lat: Float, val lon: Float, val radius: Float)
 
     companion object {
         val PHI = (PApplet.sqrt(5f) + 1f) / 2f - 1f
@@ -15,7 +15,7 @@ class FibSphereSketch : PApplet() {
         const val KMAX_POINTS = 2000
     }
 
-    val pts = Array(KMAX_POINTS) { SpherePoint(0f, 0f) }
+    val pts = Array(KMAX_POINTS) { SpherePoint(0f, 0f, 0f) }
     var numPoints = 100
     var radius = 0f
     var addPoints = false
@@ -39,7 +39,7 @@ class FibSphereSketch : PApplet() {
             // Convert dome height (which is proportional to surface area) to latitude
             val lat = asin(-1 + 2 * i / num.toFloat())
 
-            pts[i] = SpherePoint(lat, lon)
+            pts[i] = SpherePoint(lat, lon, radius)
         }
     }
 
@@ -49,7 +49,7 @@ class FibSphereSketch : PApplet() {
 
     override fun setup() {
         colorMode(HSB, 255f)
-        radius = 0.8f * height / 2f
+        radius = height / 2f
         sphereDetail(8)
         initSphere(numPoints)
     }
@@ -59,19 +59,20 @@ class FibSphereSketch : PApplet() {
         translate(centerX(), centerY(), pushBack)
 
         val xradiusot = radians(-rotationX)
-        val yradiusot = radians(270 + rotationY)
+        val yradiusot = radians(270 + rotationY + millis() * .06f)
         rotateX(xradiusot)
         rotateY(yradiusot)
 
         noStroke()
         fill(110f, 255f, 255f)
 
+        val radius = (sin(millis() * 0.0005f) * this.radius) / 4f + this.radius / 1.5f
         for (i in 0 until min(numPoints, pts.size)) {
             val pt = pts[i]
             pushMatrix()
             rotateY(pt.lon)
             rotateZ(-pt.lat)
-            translate(radius, 0f, 0f)
+            translate(if (i % 2 == 0) radius else radius / 2f, 0f, 0f)
             sphere(5f)
             popMatrix()
         }
