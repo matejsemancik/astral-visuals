@@ -4,6 +4,7 @@ import centerX
 import centerY
 import processing.core.PApplet
 import processing.core.PConstants
+import tools.audio.AudioProcessor
 
 class FibSphereSketch : PApplet() {
 
@@ -25,6 +26,8 @@ class FibSphereSketch : PApplet() {
     var velocityX = 0f
     var velocityY = 0f
     var pushBack = 0f
+
+    lateinit var audioProcessor: AudioProcessor
 
     fun initSphere(num: Int) {
         for (i in 0 until num) {
@@ -49,6 +52,8 @@ class FibSphereSketch : PApplet() {
 
     override fun setup() {
         colorMode(HSB, 255f)
+        audioProcessor = AudioProcessor(this)
+
         radius = height / 2f
         sphereDetail(8)
         initSphere(numPoints)
@@ -98,6 +103,8 @@ class FibSphereSketch : PApplet() {
 
         velocityX += (mouseY - pmouseY) * 0.02f
         velocityY += (mouseX - pmouseX) * 0.02f
+
+        audioProcessor.drawDebug()
     }
 
     override fun mouseClicked() {
