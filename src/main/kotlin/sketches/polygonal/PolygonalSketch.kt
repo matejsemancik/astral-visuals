@@ -54,7 +54,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     var starfieldRotationEnabled = false
     var starCount = 400
 
-    var hue = 0f
+    var hue = 130f
     var sat = 255f
     var bri = 255f
 
@@ -86,7 +86,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     }
 
     override fun setup() {
-        colorMode(HSB, 255f)
+        colorMode(HSB, 360f, 100f, 100f)
 
         minim = Minim(this)
 
@@ -114,15 +114,15 @@ class PolygonalSketch : PApplet(), AudioListener {
     }
 
     override fun draw() {
-        flickerEnabled = kontrol.pad(0, 0).state
-        scaleByAudioEnabled = kontrol.pad(0, 1).state
-        centerWeightEnabled = kontrol.pad(0, 2).state
-        beatDetectEnabled = kontrol.pad(0, 3).state
-        wiggleEnabled = kontrol.pad(1, 0).state
-        autoMouseEnabled = kontrol.pad(1, 1).state
-        starfieldRotationEnabled = kontrol.pad(1, 2).state
-        starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
-        hue = kontrol.encoder.midiRange(255f)
+//        flickerEnabled = kontrol.pad(0, 0).state
+//        scaleByAudioEnabled = kontrol.pad(0, 1).state
+//        centerWeightEnabled = kontrol.pad(0, 2).state
+//        beatDetectEnabled = kontrol.pad(0, 3).state
+//        wiggleEnabled = kontrol.pad(1, 0).state
+//        autoMouseEnabled = kontrol.pad(1, 1).state
+//        starfieldRotationEnabled = kontrol.pad(1, 2).state
+//        starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
+//        hue = kontrol.encoder.midiRange(255f)
 
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
@@ -140,7 +140,7 @@ class PolygonalSketch : PApplet(), AudioListener {
             autoMouse.move()
         }
 
-        background(0f, 0f, 0f)
+        background(258f, 84f, 25f)
 
         if (debugWindowEnabled) {
             debugWindow()
@@ -185,7 +185,7 @@ class PolygonalSketch : PApplet(), AudioListener {
             }
 
             triangloid.setStrokeColor(hue, sat, bri)
-            triangloid.setFillColor(0f, 0f, 0f)
+            triangloid.setFillColor(258f, 84f, 25f)
             triangloid.draw()
 
             popMatrix()
