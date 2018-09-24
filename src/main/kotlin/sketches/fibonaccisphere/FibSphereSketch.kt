@@ -32,7 +32,7 @@ class FibSphereSketch : PApplet() {
     var velocityY = 0f
     var pushBack = 0f
 
-    var drawMode = DrawMode.MODE_1
+    var drawMode = DrawMode.MODE_2
     var bass = 0f
 
     lateinit var audioProcessor: AudioProcessor
@@ -59,10 +59,10 @@ class FibSphereSketch : PApplet() {
     }
 
     override fun setup() {
-        colorMode(HSB, 255f)
+        colorMode(HSB, 360f, 100f, 100f)
         audioProcessor = AudioProcessor(this)
         audioProcessor.apply {
-            gain = 6f
+            gain = 1f
             drawRange(30f..200f)
         }
 
@@ -81,7 +81,7 @@ class FibSphereSketch : PApplet() {
         rotateY(yradiusot)
 
         noStroke()
-        fill(130f, 255f, 255f)
+        fill(110f, 255f, 255f)
 
         val radius = (sin(millis() * 0.0005f) * this.radius) / 4f + this.radius / 1.5f
         val bass = lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
@@ -134,7 +134,7 @@ class FibSphereSketch : PApplet() {
             initSphere(numPoints)
         }
 
-        background(0f)
+        background(12f, 98f, 49f)
         renderGlobe(DrawMode.MODE_1)
 
         rotationX += velocityX
