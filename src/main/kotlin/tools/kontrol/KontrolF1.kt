@@ -1,6 +1,5 @@
 package tools.kontrol
 
-import processing.core.PApplet
 import themidibus.MidiBus
 
 class KontrolF1 {
@@ -57,9 +56,10 @@ class KontrolF1 {
         private set
 
     var onEncoder: (Int) -> Unit = {}
-    val midibus = MidiBus(this, "Traktor Kontrol F1 - 1 Input", "Traktor Kontrol F1 - 1 Output")
+    lateinit var midibus: MidiBus
 
-    init {
+    fun connect() {
+        midibus = MidiBus(this, "Traktor Kontrol F1 - 1 Input", "Traktor Kontrol F1 - 1 Output")
         pads.forEach { it.ledOff() }
     }
 
@@ -119,12 +119,4 @@ class KontrolF1 {
     }
 
     // endregion
-}
-
-fun Int.midiRange(start: Float, end: Float): Float {
-    return PApplet.map(this.toFloat(), 0f, 127f, start, end)
-}
-
-fun Int.midiRange(top: Float): Float {
-    return this.midiRange(0f, top)
 }
