@@ -6,6 +6,7 @@ import ddf.minim.AudioInput
 import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.FFT
+import midiRange
 import newLine
 import processing.core.PApplet
 import processing.core.PConstants
@@ -13,7 +14,6 @@ import processing.event.KeyEvent
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
 import tools.kontrol.KontrolF1
-import tools.kontrol.midiRange
 
 class TerrainSketch : PApplet(), AudioListener, PConstants {
 
@@ -121,14 +121,6 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         translate(centerX(), centerY())
         translate(0f, 0f, -h / 2 + 50)
 
-        ellSize = lerp(ellSize, map(
-                fft.getAvg(1),
-                0f,
-                50f,
-                500f + kontrol.knob1.midiRange(600f), 600f) + kontrol.knob1.midiRange(600f), 0.2f)
-
-        ellipse(0f, 0f, ellSize, ellSize)
-        popMatrix()
 
         stroke(0f, 255f, 100f)
         strokeWeight(1.4f)
