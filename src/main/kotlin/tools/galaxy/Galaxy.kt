@@ -1,6 +1,7 @@
 package tools.galaxy
 
 import themidibus.MidiBus
+import tools.galaxy.controls.Joystick
 
 class Galaxy {
 

@@ -16,7 +16,6 @@ import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
 import tools.galaxy.Galaxy
-import tools.kontrol.KontrolF1
 
 class PolygonalSketch : PApplet(), AudioListener {
 
@@ -69,7 +68,6 @@ class PolygonalSketch : PApplet(), AudioListener {
     lateinit var audioIn: AudioInput
     lateinit var fft: FFT
     lateinit var beatDetect: BeatDetect
-    val kontrol = KontrolF1()
     val galaxy = Galaxy()
 
     val audioLevelObservable: PublishSubject<Float> = PublishSubject.create()
@@ -106,14 +104,6 @@ class PolygonalSketch : PApplet(), AudioListener {
         starfield2 = Starfield(this, 300)
 
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
-
-//        kontrol.connect()
-//        kontrol.pad(0, 0).setMode(Pad.Mode.TRIGGER)
-//        kontrol.onEncoder { it ->
-//            val hue = it
-//            kontrol.pads.forEach { it.setColorOn(hue, 255, 255) }
-//        }
-
         galaxy.connect()
     }
 
@@ -198,7 +188,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         }
 
         pushMatrix()
-        translate(centerX().toFloat(), centerY().toFloat())
+        translate(centerX(), centerY())
         popMatrix()
     }
 

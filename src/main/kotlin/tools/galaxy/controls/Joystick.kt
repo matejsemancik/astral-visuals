@@ -1,4 +1,4 @@
-package tools.galaxy
+package tools.galaxy.controls
 
 import midiRange
 import themidibus.MidiBus
