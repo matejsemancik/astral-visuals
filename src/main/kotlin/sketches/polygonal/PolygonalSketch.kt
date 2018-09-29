@@ -39,18 +39,6 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     // endregion
 
-    // region TouchOSC
-
-    val galaxy = Galaxy()
-    lateinit var joystick: Joystick
-    lateinit var regenerateButton: PushButton
-    lateinit var beatDetectButton: ToggleButton
-    lateinit var starSpeedPot: Pot
-    lateinit var starCountPot: Pot
-    lateinit var starfieldRotationPot: Pot
-
-    // endregion
-
     // region params
 
     var starSpeed = 1f
@@ -68,6 +56,18 @@ class PolygonalSketch : PApplet(), AudioListener {
     var hue = 130f
     var sat = 255f
     var bri = 255f
+
+    // endregion
+
+    // region TouchOSC
+
+    val galaxy = Galaxy()
+    lateinit var joystick: Joystick
+    lateinit var regenerateButton: PushButton
+    lateinit var beatDetectButton: ToggleButton
+    lateinit var starSpeedPot: Pot
+    lateinit var starCountPot: Pot
+    lateinit var starfieldRotationPot: Pot
 
     // endregion
 
@@ -138,7 +138,6 @@ class PolygonalSketch : PApplet(), AudioListener {
         vx *= 0.95f
         vy *= 0.95f
         beatDetectEnabled = beatDetectButton.isPressed
-
 
 //        flickerEnabled = kontrol.pad(0, 0).state
 //        scaleByAudioEnabled = kontrol.pad(0, 1).state
@@ -212,6 +211,10 @@ class PolygonalSketch : PApplet(), AudioListener {
         pushMatrix()
         translate(centerX(), centerY())
         popMatrix()
+
+        if (beatDetectButton.isPressed) {
+            saveFrame("render/frame_####.tif")
+        }
     }
 
     fun debugWindow() {
