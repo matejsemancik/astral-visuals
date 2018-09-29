@@ -7,7 +7,6 @@ import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import midiRange
 import newLine
 import processing.core.PApplet
 import processing.core.PConstants
@@ -16,6 +15,7 @@ import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
 import tools.galaxy.Galaxy
 import tools.galaxy.controls.Joystick
+import tools.galaxy.controls.Pot
 import tools.galaxy.controls.PushButton
 import tools.galaxy.controls.ToggleButton
 
@@ -45,6 +45,9 @@ class PolygonalSketch : PApplet(), AudioListener {
     lateinit var joystick: Joystick
     lateinit var regenerateButton: PushButton
     lateinit var beatDetectButton: ToggleButton
+    lateinit var starSpeedPot: Pot
+    lateinit var starCountPot: Pot
+    lateinit var starfieldRotationPot: Pot
 
     // endregion
 
@@ -54,7 +57,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     var starCount = 400
     var starfieldRotation = 0f
     var shouldRegenerate = false
-    var beatDetectEnabled = true
+    var beatDetectEnabled = false
     var debugWindowEnabled = true // TODO midi
     var flickerEnabled = false // TODO midi
     var scaleByAudioEnabled = false // TODO midi
@@ -116,6 +119,9 @@ class PolygonalSketch : PApplet(), AudioListener {
         joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
         regenerateButton = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
         beatDetectButton = galaxy.createToggleButton(0, 7, beatDetectEnabled)
+        starSpeedPot = galaxy.createPot(0, 3, 1f, 5f, starSpeed)
+        starCountPot = galaxy.createPot(0, 4, 0f, 400f, starCount.toFloat())
+        starfieldRotationPot = galaxy.createPot(0, 5, 0f, 3f, starfieldRotation)
     }
 
     override fun draw() {
@@ -124,9 +130,9 @@ class PolygonalSketch : PApplet(), AudioListener {
             shouldRegenerate = false
         }
 
-        starSpeed = galaxy.fader3.midiRange(1f, 5f)
-        starCount = lerp(starCount.toFloat(), galaxy.pot4.midiRange(0f, 400f), 0.1f).toInt()
-        starfieldRotation = galaxy.pot5.midiRange(0f, 3f)
+        starSpeed = starSpeedPot.value
+        starCount = lerp(starCount.toFloat(), starCountPot.value, 0.1f).toInt()
+        starfieldRotation = starfieldRotationPot.value
         vx += joystick.x * .01f
         vy += joystick.y * .01f
         vx *= 0.95f

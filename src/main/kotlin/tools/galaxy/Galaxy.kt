@@ -2,15 +2,13 @@ package tools.galaxy
 
 import themidibus.MidiBus
 import tools.galaxy.controls.Joystick
+import tools.galaxy.controls.Pot
 import tools.galaxy.controls.PushButton
 import tools.galaxy.controls.ToggleButton
 
 class Galaxy {
 
     lateinit var midiBus: MidiBus
-    var fader3 = 0
-    var pot4 = 0
-    var pot5 = 0
 
     fun connect() {
         midiBus = MidiBus(this, "TouchOSC Bridge", "TouchOSC Bridge")
@@ -26,15 +24,10 @@ class Galaxy {
     fun createToggleButton(channel: Int, cc: Int, defaultValue: Boolean = false) =
             ToggleButton(midiBus, channel, cc, defaultValue)
 
+    fun createPot(channel: Int, cc: Int, min: Float = 0f, max: Float = 1f, initialValue: Float = 0f) =
+            Pot(midiBus, channel, cc, min, max, initialValue)
+
     fun controllerChange(channel: Int, cc: Int, value: Int) {
         println("channel: $channel cc: $cc value: $value")
-
-        if (channel == 0) {
-            when (cc) {
-                3 -> fader3 = value
-                4 -> pot4 = value
-                5 -> pot5 = value
-            }
-        }
     }
 }
