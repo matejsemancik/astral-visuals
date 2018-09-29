@@ -3,6 +3,7 @@ package tools.galaxy
 import themidibus.MidiBus
 import tools.galaxy.controls.Joystick
 import tools.galaxy.controls.PushButton
+import tools.galaxy.controls.ToggleButton
 
 class Galaxy {
 
@@ -21,6 +22,9 @@ class Galaxy {
 
     fun createPushButton(channel: Int, cc: Int, onPress: () -> Unit) =
             PushButton(midiBus, channel, cc, onPress)
+
+    fun createToggleButton(channel: Int, cc: Int, defaultValue: Boolean = false) =
+            ToggleButton(midiBus, channel, cc, defaultValue)
 
     fun controllerChange(channel: Int, cc: Int, value: Int) {
         println("channel: $channel cc: $cc value: $value")

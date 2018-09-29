@@ -17,6 +17,7 @@ import sketches.polygonal.star.Starfield
 import tools.galaxy.Galaxy
 import tools.galaxy.controls.Joystick
 import tools.galaxy.controls.PushButton
+import tools.galaxy.controls.ToggleButton
 
 class PolygonalSketch : PApplet(), AudioListener {
 
@@ -43,22 +44,23 @@ class PolygonalSketch : PApplet(), AudioListener {
     val galaxy = Galaxy()
     lateinit var joystick: Joystick
     lateinit var regenerateButton: PushButton
-    var shouldRegenerate = false
+    lateinit var beatDetectButton: ToggleButton
 
     // endregion
 
-    // region modes
+    // region params
 
-    var debugWindowEnabled = true
-    var flickerEnabled = false
-    var scaleByAudioEnabled = false
-    var centerWeightEnabled = false
-    var beatDetectEnabled = true
-    var wiggleEnabled = false
-    var starfieldRotationEnabled = true
     var starSpeed = 1f
     var starCount = 400
     var starfieldRotation = 0f
+    var shouldRegenerate = false
+    var beatDetectEnabled = true
+    var debugWindowEnabled = true // TODO midi
+    var flickerEnabled = false // TODO midi
+    var scaleByAudioEnabled = false // TODO midi
+    var centerWeightEnabled = false // TODO midi
+    var wiggleEnabled = false // TODO midi
+    var starfieldRotationEnabled = true // TODO midi
 
     var hue = 130f
     var sat = 255f
@@ -112,9 +114,8 @@ class PolygonalSketch : PApplet(), AudioListener {
         // TouchOSC
         galaxy.connect()
         joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
-        regenerateButton = galaxy.createPushButton(0, 6) {
-            shouldRegenerate = true
-        }
+        regenerateButton = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
+        beatDetectButton = galaxy.createToggleButton(0, 7, beatDetectEnabled)
     }
 
     override fun draw() {
@@ -130,11 +131,12 @@ class PolygonalSketch : PApplet(), AudioListener {
         vy += joystick.y * .01f
         vx *= 0.95f
         vy *= 0.95f
+        beatDetectEnabled = beatDetectButton.isPressed
+
 
 //        flickerEnabled = kontrol.pad(0, 0).state
 //        scaleByAudioEnabled = kontrol.pad(0, 1).state
 //        centerWeightEnabled = kontrol.pad(0, 2).state
-//        beatDetectEnabled = kontrol.pad(0, 3).state
 //        wiggleEnabled = kontrol.pad(1, 0).state
 //        autoMouseEnabled = kontrol.pad(1, 1).state
 //        starfieldRotationEnabled = kontrol.pad(1, 2).state
