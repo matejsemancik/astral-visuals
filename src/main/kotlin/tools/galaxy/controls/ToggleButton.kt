@@ -1,7 +1,7 @@
 package tools.galaxy.controls
 
 import themidibus.MidiBus
-import themidibus.SimpleMidiListener
+import tools.galaxy.SimpleMidiListenerAdapter
 
 class ToggleButton internal constructor(
         private val midiBus: MidiBus,
@@ -16,11 +16,7 @@ class ToggleButton internal constructor(
         isPressed = defaultValue
         midiBus.sendControllerChange(ch, cc, if (isPressed) 127 else 0)
 
-        midiBus.addMidiListener(object : SimpleMidiListener {
-            override fun noteOn(p0: Int, p1: Int, p2: Int) = Unit
-
-            override fun noteOff(p0: Int, p1: Int, p2: Int) = Unit
-
+        midiBus.addMidiListener(object : SimpleMidiListenerAdapter() {
             override fun controllerChange(channel: Int, control: Int, v: Int) {
                 if (channel == ch && control == cc) {
                     isPressed = v == 127
