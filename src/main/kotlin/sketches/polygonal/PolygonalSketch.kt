@@ -7,7 +7,6 @@ import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import io.reactivex.subjects.PublishSubject
 import midiRange
 import newLine
 import processing.core.PApplet
@@ -16,28 +15,35 @@ import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
 import tools.galaxy.Galaxy
+import tools.galaxy.controls.Joystick
+import tools.galaxy.controls.PushButton
 
 class PolygonalSketch : PApplet(), AudioListener {
-
-    // region AudioListener for input signal
 
     companion object {
         const val NUMBER_ASTEROIDS = 3
     }
 
+    // region AudioListener for input signal
+
     override fun samples(p0: FloatArray?) {
         beatDetect.detect(audioIn.mix)
         fft.forward(audioIn.mix)
-
-        audioLevelObservable.onNext(audioIn.mix.level())
     }
 
     override fun samples(p0: FloatArray?, p1: FloatArray?) {
         beatDetect.detect(audioIn.mix)
         fft.forward(audioIn.mix)
-
-        audioLevelObservable.onNext(audioIn.mix.level())
     }
+
+    // endregion
+
+    // region TouchOSC
+
+    val galaxy = Galaxy()
+    lateinit var joystick: Joystick
+    lateinit var regenerateButton: PushButton
+    var shouldRegenerate = false
 
     // endregion
 
@@ -47,7 +53,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     var flickerEnabled = false
     var scaleByAudioEnabled = false
     var centerWeightEnabled = false
-    var beatDetectEnabled = false
+    var beatDetectEnabled = true
     var wiggleEnabled = false
     var starfieldRotationEnabled = true
     var starSpeed = 1f
@@ -68,9 +74,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     lateinit var audioIn: AudioInput
     lateinit var fft: FFT
     lateinit var beatDetect: BeatDetect
-    val galaxy = Galaxy()
 
-    val audioLevelObservable: PublishSubject<Float> = PublishSubject.create()
     var rmsSum = 0f
     var bassSum = 0f
     var vx = 0f
@@ -104,16 +108,26 @@ class PolygonalSketch : PApplet(), AudioListener {
         starfield2 = Starfield(this, 300)
 
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
+
+        // TouchOSC
         galaxy.connect()
+        joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
+        regenerateButton = galaxy.createPushButton(0, 6) {
+            shouldRegenerate = true
+        }
     }
 
     override fun draw() {
+        if (shouldRegenerate) {
+            regenerate()
+            shouldRegenerate = false
+        }
+
         starSpeed = galaxy.fader3.midiRange(1f, 5f)
         starCount = lerp(starCount.toFloat(), galaxy.pot4.midiRange(0f, 400f), 0.1f).toInt()
         starfieldRotation = galaxy.pot5.midiRange(0f, 3f)
-        vx += galaxy.joystick.x * .01f
-        vy += galaxy.joystick.y * .01f
-
+        vx += joystick.x * .01f
+        vy += joystick.y * .01f
         vx *= 0.95f
         vy *= 0.95f
 

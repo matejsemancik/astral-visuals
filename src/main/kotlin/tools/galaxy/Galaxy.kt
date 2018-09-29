@@ -2,20 +2,25 @@ package tools.galaxy
 
 import themidibus.MidiBus
 import tools.galaxy.controls.Joystick
+import tools.galaxy.controls.PushButton
 
 class Galaxy {
 
     lateinit var midiBus: MidiBus
-    lateinit var joystick: Joystick
     var fader3 = 0
     var pot4 = 0
     var pot5 = 0
 
     fun connect() {
         midiBus = MidiBus(this, "TouchOSC Bridge", "TouchOSC Bridge")
-        joystick = Joystick(midiBus, 0, 0, 1, 2).apply { flipped = true }
         println("MidiBus connected")
     }
+
+    fun createJoystick(channel: Int, ccX: Int, ccY: Int, ccTouch: Int): Joystick =
+            Joystick(midiBus, channel, ccX, ccY, ccTouch)
+
+    fun createPushButton(channel: Int, cc: Int, onPress: () -> Unit) =
+            PushButton(midiBus, channel, cc, onPress)
 
     fun controllerChange(channel: Int, cc: Int, value: Int) {
         println("channel: $channel cc: $cc value: $value")

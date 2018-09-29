@@ -4,7 +4,7 @@ import midiRange
 import themidibus.MidiBus
 import themidibus.SimpleMidiListener
 
-class Joystick(
+class Joystick internal constructor(
         private val midiBus: MidiBus,
         private val ch: Int,
         private val ccX: Int,
