@@ -25,6 +25,8 @@ class SketchLoader : PApplet() {
         selectors = mapOf(
                 '0' to blankSketch
                 )
+
+        activeSketch().onBecameActive()
     }
 
     override fun draw() {
