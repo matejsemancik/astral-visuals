@@ -7,6 +7,8 @@ abstract class BaseSketch(open val sketch: PApplet) {
 
     abstract fun setup()
 
+    abstract fun onBecameActive()
+
     abstract fun draw()
 
     open fun keyPressed(event: KeyEvent?) {

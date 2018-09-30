@@ -3,19 +3,13 @@ package sketches
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.event.KeyEvent
-import sketches.test.BlankSketch
-import sketches.test.BlueSketch
-import sketches.test.GreenSketch
-import sketches.test.TestSketch
+import sketches.blank.BlankSketch
 
 class SketchLoader : PApplet() {
 
     private var selector = '0'
     private lateinit var selectors: Map<Char, BaseSketch>
 
-    lateinit var greenSketch: GreenSketch
-    lateinit var blueSketch: BlueSketch
-    lateinit var testSketch: TestSketch
     lateinit var blankSketch: BlankSketch
 
     override fun settings() {
@@ -25,21 +19,12 @@ class SketchLoader : PApplet() {
 
     override fun setup() {
         blankSketch = BlankSketch(this)
-        greenSketch = GreenSketch(this)
-        blueSketch = BlueSketch(this)
-        testSketch = TestSketch(this)
 
         blankSketch.setup()
-        greenSketch.setup()
-        blueSketch.setup()
-        testSketch.setup()
 
         selectors = mapOf(
-                '0' to blankSketch,
-                '1' to greenSketch,
-                '2' to blueSketch,
-                '3' to testSketch
-        )
+                '0' to blankSketch
+                )
     }
 
     override fun draw() {
@@ -47,13 +32,14 @@ class SketchLoader : PApplet() {
     }
 
     private fun activeSketch(): BaseSketch {
-        return selectors.getOrDefault(selector, testSketch)
+        return selectors.getOrDefault(selector, blankSketch)
     }
 
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             if (selectors.keys.contains(it.key)) {
                 selector = it.key
+                activeSketch().onBecameActive()
             } else {
                 activeSketch().keyPressed(event)
             }
