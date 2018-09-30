@@ -6,6 +6,9 @@ import processing.core.PApplet
 import processing.core.PConstants
 import tools.audio.AudioProcessor
 
+/**
+ * Based on https://www.openprocessing.org/sketch/103897
+ */
 class FibSphereSketch : PApplet() {
 
     data class SpherePoint(val lat: Float, val lon: Float, val radius: Float)
