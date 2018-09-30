@@ -25,5 +25,17 @@ fun StringBuilder.newLine(): StringBuilder {
     return this
 }
 
-fun PApplet.centerX() = this.width / 2
-fun PApplet.centerY() = this.height / 2
+fun PApplet.centerX() = this.width / 2f
+fun PApplet.centerY() = this.height / 2f
+
+fun Float.mapp(start: Float, end: Float): Float {
+    return PApplet.map(this, 0f, 1f, start, end)
+}
+
+fun Int.midiRange(start: Float, end: Float): Float {
+    return PApplet.map(this.toFloat(), 0f, 127f, start, end)
+}
+
+fun Int.midiRange(top: Float): Float {
+    return this.midiRange(0f, top)
+}

@@ -2,6 +2,7 @@ package sketches.polygonal.star
 
 import processing.core.PApplet
 import processing.core.PApplet.map
+import processing.core.PVector
 
 class Star(private val sketch: PApplet) {
 
@@ -10,10 +11,11 @@ class Star(private val sketch: PApplet) {
         const val SPEED_DEFAULT = 8
     }
 
-    var x: Float = 0f
-    var y: Float = 0f
-    var z: Float = 0f
-    var pz: Float = 0f
+    private var x: Float = 0f
+    private var y: Float = 0f
+    private var z: Float = 0f
+    private var pz: Float = 0f
+    private var color = PVector(255f, 255f, 255f)
 
     init {
         newLocation()
@@ -44,8 +46,12 @@ class Star(private val sketch: PApplet) {
         pz = z
     }
 
+    fun setColor(a: Float, b: Float, c: Float) {
+        color = PVector(a, b, c)
+    }
+
     fun draw() {
-        sketch.fill(0f, 255f, 100f)
+        sketch.fill(color.x, color.y, color.z)
         sketch.noStroke()
 
         val sx = map(x / z, 0f, 1f, 0f, sketch.width.toFloat())
@@ -56,7 +62,7 @@ class Star(private val sketch: PApplet) {
 
         val px = map(x / pz, 0f, 1f, 0f, sketch.width.toFloat())
         val py = map(y / pz, 0f, 1f, 0f, sketch.height.toFloat())
-        sketch.stroke(0f, 255f, 100f)
+        sketch.stroke(color.x, color.y, color.z)
         sketch.strokeWeight(2f)
         sketch.line(sx, sy, px, py)
         pz = z

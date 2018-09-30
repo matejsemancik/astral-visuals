@@ -11,6 +11,8 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
     private val skeletonVectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
     private val fftAverages = mutableListOf<Float>(0f, 0f, 0f, 0f)
+    private var strokeColor = PVector(255f, 255f, 255f)
+    private var fillColor = PVector(0f, 0f, 0f)
 
     companion object {
         const val NUMBER_VECTORS = 4
@@ -49,7 +51,7 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
             val polygon = sketch.createShape()
             polygon.beginShape()
 
-            polygon.fill(0f)
+            polygon.fill(32f, 32f, 32f)
             polygon.stroke(0f, 255f, 100f)
             polygon.strokeWeight(5f)
 
@@ -65,6 +67,14 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
 
             group.addChild(polygon)
         }
+    }
+
+    fun setStrokeColor(a: Float, b: Float, c: Float) {
+        strokeColor = PVector(a, b, c)
+    }
+
+    fun setFillColor(a: Float, b: Float, c: Float) {
+        fillColor = PVector(a, b, c)
     }
 
     fun draw() {
@@ -92,8 +102,8 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
             val polygon = sketch.createShape()
             polygon.beginShape()
 
-            polygon.fill(0f)
-            polygon.stroke(0f, 255f, 100f)
+            polygon.fill(fillColor.x, fillColor.y, fillColor.z)
+            polygon.stroke(strokeColor.x, strokeColor.y, strokeColor.z)
             polygon.strokeWeight(5f)
 
             val currentVector = shapeVectors[i]

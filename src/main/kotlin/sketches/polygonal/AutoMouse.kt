@@ -4,8 +4,8 @@ import processing.core.PApplet
 import processing.core.PVector
 
 class AutoMouse(private val sketch: PApplet,
-                private val centerX: Int,
-                private val centerY: Int) {
+                private val centerX: Float,
+                private val centerY: Float) {
 
     private val baseVector: PVector = PVector(100f, 0f)
     private var multiplier = 1f
