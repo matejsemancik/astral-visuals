@@ -43,9 +43,9 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     var starSpeed = 1f
     var starCount = 400
-    var starfieldRotation = 0f
+    var starfieldRotation = 2f
     var shouldRegenerate = false
-    var beatDetectEnabled = false
+    var beatDetectEnabled = true
     var debugWindowEnabled = true // TODO midi
     var flickerEnabled = false // TODO midi
     var scaleByAudioEnabled = false // TODO midi
@@ -104,7 +104,7 @@ class PolygonalSketch : PApplet(), AudioListener {
         audioIn.addListener(this)
 
         fft = FFT(audioIn.bufferSize(), audioIn.sampleRate())
-        fft.logAverages(22, 1)
+        fft.logAverages(22, 3)
 
         beatDetect = BeatDetect(audioIn.bufferSize(), audioIn.sampleRate())
         beatDetect.setSensitivity(150)
@@ -211,10 +211,6 @@ class PolygonalSketch : PApplet(), AudioListener {
         pushMatrix()
         translate(centerX(), centerY())
         popMatrix()
-
-        if (beatDetectButton.isPressed) {
-            saveFrame("render/frame_####.tif")
-        }
     }
 
     fun debugWindow() {

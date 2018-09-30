@@ -1,11 +1,11 @@
 
 import processing.core.PApplet
-import sketches.polygonal.PolygonalSketch
+import sketches.fibonaccisphere.FibSphereSketch
 
 fun main(args: Array<String>) {
     val processingArgs = arrayOf("Sketch")
-    val sketch = PolygonalSketch()
+//    val sketch = PolygonalSketch()
 //    val sketch = TerrainSketch()
-//    val sketch = FibSphereSketch()
+    val sketch = FibSphereSketch()
     PApplet.runSketch(processingArgs, sketch)
 }
