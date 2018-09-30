@@ -7,56 +7,67 @@ import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import io.reactivex.subjects.PublishSubject
 import newLine
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
-import tools.kontrol.KontrolF1
-import tools.kontrol.Pad
-import tools.kontrol.midiRange
+import tools.galaxy.Galaxy
+import tools.galaxy.controls.Joystick
+import tools.galaxy.controls.Pot
+import tools.galaxy.controls.PushButton
+import tools.galaxy.controls.ToggleButton
 
 class PolygonalSketch : PApplet(), AudioListener {
-
-    // region AudioListener for input signal
 
     companion object {
         const val NUMBER_ASTEROIDS = 3
     }
 
+    // region AudioListener for input signal
+
     override fun samples(p0: FloatArray?) {
         beatDetect.detect(audioIn.mix)
         fft.forward(audioIn.mix)
-
-        audioLevelObservable.onNext(audioIn.mix.level())
     }
 
     override fun samples(p0: FloatArray?, p1: FloatArray?) {
         beatDetect.detect(audioIn.mix)
         fft.forward(audioIn.mix)
-
-        audioLevelObservable.onNext(audioIn.mix.level())
     }
 
     // endregion
 
-    // region modes
+    // region params
 
-    var debugWindowEnabled = true
-    var flickerEnabled = false
-    var scaleByAudioEnabled = false
-    var centerWeightEnabled = false
-    var beatDetectEnabled = false
-    var wiggleEnabled = false
-    var autoMouseEnabled = true
-    var starfieldRotationEnabled = false
+    var starSpeed = 1f
     var starCount = 400
+    var starfieldRotation = 2f
+    var shouldRegenerate = false
+    var beatDetectEnabled = true
+    var debugWindowEnabled = true // TODO midi
+    var flickerEnabled = false // TODO midi
+    var scaleByAudioEnabled = false // TODO midi
+    var centerWeightEnabled = false // TODO midi
+    var wiggleEnabled = false // TODO midi
+    var starfieldRotationEnabled = true // TODO midi
 
-    var hue = 0f
+    var hue = 130f
     var sat = 255f
     var bri = 255f
+
+    // endregion
+
+    // region TouchOSC
+
+    val galaxy = Galaxy()
+    lateinit var joystick: Joystick
+    lateinit var regenerateButton: PushButton
+    lateinit var beatDetectButton: ToggleButton
+    lateinit var starSpeedPot: Pot
+    lateinit var starCountPot: Pot
+    lateinit var starfieldRotationPot: Pot
 
     // endregion
 
@@ -68,12 +79,11 @@ class PolygonalSketch : PApplet(), AudioListener {
     lateinit var audioIn: AudioInput
     lateinit var fft: FFT
     lateinit var beatDetect: BeatDetect
-    lateinit var autoMouse: AutoMouse
-    val kontrol = KontrolF1()
 
-    val audioLevelObservable: PublishSubject<Float> = PublishSubject.create()
     var rmsSum = 0f
     var bassSum = 0f
+    var vx = 0f
+    var vy = 0f
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
@@ -86,7 +96,7 @@ class PolygonalSketch : PApplet(), AudioListener {
     }
 
     override fun setup() {
-        colorMode(HSB, 255f)
+        colorMode(HSB, 360f, 100f, 100f)
 
         minim = Minim(this)
 
@@ -94,35 +104,49 @@ class PolygonalSketch : PApplet(), AudioListener {
         audioIn.addListener(this)
 
         fft = FFT(audioIn.bufferSize(), audioIn.sampleRate())
-        fft.logAverages(22, 1)
+        fft.logAverages(22, 3)
 
         beatDetect = BeatDetect(audioIn.bufferSize(), audioIn.sampleRate())
         beatDetect.setSensitivity(150)
-
-        autoMouse = AutoMouse(this, centerX(), centerY())
 
         starfield1 = Starfield(this, 300)
         starfield2 = Starfield(this, 300)
 
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
 
-        kontrol.pad(0, 0).setMode(Pad.Mode.TRIGGER)
-        kontrol.onEncoder { it ->
-            val hue = it
-            kontrol.pads.forEach { it.setColorOn(hue, 255, 255) }
-        }
+        // TouchOSC
+        galaxy.connect()
+        joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
+        regenerateButton = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
+        beatDetectButton = galaxy.createToggleButton(0, 7, beatDetectEnabled)
+        starSpeedPot = galaxy.createPot(0, 3, 1f, 5f, starSpeed)
+        starCountPot = galaxy.createPot(0, 4, 0f, 400f, starCount.toFloat())
+        starfieldRotationPot = galaxy.createPot(0, 5, 0f, 3f, starfieldRotation)
     }
 
     override fun draw() {
-        flickerEnabled = kontrol.pad(0, 0).state
-        scaleByAudioEnabled = kontrol.pad(0, 1).state
-        centerWeightEnabled = kontrol.pad(0, 2).state
-        beatDetectEnabled = kontrol.pad(0, 3).state
-        wiggleEnabled = kontrol.pad(1, 0).state
-        autoMouseEnabled = kontrol.pad(1, 1).state
-        starfieldRotationEnabled = kontrol.pad(1, 2).state
-        starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
-        hue = kontrol.encoder.midiRange(255f)
+        if (shouldRegenerate) {
+            regenerate()
+            shouldRegenerate = false
+        }
+
+        starSpeed = starSpeedPot.value
+        starCount = lerp(starCount.toFloat(), starCountPot.value, 0.1f).toInt()
+        starfieldRotation = starfieldRotationPot.value
+        vx += joystick.x * .01f
+        vy += joystick.y * .01f
+        vx *= 0.95f
+        vy *= 0.95f
+        beatDetectEnabled = beatDetectButton.isPressed
+
+//        flickerEnabled = kontrol.pad(0, 0).state
+//        scaleByAudioEnabled = kontrol.pad(0, 1).state
+//        centerWeightEnabled = kontrol.pad(0, 2).state
+//        wiggleEnabled = kontrol.pad(1, 0).state
+//        autoMouseEnabled = kontrol.pad(1, 1).state
+//        starfieldRotationEnabled = kontrol.pad(1, 2).state
+//        starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
+//        hue = kontrol.encoder.midiRange(255f)starfieldRotation
 
         rmsSum += audioIn.mix.level()
         rmsSum *= 0.2f
@@ -136,11 +160,7 @@ class PolygonalSketch : PApplet(), AudioListener {
             regenerate()
         }
 
-        if (autoMouseEnabled) {
-            autoMouse.move()
-        }
-
-        background(0f, 0f, 0f)
+        background(258f, 84f, 25f)
 
         if (debugWindowEnabled) {
             debugWindow()
@@ -152,25 +172,22 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         // Stars
         if (starfieldRotationEnabled) {
-            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f * kontrol.knob2.midiRange(0.0f, 3.0f)))
-            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f * kontrol.knob2.midiRange(0.0f, 3.0f)))
+            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f * starfieldRotation))
+            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f * starfieldRotation))
         }
 
-//        starCount = map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 400f).toInt()
         starfield1.setCount(starCount)
         starfield2.setCount(starCount)
-        starfield1.update(speed = (2 * kontrol.slider1.midiRange(1f, 5f)).toInt())
-        starfield2.update(speed = (4 * kontrol.slider1.midiRange(1f, 5f)).toInt())
+        starfield1.update(speed = (2 * starSpeed).toInt())
+        starfield2.update(speed = (4 * starSpeed).toInt())
         starfield1.setColor(hue, sat, bri)
         starfield2.setColor(hue, sat, bri)
         starfield1.draw()
         starfield2.draw()
 
         for ((index, triangloid) in triangloids.withIndex()) {
-//            triangloid.getShape().rotateY(0.000f + map(autoMouse.xPos, width.toFloat() / 2f, width.toFloat(), 0f, 0.15f))
-//            triangloid.getShape().rotateX(0.000f - map(autoMouse.yPos, height.toFloat() / 2f, height.toFloat(), 0f, 0.15f))
-            triangloid.getShape().rotateY(0f + map(bassSum, 0f, 50f, 0f, 0.05f))
-            triangloid.getShape().rotateX(0.005f * (index + 1))
+            triangloid.getShape().rotateY(0f + map(bassSum, 0f, 50f, 0f, 0.05f) + vx)
+            triangloid.getShape().rotateX(0.005f * (index + 1) + vy)
 
             if (wiggleEnabled) {
                 triangloid.wiggle()
@@ -185,14 +202,14 @@ class PolygonalSketch : PApplet(), AudioListener {
             }
 
             triangloid.setStrokeColor(hue, sat, bri)
-            triangloid.setFillColor(0f, 0f, 0f)
+            triangloid.setFillColor(258f, 84f, 25f)
             triangloid.draw()
 
             popMatrix()
         }
 
         pushMatrix()
-        translate(centerX().toFloat(), centerY().toFloat())
+        translate(centerX(), centerY())
         popMatrix()
     }
 
@@ -219,7 +236,6 @@ class PolygonalSketch : PApplet(), AudioListener {
                 .append("[c] center-weighted triangloids: $centerWeightEnabled").newLine()
                 .append("[b] beat detect: $beatDetectEnabled").newLine()
                 .append("[w] wiggle: $wiggleEnabled").newLine()
-                .append("[a] automouse: $autoMouseEnabled").newLine()
                 .append("[r] starfield1 rotation: $starfieldRotationEnabled")
                 .toString()
 
@@ -259,9 +275,6 @@ class PolygonalSketch : PApplet(), AudioListener {
 
         popMatrix()
 
-        // AutoMouse
-        autoMouse.draw()
-
         // Star count noStroke()
         fill(hue, sat, bri)
         textSize(14f)
@@ -281,7 +294,6 @@ class PolygonalSketch : PApplet(), AudioListener {
                 'c' -> centerWeightEnabled = !centerWeightEnabled
                 'b' -> beatDetectEnabled = !beatDetectEnabled
                 'w' -> wiggleEnabled = !wiggleEnabled
-                'a' -> autoMouseEnabled = !autoMouseEnabled
                 'r' -> starfieldRotationEnabled = !starfieldRotationEnabled
             }
         }
