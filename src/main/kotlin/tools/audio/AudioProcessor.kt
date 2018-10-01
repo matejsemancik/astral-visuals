@@ -2,6 +2,7 @@ package tools.audio
 
 import ddf.minim.AudioListener
 import ddf.minim.Minim
+import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
 import processing.core.PApplet
 
@@ -20,7 +21,10 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
         addListener(this@AudioProcessor)
     }
     val fft = FFT(audioInput.bufferSize(), audioInput.sampleRate()).apply {
-        logAverages(22, 3)
+        logAverages(22, 1)
+    }
+    val beatDetect = BeatDetect(audioInput.bufferSize(), audioInput.sampleRate()).apply {
+        setSensitivity(150)
     }
 
     var gain = 1f
