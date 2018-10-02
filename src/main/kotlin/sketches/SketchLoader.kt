@@ -5,6 +5,7 @@ import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.blank.BlankSketch
 import sketches.polygonal.PolygonalSketch
+import sketches.terrain.TerrainSketch
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
@@ -37,6 +38,7 @@ class SketchLoader : PApplet() {
         sketches.apply {
             put('0', blankSketch)
             put('1', PolygonalSketch(this@SketchLoader, audioProcessor, galaxy))
+            put('2', TerrainSketch(this@SketchLoader, audioProcessor, galaxy))
         }
 
         sketches.forEach { key, sketch ->

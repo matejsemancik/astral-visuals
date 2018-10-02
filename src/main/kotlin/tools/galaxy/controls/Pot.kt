@@ -15,6 +15,7 @@ open class Pot internal constructor(
 ) {
 
     var value = 0f
+    var raw = 0
 
     init {
         if (min > max) {
@@ -23,13 +24,15 @@ open class Pot internal constructor(
 
         if ((min..max).contains(initialValue)) {
             value = initialValue
-            midiBus.sendControllerChange(ch, cc, PApplet.map(initialValue, min, max, 0f, 127f).toInt())
+            raw = PApplet.map(initialValue, min, max, 0f, 127f).toInt()
+            midiBus.sendControllerChange(ch, cc, raw)
         }
 
         midiBus.addMidiListener(object : SimpleMidiListenerAdapter() {
             override fun controllerChange(channel: Int, control: Int, v: Int) {
                 if (channel == ch && control == cc) {
                     value = v.midiRange(min, max)
+                    raw = v
                 }
             }
         })

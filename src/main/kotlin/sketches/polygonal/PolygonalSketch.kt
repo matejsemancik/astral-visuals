@@ -126,7 +126,7 @@ class PolygonalSketch(override val sketch: PApplet,
             regenerate()
         }
 
-        sketch.background(258f, 84f, 25f)
+        background(258f, 84f, 25f)
 
         if (debugWindowEnabled) {
             debugWindow()
