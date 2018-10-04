@@ -33,7 +33,13 @@ abstract class BaseSketch(open val sketch: PApplet, audioProcess: AudioProcessor
 
     val mouseY: Int get() = sketch.mouseY
 
+    val pmouseX: Int get() = sketch.pmouseX
+
+    val pmouseY: Int get() = sketch.pmouseY
+
     val mousePressed: Boolean get() = sketch.mousePressed
+
+    fun millis() = sketch.millis()
 
     fun pushMatrix() = sketch.pushMatrix()
 
@@ -80,4 +86,8 @@ abstract class BaseSketch(open val sketch: PApplet, audioProcess: AudioProcessor
     fun endShape() = sketch.endShape()
 
     fun vertex(x: Float, y: Float, z: Float) = sketch.vertex(x, y, z)
+
+    fun sphereDetail(detail: Int) = sketch.sphereDetail(detail)
+
+    fun sphere(radius: Float) = sketch.sphere(radius)
 }

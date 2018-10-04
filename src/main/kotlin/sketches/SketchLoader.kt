@@ -4,6 +4,7 @@ import processing.core.PApplet
 import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.blank.BlankSketch
+import sketches.fibonaccisphere.FibSphereSketch
 import sketches.polygonal.PolygonalSketch
 import sketches.terrain.TerrainSketch
 import tools.audio.AudioProcessor
@@ -47,6 +48,7 @@ class SketchLoader : PApplet() {
             put('0', blankSketch)
             put('1', PolygonalSketch(this@SketchLoader, audioProcessor, galaxy))
             put('2', TerrainSketch(this@SketchLoader, audioProcessor, galaxy))
+            put('3', FibSphereSketch(this@SketchLoader, audioProcessor, galaxy))
         }
 
         sketches.forEach { key, sketch ->
@@ -57,6 +59,7 @@ class SketchLoader : PApplet() {
 
         PushButton(galaxy.midiBus, 15, 1) { switchSketch('1') }
         PushButton(galaxy.midiBus, 15, 2) { switchSketch('2') }
+        PushButton(galaxy.midiBus, 15, 3) { switchSketch('3') }
     }
 
     override fun draw() {

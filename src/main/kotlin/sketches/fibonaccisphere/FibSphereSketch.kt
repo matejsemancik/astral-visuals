@@ -3,13 +3,24 @@ package sketches.fibonaccisphere
 import centerX
 import centerY
 import processing.core.PApplet
+import processing.core.PApplet.*
 import processing.core.PConstants
+import sketches.BaseSketch
 import tools.audio.AudioProcessor
+import tools.galaxy.Galaxy
 
 /**
  * Based on https://www.openprocessing.org/sketch/103897
  */
-class FibSphereSketch : PApplet() {
+class FibSphereSketch(
+        override val sketch: PApplet,
+        val audioProcessor: AudioProcessor,
+        val galaxy: Galaxy)
+    : BaseSketch(sketch, audioProcessor, galaxy) {
+
+    override fun onBecameActive() {
+        audioProcessor.drawRanges(listOf((30f..200f)))
+    }
 
     data class SpherePoint(val lat: Float, val lon: Float, val radius: Float)
 
@@ -38,8 +49,6 @@ class FibSphereSketch : PApplet() {
     var drawMode = DrawMode.MODE_2
     var bass = 0f
 
-    lateinit var audioProcessor: AudioProcessor
-
     fun initSphere(num: Int) {
         for (i in 0 until num) {
             var lon = GA * i
@@ -57,18 +66,7 @@ class FibSphereSketch : PApplet() {
         }
     }
 
-    override fun settings() {
-        size(1280, 720, PConstants.P3D)
-    }
-
     override fun setup() {
-        colorMode(HSB, 360f, 100f, 100f)
-        audioProcessor = AudioProcessor(this)
-        audioProcessor.apply {
-            gain = 1f
-            drawRange(30f..200f)
-        }
-
         radius = height / 2f
         sphereDetail(8)
         initSphere(numPoints)
@@ -84,7 +82,7 @@ class FibSphereSketch : PApplet() {
         rotateY(yradiusot)
 
         noStroke()
-        fill(110f, 255f, 255f)
+        fill(130f, 255f, 255f)
 
         val radius = (sin(millis() * 0.0005f) * this.radius) / 4f + this.radius / 1.5f
         val bass = lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
@@ -137,7 +135,7 @@ class FibSphereSketch : PApplet() {
             initSphere(numPoints)
         }
 
-        background(12f, 98f, 49f)
+        background(258f, 84f, 25f)
         renderGlobe(DrawMode.MODE_1)
 
         rotationX += velocityX
@@ -149,6 +147,12 @@ class FibSphereSketch : PApplet() {
         velocityX += (mouseY - pmouseY) * 0.02f
         velocityY += (mouseX - pmouseX) * 0.02f
 
+        if (isInDebugMode) {
+            debugWindow()
+        }
+    }
+
+    fun debugWindow() {
         audioProcessor.drawDebug()
     }
 

@@ -30,8 +30,9 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
     var gain = 1f
     private val ranges = mutableListOf<ClosedFloatingPointRange<Float>>()
 
-    fun drawRange(range: ClosedFloatingPointRange<Float>) {
-        ranges.add(range)
+    fun drawRanges(newRanges: List<ClosedFloatingPointRange<Float>>) {
+        ranges.clear()
+        ranges.addAll(newRanges)
     }
 
     fun getRange(range: ClosedFloatingPointRange<Float>): Float = fft.calcAvg(range.start, range.endInclusive) * gain
