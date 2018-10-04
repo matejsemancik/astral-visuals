@@ -80,7 +80,7 @@ class PolygonalSketch(override val sketch: PApplet,
         joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
         regenerateButton = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
         beatDetectButton = galaxy.createToggleButton(0, 7, beatDetectEnabled)
-        starSpeedPot = galaxy.createPot(0, 3, 1f, 5f, starSpeed)
+        starSpeedPot = galaxy.createPot(0, 3, 0.5f, 5f, starSpeed)
         starCountPot = galaxy.createPot(0, 4, 0f, 400f, starCount.toFloat())
         starfieldRotationPot = galaxy.createPot(0, 5, 0f, 3f, starfieldRotation)
     }

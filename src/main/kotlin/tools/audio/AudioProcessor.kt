@@ -10,10 +10,12 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
 
     override fun samples(p0: FloatArray?) {
         fft.forward(audioInput.mix)
+        beatDetect.detect(p0)
     }
 
     override fun samples(p0: FloatArray?, p1: FloatArray?) {
         fft.forward(audioInput.mix)
+        beatDetect.detect(p0)
     }
 
     val minim = Minim(sketch)
