@@ -34,9 +34,9 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
         ranges.add(range)
     }
 
-    fun getRange(range: ClosedFloatingPointRange<Float>): Float {
-        return fft.calcAvg(range.start, range.endInclusive) * gain
-    }
+    fun getRange(range: ClosedFloatingPointRange<Float>): Float = fft.calcAvg(range.start, range.endInclusive) * gain
+
+    fun getFftAvg(i: Int): Float = fft.getAvg(i) * gain
 
     fun drawDebug() {
         val rectHeight = 12 // px

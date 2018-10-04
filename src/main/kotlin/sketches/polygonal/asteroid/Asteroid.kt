@@ -1,12 +1,12 @@
 package sketches.polygonal.asteroid
 
-import ddf.minim.analysis.FFT
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PShape
 import processing.core.PVector
+import tools.audio.AudioProcessor
 
-class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, private val fft: FFT) {
+class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, private val audioProcessor: AudioProcessor) {
 
     private val skeletonVectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
@@ -85,7 +85,7 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
 
         for (i in 0 until shapeVectors.size) {
             // scale by FFT
-            fftAverages[i] += fft.getAvg(i)
+            fftAverages[i] += audioProcessor.getFftAvg(i)
             fftAverages[i] = fftAverages[i] * 0.2f
 
             shapeVectors[i].add(shapeVectors[i].copy().mult(PApplet.map(fftAverages[i], 0f, 50f, 0f, 0.5f)))

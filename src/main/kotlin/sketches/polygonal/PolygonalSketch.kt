@@ -67,14 +67,14 @@ class PolygonalSketch(override val sketch: PApplet,
 
     private fun regenerate() {
         triangloids.removeAt(0)
-        triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor.fft))
+        triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor))
     }
 
     override fun setup() {
         starfield1 = Starfield(sketch, 300)
         starfield2 = Starfield(sketch, 300)
 
-        repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor.fft)) })
+        repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor)) })
 
         // TouchOSC
         joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
@@ -117,7 +117,7 @@ class PolygonalSketch(override val sketch: PApplet,
         rmsSum *= 0.2f
 
         if (audioProcessor.fft.avgSize() >= 2) {
-            bassSum += audioProcessor.fft.getAvg(0)
+            bassSum += audioProcessor.getFftAvg(0)
             bassSum *= 0.2f
         }
 
@@ -230,7 +230,7 @@ class PolygonalSketch(override val sketch: PApplet,
         for (i in 0 until audioProcessor.fft.avgSize()) {
             // Draw frequency band
             fill(hue, sat, bri)
-            rect(0f, i.toFloat() * rectHeight, audioProcessor.fft.getAvg(i), rectHeight.toFloat())
+            rect(0f, i.toFloat() * rectHeight, audioProcessor.getFftAvg(i), rectHeight.toFloat())
 
             // Draw band frequency value
             fill(hue, sat, bri)
