@@ -2,20 +2,22 @@ package sketches.terrain
 
 import centerX
 import centerY
-import ddf.minim.AudioInput
-import ddf.minim.AudioListener
-import ddf.minim.Minim
-import ddf.minim.analysis.FFT
 import midiRange
 import newLine
 import processing.core.PApplet
+import processing.core.PApplet.lerp
+import processing.core.PApplet.map
 import processing.core.PConstants
+import processing.core.PConstants.TRIANGLE_STRIP
 import processing.event.KeyEvent
+import sketches.BaseSketch
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
-import tools.kontrol.KontrolF1
+import tools.audio.AudioProcessor
+import tools.galaxy.Galaxy
 
-class TerrainSketch : PApplet(), AudioListener, PConstants {
+class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProcessor, val galaxy: Galaxy)
+    : BaseSketch(sketch, audioProcessor, galaxy), PConstants {
 
     companion object {
         const val PADDING = 12f
@@ -43,17 +45,8 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         )
     }
 
-    override fun samples(p0: FloatArray?) {
-        fft.forward(p0)
-    }
-
-    override fun samples(p0: FloatArray?, p1: FloatArray?) {
-        fft.forward(p0, p1)
-    }
-
     // region prefs
 
-    private var debugEnabled = false
     private var rotationZEnabled = false
     private var drawMode = 0
     private var terrainMode = 0
@@ -86,48 +79,29 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
 
     // endregion
 
-    private lateinit var minim: Minim
-    private lateinit var audioIn: AudioInput
-    private lateinit var fft: FFT
     private lateinit var fftLogger: FFTLogger
-    private val kontrol = KontrolF1()
-
-    override fun settings() {
-        size(1280, 720, P3D)
-//        fullScreen(P3D)
-        smooth(4)
-    }
 
     override fun setup() {
-        minim = Minim(this)
-        audioIn = minim.lineIn
-        audioIn.addListener(this)
-        fft = FFT(audioIn.bufferSize(), audioIn.sampleRate())
-        fft.logAverages(22, 3)
-        fftLogger = FFTLogger(this, fft)
+        fftLogger = FFTLogger(sketch, audioProcessor)
+        starfield = Starfield(sketch, 800)
+    }
 
-        starfield = Starfield(this, 800)
+    override fun onBecameActive() {
+
     }
 
     override fun draw() {
-        background(32f, 32f, 32f)
+        background(258f, 84f, 25f)
 
         starfield.update(3)
         starfield.draw()
 
-        pushMatrix()
-        noStroke()
-        fill(0f, 255f, 100f)
-        translate(centerX(), centerY())
-        translate(0f, 0f, -h / 2 + 50)
-
-
-        stroke(0f, 255f, 100f)
+        stroke(130f, 255f, 255f)
         strokeWeight(1.4f)
-        fill(32f, 32f, 32f)
+        fill(258f, 84f, 25f)
 
         pushMatrix()
-        translate(width.toFloat() / 2, height.toFloat() / 2)
+        translate(centerX(), centerY())
 
         if (mousePressed) {
             rotationX = lerp(rotationX, map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f), 0.1f)
@@ -172,7 +146,7 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
 
         popMatrix()
 
-        if (debugEnabled) {
+        if (isInDebugMode) {
             debugWindow()
         }
     }
@@ -182,7 +156,11 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
         buff.removeAt(buff.size - 1)
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
-            val amp = if (x < fft.avgSize()) map(fft.getAvg(x), 0f, 80f, 0f, 20f + kontrol.slider1.midiRange(200f)) else 0f
+            val amp = if (x < audioProcessor.fft.avgSize()) {
+                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + galaxy.pot1.raw.midiRange(200f))
+            } else {
+                0f
+            }
 
             when (TERRAIN_MODES[terrainMode]) {
                 TERRAIN_MODE_BASS_CORNER -> {
@@ -223,8 +201,8 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
                         noise(xoff, yoff),
                         0f,
                         1f,
-                        -20f * kontrol.knob2.midiRange(2f),
-                        50f * kontrol.knob2.midiRange(2f)) + musicTerrain[y][x]
+                        -20f * galaxy.pot2.raw.midiRange(2f),
+                        50f * galaxy.pot2.raw.midiRange(2f)) + musicTerrain[y][x]
 
                 xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f)
             }
@@ -267,7 +245,6 @@ class TerrainSketch : PApplet(), AudioListener, PConstants {
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             when (event.key) {
-                'd' -> debugEnabled = !debugEnabled
                 'r' -> rotationZEnabled = !rotationZEnabled
                 'm' -> {
                     drawMode++

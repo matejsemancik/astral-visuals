@@ -2,6 +2,7 @@ package tools.audio
 
 import ddf.minim.AudioListener
 import ddf.minim.Minim
+import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
 import processing.core.PApplet
 
@@ -20,19 +21,23 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
         addListener(this@AudioProcessor)
     }
     val fft = FFT(audioInput.bufferSize(), audioInput.sampleRate()).apply {
-        logAverages(22, 3)
+        logAverages(22, 1)
+    }
+    val beatDetect = BeatDetect(audioInput.bufferSize(), audioInput.sampleRate()).apply {
+        setSensitivity(150)
     }
 
     var gain = 1f
     private val ranges = mutableListOf<ClosedFloatingPointRange<Float>>()
 
-    fun drawRange(range: ClosedFloatingPointRange<Float>) {
-        ranges.add(range)
+    fun drawRanges(newRanges: List<ClosedFloatingPointRange<Float>>) {
+        ranges.clear()
+        ranges.addAll(newRanges)
     }
 
-    fun getRange(range: ClosedFloatingPointRange<Float>): Float {
-        return fft.calcAvg(range.start, range.endInclusive) * gain
-    }
+    fun getRange(range: ClosedFloatingPointRange<Float>): Float = fft.calcAvg(range.start, range.endInclusive) * gain
+
+    fun getFftAvg(i: Int): Float = fft.getAvg(i) * gain
 
     fun drawDebug() {
         val rectHeight = 12 // px

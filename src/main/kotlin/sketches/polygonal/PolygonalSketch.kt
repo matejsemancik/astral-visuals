@@ -2,42 +2,29 @@ package sketches.polygonal
 
 import centerX
 import centerY
-import ddf.minim.AudioInput
-import ddf.minim.AudioListener
-import ddf.minim.Minim
-import ddf.minim.analysis.BeatDetect
-import ddf.minim.analysis.FFT
 import newLine
 import processing.core.PApplet
-import processing.core.PConstants
+import processing.core.PApplet.lerp
+import processing.core.PApplet.map
 import processing.event.KeyEvent
+import sketches.BaseSketch
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
+import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 import tools.galaxy.controls.Joystick
 import tools.galaxy.controls.Pot
 import tools.galaxy.controls.PushButton
 import tools.galaxy.controls.ToggleButton
 
-class PolygonalSketch : PApplet(), AudioListener {
+class PolygonalSketch(override val sketch: PApplet,
+                      val audioProcessor: AudioProcessor,
+                      val galaxy: Galaxy)
+    : BaseSketch(sketch, audioProcessor, galaxy) {
 
     companion object {
         const val NUMBER_ASTEROIDS = 3
     }
-
-    // region AudioListener for input signal
-
-    override fun samples(p0: FloatArray?) {
-        beatDetect.detect(audioIn.mix)
-        fft.forward(audioIn.mix)
-    }
-
-    override fun samples(p0: FloatArray?, p1: FloatArray?) {
-        beatDetect.detect(audioIn.mix)
-        fft.forward(audioIn.mix)
-    }
-
-    // endregion
 
     // region params
 
@@ -46,7 +33,6 @@ class PolygonalSketch : PApplet(), AudioListener {
     var starfieldRotation = 2f
     var shouldRegenerate = false
     var beatDetectEnabled = true
-    var debugWindowEnabled = true // TODO midi
     var flickerEnabled = false // TODO midi
     var scaleByAudioEnabled = false // TODO midi
     var centerWeightEnabled = false // TODO midi
@@ -61,7 +47,6 @@ class PolygonalSketch : PApplet(), AudioListener {
 
     // region TouchOSC
 
-    val galaxy = Galaxy()
     lateinit var joystick: Joystick
     lateinit var regenerateButton: PushButton
     lateinit var beatDetectButton: ToggleButton
@@ -75,53 +60,33 @@ class PolygonalSketch : PApplet(), AudioListener {
     lateinit var starfield2: Starfield
     val triangloids = mutableListOf<Asteroid>()
 
-    lateinit var minim: Minim
-    lateinit var audioIn: AudioInput
-    lateinit var fft: FFT
-    lateinit var beatDetect: BeatDetect
-
     var rmsSum = 0f
     var bassSum = 0f
     var vx = 0f
     var vy = 0f
 
-    override fun settings() {
-        size(1280, 720, PConstants.P3D)
-        smooth(4)
-    }
-
     private fun regenerate() {
         triangloids.removeAt(0)
-        triangloids.add(Asteroid(this, centerWeightEnabled, fft))
+        triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor))
     }
 
     override fun setup() {
-        colorMode(HSB, 360f, 100f, 100f)
+        starfield1 = Starfield(sketch, 300)
+        starfield2 = Starfield(sketch, 300)
 
-        minim = Minim(this)
-
-        audioIn = minim.getLineIn()
-        audioIn.addListener(this)
-
-        fft = FFT(audioIn.bufferSize(), audioIn.sampleRate())
-        fft.logAverages(22, 3)
-
-        beatDetect = BeatDetect(audioIn.bufferSize(), audioIn.sampleRate())
-        beatDetect.setSensitivity(150)
-
-        starfield1 = Starfield(this, 300)
-        starfield2 = Starfield(this, 300)
-
-        repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(this, centerWeightEnabled, fft)) })
+        repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor)) })
 
         // TouchOSC
-        galaxy.connect()
         joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
         regenerateButton = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
         beatDetectButton = galaxy.createToggleButton(0, 7, beatDetectEnabled)
         starSpeedPot = galaxy.createPot(0, 3, 1f, 5f, starSpeed)
         starCountPot = galaxy.createPot(0, 4, 0f, 400f, starCount.toFloat())
         starfieldRotationPot = galaxy.createPot(0, 5, 0f, 3f, starfieldRotation)
+    }
+
+    override fun onBecameActive() {
+
     }
 
     override fun draw() {
@@ -148,25 +113,25 @@ class PolygonalSketch : PApplet(), AudioListener {
 //        starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
 //        hue = kontrol.encoder.midiRange(255f)starfieldRotation
 
-        rmsSum += audioIn.mix.level()
+        rmsSum += audioProcessor.audioInput.mix.level()
         rmsSum *= 0.2f
 
-        if (fft.avgSize() >= 2) {
-            bassSum += fft.getAvg(0)
+        if (audioProcessor.fft.avgSize() >= 2) {
+            bassSum += audioProcessor.getFftAvg(0)
             bassSum *= 0.2f
         }
 
-        if (beatDetectEnabled && beatDetect.isSnare) {
+        if (beatDetectEnabled && audioProcessor.beatDetect.isSnare) {
             regenerate()
         }
 
         background(258f, 84f, 25f)
 
-        if (debugWindowEnabled) {
+        if (isInDebugMode) {
             debugWindow()
         }
 
-        if (flickerEnabled && frameCount % 4 == 0) {
+        if (flickerEnabled && sketch.frameCount % 4 == 0) {
             return
         }
 
@@ -262,15 +227,15 @@ class PolygonalSketch : PApplet(), AudioListener {
         // FFT
         pushMatrix()
         translate(12f, 130f)
-        for (i in 0 until fft.avgSize()) {
+        for (i in 0 until audioProcessor.fft.avgSize()) {
             // Draw frequency band
             fill(hue, sat, bri)
-            rect(0f, i.toFloat() * rectHeight, fft.getAvg(i), rectHeight.toFloat())
+            rect(0f, i.toFloat() * rectHeight, audioProcessor.getFftAvg(i), rectHeight.toFloat())
 
             // Draw band frequency value
             fill(hue, sat, bri)
             textSize(10f)
-            text("${fft.getAverageCenterFrequency(i)} Hz", 0f, i.toFloat() * rectHeight + rectHeight)
+            text("${audioProcessor.fft.getAverageCenterFrequency(i)} Hz", 0f, i.toFloat() * rectHeight + rectHeight)
         }
 
         popMatrix()
@@ -288,7 +253,6 @@ class PolygonalSketch : PApplet(), AudioListener {
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             when (event.key) {
-                'd' -> debugWindowEnabled = !debugWindowEnabled
                 'f' -> flickerEnabled = !flickerEnabled
                 's' -> scaleByAudioEnabled = !scaleByAudioEnabled
                 'c' -> centerWeightEnabled = !centerWeightEnabled

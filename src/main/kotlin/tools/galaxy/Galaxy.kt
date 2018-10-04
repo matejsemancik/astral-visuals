@@ -10,9 +10,17 @@ class Galaxy {
 
     lateinit var midiBus: MidiBus
 
+    lateinit var pot1: Pot
+    lateinit var pot2: Pot
+    lateinit var pot3: Pot
+
     fun connect() {
         midiBus = MidiBus(this, "TouchOSC Bridge", "TouchOSC Bridge")
         println("MidiBus connected")
+
+        pot1 = Pot(midiBus, 1, 1)
+        pot2 = Pot(midiBus, 1, 2)
+        pot3 = Pot(midiBus, 1, 3)
     }
 
     fun createJoystick(channel: Int, ccX: Int, ccY: Int, ccTouch: Int): Joystick =
@@ -28,6 +36,6 @@ class Galaxy {
             Pot(midiBus, channel, cc, min, max, initialValue)
 
     fun controllerChange(channel: Int, cc: Int, value: Int) {
-        println("channel: $channel cc: $cc value: $value")
+//        println("channel: $channel cc: $cc value: $value")
     }
 }
