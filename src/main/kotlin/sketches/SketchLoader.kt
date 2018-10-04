@@ -8,6 +8,9 @@ import sketches.polygonal.PolygonalSketch
 import sketches.terrain.TerrainSketch
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
+import tools.galaxy.controls.Pot
+import tools.galaxy.controls.PushButton
+import tools.galaxy.controls.ToggleButton
 
 class SketchLoader : PApplet() {
 
@@ -15,6 +18,8 @@ class SketchLoader : PApplet() {
 
     private lateinit var audioProcessor: AudioProcessor
     private val galaxy: Galaxy = Galaxy()
+    private lateinit var debugButton: ToggleButton
+    private lateinit var gainPot: Pot
 
     // endregion
 
@@ -33,6 +38,9 @@ class SketchLoader : PApplet() {
         galaxy.connect()
         audioProcessor = AudioProcessor(this)
 
+        gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
+        debugButton = galaxy.createToggleButton(15, 65, true)
+
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
 
         sketches.apply {
@@ -46,14 +54,24 @@ class SketchLoader : PApplet() {
         }
 
         activeSketch().onBecameActive()
+
+        PushButton(galaxy.midiBus, 15, 1) { switchSketch('1') }
+        PushButton(galaxy.midiBus, 15, 2) { switchSketch('2') }
     }
 
     override fun draw() {
+        audioProcessor.gain = gainPot.value
+        activeSketch().isInDebugMode = debugButton.isPressed
         activeSketch().draw()
     }
 
     private fun activeSketch(): BaseSketch {
         return sketches.getOrDefault(selector, blankSketch)
+    }
+
+    private fun switchSketch(num: Char) {
+        selector = num
+        activeSketch().onBecameActive()
     }
 
     override fun keyPressed(event: KeyEvent?) {

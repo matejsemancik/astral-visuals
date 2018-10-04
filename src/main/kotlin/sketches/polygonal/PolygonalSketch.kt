@@ -33,7 +33,6 @@ class PolygonalSketch(override val sketch: PApplet,
     var starfieldRotation = 2f
     var shouldRegenerate = false
     var beatDetectEnabled = true
-    var debugWindowEnabled = true // TODO midi
     var flickerEnabled = false // TODO midi
     var scaleByAudioEnabled = false // TODO midi
     var centerWeightEnabled = false // TODO midi
@@ -128,7 +127,7 @@ class PolygonalSketch(override val sketch: PApplet,
 
         background(258f, 84f, 25f)
 
-        if (debugWindowEnabled) {
+        if (isInDebugMode) {
             debugWindow()
         }
 
@@ -254,7 +253,6 @@ class PolygonalSketch(override val sketch: PApplet,
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             when (event.key) {
-                'd' -> debugWindowEnabled = !debugWindowEnabled
                 'f' -> flickerEnabled = !flickerEnabled
                 's' -> scaleByAudioEnabled = !scaleByAudioEnabled
                 'c' -> centerWeightEnabled = !centerWeightEnabled

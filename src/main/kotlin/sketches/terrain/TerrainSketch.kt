@@ -47,7 +47,6 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     // region prefs
 
-    private var debugEnabled = false
     private var rotationZEnabled = false
     private var drawMode = 0
     private var terrainMode = 0
@@ -97,16 +96,9 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         starfield.update(3)
         starfield.draw()
 
-//        pushMatrix()
-//        noStroke()
-//        fill(0f, 255f, 100f)
-//        translate(centerX(), centerY())
-//        translate(0f, 0f, -h / 2 + 50)
-//
         stroke(130f, 255f, 255f)
         strokeWeight(1.4f)
         fill(258f, 84f, 25f)
-//        popMatrix()
 
         pushMatrix()
         translate(centerX(), centerY())
@@ -154,7 +146,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
         popMatrix()
 
-        if (debugEnabled) {
+        if (isInDebugMode) {
             debugWindow()
         }
     }
@@ -253,7 +245,6 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             when (event.key) {
-                'd' -> debugEnabled = !debugEnabled
                 'r' -> rotationZEnabled = !rotationZEnabled
                 'm' -> {
                     drawMode++

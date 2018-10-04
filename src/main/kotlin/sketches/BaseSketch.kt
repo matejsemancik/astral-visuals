@@ -7,6 +7,8 @@ import tools.galaxy.Galaxy
 
 abstract class BaseSketch(open val sketch: PApplet, audioProcess: AudioProcessor, galaxy: Galaxy) {
 
+    var isInDebugMode = false
+
     abstract fun setup()
 
     abstract fun onBecameActive()
