@@ -82,7 +82,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     private lateinit var fftLogger: FFTLogger
 
     override fun setup() {
-        fftLogger = FFTLogger(sketch, audioProcessor.fft)
+        fftLogger = FFTLogger(sketch, audioProcessor)
         starfield = Starfield(sketch, 800)
     }
 
@@ -157,7 +157,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
             val amp = if (x < audioProcessor.fft.avgSize()) {
-                map(audioProcessor.fft.getAvg(x), 0f, 80f, 0f, 20f + galaxy.pot1.raw.midiRange(200f))
+                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + galaxy.pot1.raw.midiRange(200f))
             } else {
                 0f
             }
