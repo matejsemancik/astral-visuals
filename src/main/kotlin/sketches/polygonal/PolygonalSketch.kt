@@ -28,7 +28,7 @@ class PolygonalSketch(override val sketch: PApplet,
 
     // region params
 
-    var starSpeed = 1f
+    var starSpeed = 4f
     var starCount = 400
     var starfieldRotation = 2f
     var shouldRegenerate = false
@@ -71,8 +71,8 @@ class PolygonalSketch(override val sketch: PApplet,
     }
 
     override fun setup() {
-        starfield1 = Starfield(sketch, 300)
-        starfield2 = Starfield(sketch, 300)
+        starfield1 = Starfield(sketch, 300).apply { motion = Starfield.Motion.TRANSLATING_FORWARD }
+        starfield2 = Starfield(sketch, 300).apply { motion = Starfield.Motion.TRANSLATING_FORWARD }
 
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor)) })
 
@@ -248,6 +248,15 @@ class PolygonalSketch(override val sketch: PApplet,
 
     override fun mouseClicked() {
         regenerate()
+
+        val newMotion = when (starfield1.motion) {
+            Starfield.Motion.ZOOMING -> Starfield.Motion.TRANSLATING_BACKWARD
+            Starfield.Motion.TRANSLATING_BACKWARD -> Starfield.Motion.TRANSLATING_FORWARD
+            Starfield.Motion.TRANSLATING_FORWARD -> Starfield.Motion.ZOOMING
+        }
+
+        starfield1.motion = newMotion
+        starfield2.motion = newMotion
     }
 
     override fun keyPressed(event: KeyEvent?) {
