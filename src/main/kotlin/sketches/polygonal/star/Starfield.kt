@@ -7,6 +7,13 @@ import processing.core.PVector
 
 class Starfield(private val sketch: PApplet, initialCount: Int) {
 
+    enum class Motion {
+        ZOOMING,
+        TRANSLATING_FORWARD,
+        TRANSLATING_BACKWARD
+    }
+
+    var motion = Motion.ZOOMING
     private val stars = mutableListOf<Star>()
     private var rotation = 0f
     private var desiredCount = initialCount
@@ -42,11 +49,12 @@ class Starfield(private val sketch: PApplet, initialCount: Int) {
 
     fun draw() {
         sketch.pushMatrix()
-        sketch.translate(sketch.centerX().toFloat(), sketch.centerY().toFloat(), -sketch.height.toFloat())
+        sketch.translate(sketch.centerX(), sketch.centerY(), -sketch.height.toFloat())
         sketch.rotateZ(rotation)
 
         for (star in stars) {
             star.setColor(color.x, color.y, color.z)
+            star.motion = this.motion
             star.draw()
         }
 
