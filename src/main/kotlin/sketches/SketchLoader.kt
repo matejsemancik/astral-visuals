@@ -6,6 +6,7 @@ import processing.event.KeyEvent
 import sketches.blank.BlankSketch
 import sketches.fibonaccisphere.FibSphereSketch
 import sketches.polygonal.PolygonalSketch
+import sketches.starglitch.StarGlitchSketch
 import sketches.terrain.TerrainSketch
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
@@ -25,7 +26,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '1'
+    var selector = '4'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -49,6 +50,7 @@ class SketchLoader : PApplet() {
             put('1', PolygonalSketch(this@SketchLoader, audioProcessor, galaxy))
             put('2', TerrainSketch(this@SketchLoader, audioProcessor, galaxy))
             put('3', FibSphereSketch(this@SketchLoader, audioProcessor, galaxy))
+            put('4', StarGlitchSketch(this@SketchLoader, audioProcessor, galaxy))
         }
 
         sketches.forEach { key, sketch ->
