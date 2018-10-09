@@ -6,7 +6,13 @@ import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
 import processing.core.PApplet
 
-class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
+class AudioProcessor constructor(
+        private val sketch: PApplet,
+        private val isInRenderMode: Boolean
+) : AudioListener {
+
+    private var mockLeft = arrayListOf<Float>()
+    private var mockRight = arrayListOf<Float>()
 
     override fun samples(p0: FloatArray?) {
         fft.forward(audioInput.mix)
@@ -20,7 +26,7 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
 
     val minim = Minim(sketch)
     val audioInput = minim.lineIn.apply {
-        addListener(this@AudioProcessor)
+        if (!isInRenderMode) addListener(this@AudioProcessor)
     }
     val fft = FFT(audioInput.bufferSize(), audioInput.sampleRate()).apply {
         logAverages(22, 1)
@@ -39,7 +45,15 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
 
     fun getRange(range: ClosedFloatingPointRange<Float>): Float = fft.calcAvg(range.start, range.endInclusive) * gain
 
-    fun getFftAvg(i: Int): Float = fft.getAvg(i) * gain
+    fun getFftAvg(i: Int): Float {
+        return if (isInRenderMode) {
+            val l = mockLeft[i]
+            val r = mockRight[i]
+            (l + r) / 2f
+        } else {
+            fft.getAvg(i) * gain
+        }
+    }
 
     fun drawDebug() {
         val rectHeight = 12 // px
@@ -71,5 +85,11 @@ class AudioProcessor constructor(private val sketch: PApplet) : AudioListener {
         }
 
         sketch.popMatrix()
+    }
+
+    fun mockFft(left: List<Float>, right: List<Float>) {
+        mockLeft = ArrayList(left)
+        mockRight = ArrayList(right)
+        beatDetect.detect(left.toFloatArray())
     }
 }
