@@ -4,17 +4,17 @@ import centerX
 import centerY
 import newLine
 import processing.core.PApplet
-import processing.core.PApplet.lerp
-import processing.core.PApplet.map
+import processing.core.PApplet.*
+import processing.core.PConstants
 import processing.event.KeyEvent
 import sketches.BaseSketch
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
+import tools.FFTLogger
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 import tools.galaxy.controls.Joystick
 import tools.galaxy.controls.Pot
-import tools.galaxy.controls.PushButton
 import tools.galaxy.controls.ToggleButton
 
 class PolygonalSketch(override val sketch: PApplet,
@@ -28,9 +28,11 @@ class PolygonalSketch(override val sketch: PApplet,
 
     // region params
 
-    var starSpeed = 4f
-    var starCount = 400
-    var starfieldRotation = 2f
+    var starAccel = 0.4f
+    var starMotion = Starfield.Motion.ZOOMING
+    var starSpeed = 0.5f
+    var starCount = 1200
+    var starfieldRotation = 1f
     var shouldRegenerate = false
     var beatDetectEnabled = true
     var flickerEnabled = false // TODO midi
@@ -48,17 +50,18 @@ class PolygonalSketch(override val sketch: PApplet,
     // region TouchOSC
 
     lateinit var joystick: Joystick
-    lateinit var regenerateButton: PushButton
     lateinit var beatDetectButton: ToggleButton
     lateinit var starSpeedPot: Pot
     lateinit var starCountPot: Pot
     lateinit var starfieldRotationPot: Pot
+    lateinit var starAccelPot: Pot
 
     // endregion
 
     lateinit var starfield1: Starfield
     lateinit var starfield2: Starfield
     val triangloids = mutableListOf<Asteroid>()
+    lateinit var fftLogger: FFTLogger
 
     var rmsSum = 0f
     var bassSum = 0f
@@ -71,18 +74,22 @@ class PolygonalSketch(override val sketch: PApplet,
     }
 
     override fun setup() {
-        starfield1 = Starfield(sketch, 300).apply { motion = Starfield.Motion.TRANSLATING_FORWARD }
-        starfield2 = Starfield(sketch, 300).apply { motion = Starfield.Motion.TRANSLATING_FORWARD }
-
+        starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
+        starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor)) })
+        fftLogger = FFTLogger(sketch, audioProcessor)
 
         // TouchOSC
         joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
-        regenerateButton = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
+        galaxy.createPushButton(0, 6) { shouldRegenerate = true }
+        galaxy.createPushButton(0, 8) { starMotion = Starfield.Motion.ZOOMING }
+        galaxy.createPushButton(0, 9) { starMotion = Starfield.Motion.TRANSLATING_BACKWARD }
+        galaxy.createPushButton(0, 11) { starMotion = Starfield.Motion.TRANSLATING_FORWARD }
         beatDetectButton = galaxy.createToggleButton(0, 7, beatDetectEnabled)
         starSpeedPot = galaxy.createPot(0, 3, 0.5f, 5f, starSpeed)
-        starCountPot = galaxy.createPot(0, 4, 0f, 400f, starCount.toFloat())
+        starCountPot = galaxy.createPot(0, 4, 0f, 1200f, starCount.toFloat())
         starfieldRotationPot = galaxy.createPot(0, 5, 0f, 3f, starfieldRotation)
+        starAccelPot = galaxy.createPot(0, 12, 0f, 1f, 0.6f)
     }
 
     override fun onBecameActive() {
@@ -95,6 +102,7 @@ class PolygonalSketch(override val sketch: PApplet,
             shouldRegenerate = false
         }
 
+        starAccel = starAccelPot.value
         starSpeed = starSpeedPot.value
         starCount = lerp(starCount.toFloat(), starCountPot.value, 0.1f).toInt()
         starfieldRotation = starfieldRotationPot.value
@@ -143,16 +151,19 @@ class PolygonalSketch(override val sketch: PApplet,
 
         starfield1.setCount(starCount)
         starfield2.setCount(starCount)
-        starfield1.update(speed = (2 * starSpeed).toInt())
+        starfield1.update(speed = (2 * starSpeed).toInt() + (bassSum * starAccel).toInt())
         starfield2.update(speed = (4 * starSpeed).toInt())
         starfield1.setColor(hue, sat, bri)
         starfield2.setColor(hue, sat, bri)
+        starfield1.motion = starMotion
+        starfield2.motion = starMotion
         starfield1.draw()
         starfield2.draw()
 
         for ((index, triangloid) in triangloids.withIndex()) {
             triangloid.getShape().rotateY(0f + map(bassSum, 0f, 50f, 0f, 0.05f) + vx)
             triangloid.getShape().rotateX(0.005f * (index + 1) + vy)
+            triangloid.getShape().rotateZ(0.010f)
 
             if (wiggleEnabled) {
                 triangloid.wiggle()
@@ -171,10 +182,45 @@ class PolygonalSketch(override val sketch: PApplet,
             triangloid.draw()
 
             popMatrix()
+
+            hud()
         }
+    }
+
+    fun hud() {
+        pushMatrix()
+        translate(centerX(), centerY())
+        rotateX(sin(millis() * 0.0005f) * PConstants.PI / 100f)
+        rotateZ(sin(millis() * 0.0005f) * PConstants.PI / 100f)
+        rotateY(sin(millis() * 0.0005f) * PConstants.PI / 20f)
+        translate(0f, 0f, sin(millis() * 0.001f) * PConstants.PI / 50f)
+
+        translate(-centerX() / 2, -centerY() / 2)
+        fftLogger.draw()
+        popMatrix()
 
         pushMatrix()
         translate(centerX(), centerY())
+        rotateX(sin(millis() * 0.0005f) * PConstants.PI / 100f)
+        rotateZ(sin(millis() * 0.0005f) * PConstants.PI / 100f)
+        rotateY(sin(millis() * 0.0005f) * PConstants.PI / 20f)
+        translate(0f, 0f, sin(millis() * 0.001f) * PConstants.PI / 50f)
+
+        translate(centerX() / 8, centerY() / 2)
+        textSize(20f)
+        text("Astral / Bop (RU) /\n09.11.2018", 0f, 0f)
+        popMatrix()
+
+        pushMatrix()
+        translate(centerX(), centerY())
+        rotateX(sin(millis() * 0.0005f) * PConstants.PI / 100f)
+        rotateZ(sin(millis() * 0.0005f) * PConstants.PI / 100f)
+        rotateY(sin(millis() * 0.0005f) * PConstants.PI / 80f)
+        translate(0f, 0f, sin(millis() * 0.001f) * PConstants.PI / 50f)
+
+        translate(centerX() / 2 + 40f, centerY() / 2 - 20)
+        rect(0f, 0f, - bassSum * 4, - 5f)
+
         popMatrix()
     }
 
@@ -248,15 +294,6 @@ class PolygonalSketch(override val sketch: PApplet,
 
     override fun mouseClicked() {
         regenerate()
-
-        val newMotion = when (starfield1.motion) {
-            Starfield.Motion.ZOOMING -> Starfield.Motion.TRANSLATING_BACKWARD
-            Starfield.Motion.TRANSLATING_BACKWARD -> Starfield.Motion.TRANSLATING_FORWARD
-            Starfield.Motion.TRANSLATING_FORWARD -> Starfield.Motion.ZOOMING
-        }
-
-        starfield1.motion = newMotion
-        starfield2.motion = newMotion
     }
 
     override fun keyPressed(event: KeyEvent?) {

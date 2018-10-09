@@ -31,7 +31,7 @@ class SketchLoader : PApplet() {
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
 
-    val isInRenderMode = false
+    val isInRenderMode = true
     val audioFilePath = "bop.wav"
     val sep = "|"
     val movieFps = 30f
@@ -47,7 +47,7 @@ class SketchLoader : PApplet() {
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
-        size(320, 640, PConstants.P3D)
+        size(720, 1280, PConstants.P3D)
         smooth(4)
     }
 
