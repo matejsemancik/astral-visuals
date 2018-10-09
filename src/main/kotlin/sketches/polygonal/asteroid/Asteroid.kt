@@ -24,7 +24,7 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
 
     init {
         repeat(NUMBER_VECTORS, action = {
-            val random3D = PVector.random3D().mult(sketch.width / 3.5f)
+            val random3D = PVector.random3D().mult(sketch.width / 2f)
 
             if (centerAverage) {
                 xAvg.add(random3D.x)

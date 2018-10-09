@@ -7,7 +7,7 @@ import processing.core.PVector
 class Star(private val sketch: PApplet) {
 
     companion object {
-        const val ELLIPSE_SIZE = 15f
+        const val ELLIPSE_SIZE = 20f
         const val SPEED_DEFAULT = 8
     }
 
