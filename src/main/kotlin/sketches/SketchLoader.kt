@@ -31,7 +31,7 @@ class SketchLoader : PApplet() {
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
 
-    val isInRenderMode = true
+    val isInRenderMode = false
     val audioFilePath = "bop.wav"
     val sep = "|"
     val movieFps = 30f
@@ -47,7 +47,7 @@ class SketchLoader : PApplet() {
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
-        size(720, 1280, PConstants.P3D)
+        size(1280, 720, PConstants.P3D)
         smooth(4)
     }
 
@@ -57,7 +57,7 @@ class SketchLoader : PApplet() {
         galaxy.connect()
         audioProcessor = AudioProcessor(this, isInRenderMode)
 
-        gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
+        gainPot = galaxy.createPot(15, 64, 0f, 5f, 2f)
         debugButton = galaxy.createToggleButton(15, 65, false)
 
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
