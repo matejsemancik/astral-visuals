@@ -8,7 +8,7 @@ class ToggleButton internal constructor(
         private val ch: Int,
         private val cc: Int,
         private val defaultValue: Boolean = false
-) {
+) : MidiControl() {
 
     var isPressed = false
 
@@ -24,4 +24,6 @@ class ToggleButton internal constructor(
             }
         })
     }
+
+    override fun onUpdate() = Unit
 }

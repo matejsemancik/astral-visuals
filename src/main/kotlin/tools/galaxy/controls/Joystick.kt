@@ -10,7 +10,7 @@ class Joystick internal constructor(
         private val ccX: Int,
         private val ccY: Int,
         private val ccTouch: Int
-) {
+) : MidiControl() {
 
     var x: Float = 0f
     var y: Float = 0f

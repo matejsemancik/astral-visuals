@@ -1,6 +1,5 @@
 package tools.galaxy.controls
 
-import midiRange
 import processing.core.PApplet
 import themidibus.MidiBus
 import tools.galaxy.SimpleMidiListenerAdapter
@@ -12,10 +11,11 @@ open class Pot internal constructor(
         private val min: Float = 0f,
         private val max: Float = 1f,
         private val initialValue: Float = 0f
-) {
+) : MidiControl() {
 
     var value = 0f
-    var raw = 0
+    var rawValue = 0
+    private var lerp = 1f
 
     init {
         if (min > max) {
@@ -24,17 +24,24 @@ open class Pot internal constructor(
 
         if ((min..max).contains(initialValue)) {
             value = initialValue
-            raw = PApplet.map(initialValue, min, max, 0f, 127f).toInt()
-            midiBus.sendControllerChange(ch, cc, raw)
+            rawValue = PApplet.map(initialValue, min, max, 0f, 127f).toInt()
+            midiBus.sendControllerChange(ch, cc, rawValue)
         }
 
         midiBus.addMidiListener(object : SimpleMidiListenerAdapter() {
             override fun controllerChange(channel: Int, control: Int, v: Int) {
                 if (channel == ch && control == cc) {
-                    value = v.midiRange(min, max)
-                    raw = v
+                    rawValue = v
                 }
             }
         })
+    }
+
+    override fun onUpdate() {
+        value = PApplet.lerp(value, PApplet.map(rawValue.toFloat(), 0f, 127f, min, max), lerp)
+    }
+
+    fun lerp(lerp: Float) = apply {
+        this.lerp = lerp
     }
 }

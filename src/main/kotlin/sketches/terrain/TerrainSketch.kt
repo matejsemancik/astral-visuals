@@ -157,7 +157,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
             val amp = if (x < audioProcessor.fft.avgSize()) {
-                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + galaxy.pot1.raw.midiRange(200f))
+                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + galaxy.pot1.rawValue.midiRange(200f))
             } else {
                 0f
             }
@@ -201,8 +201,8 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
                         noise(xoff, yoff),
                         0f,
                         1f,
-                        -20f * galaxy.pot2.raw.midiRange(2f),
-                        50f * galaxy.pot2.raw.midiRange(2f)) + musicTerrain[y][x]
+                        -20f * galaxy.pot2.rawValue.midiRange(2f),
+                        50f * galaxy.pot2.rawValue.midiRange(2f)) + musicTerrain[y][x]
 
                 xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f)
             }

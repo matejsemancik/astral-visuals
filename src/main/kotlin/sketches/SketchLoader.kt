@@ -57,7 +57,7 @@ class SketchLoader : PApplet() {
         galaxy.connect()
         audioProcessor = AudioProcessor(this, isInRenderMode)
 
-        gainPot = galaxy.createPot(15, 64, 0f, 5f, 2f)
+        gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
         debugButton = galaxy.createToggleButton(15, 65, false)
 
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
@@ -93,7 +93,13 @@ class SketchLoader : PApplet() {
     }
 
     override fun draw() {
-        if (isInRenderMode) {
+        galaxy.update()
+
+        if (!isInRenderMode) {
+            audioProcessor.gain = gainPot.value
+            activeSketch().isInDebugMode = debugButton.isPressed
+            activeSketch().draw()
+        } else {
             audioProcessor.gain = 2f
             activeSketch().isInDebugMode = false
 
@@ -142,10 +148,6 @@ class SketchLoader : PApplet() {
                     videoExport.saveFrame()
                 }
             }
-        } else {
-            audioProcessor.gain = gainPot.value
-            activeSketch().isInDebugMode = debugButton.isPressed
-            activeSketch().draw()
         }
     }
 

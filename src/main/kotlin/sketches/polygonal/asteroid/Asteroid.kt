@@ -123,10 +123,10 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
         sketch.shape(group)
     }
 
-    fun wiggle() {
+    fun wiggle(multiplier: Float) {
         // Wiggle wiggle wiggle
         for (index in 0 until skeletonVectors.size) {
-            val offsetVector = PVector.random3D().mult(1.5f)
+            val offsetVector = PVector.random3D().mult(multiplier)
             skeletonVectors[index] = skeletonVectors[index].add(offsetVector)
         }
     }

@@ -8,7 +8,7 @@ class PushButton internal constructor(
         private val ch: Int,
         private val cc: Int,
         private val onPress: () -> Unit
-) {
+) : MidiControl() {
     init {
         midiBus.addMidiListener(object : SimpleMidiListenerAdapter() {
             override fun controllerChange(channel: Int, control: Int, v: Int) {
