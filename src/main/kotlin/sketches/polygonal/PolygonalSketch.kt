@@ -7,7 +7,6 @@ import processing.core.PApplet
 import processing.core.PApplet.map
 import processing.core.PApplet.sin
 import processing.core.PConstants
-import processing.event.KeyEvent
 import sketches.BaseSketch
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
@@ -28,11 +27,6 @@ class PolygonalSketch(override val sketch: PApplet,
 
     var shouldRegenerate = false
     var starMotion = Starfield.Motion.ZOOMING
-    var flickerEnabled = false // TODO midi
-    var centerWeightEnabled = false // TODO midi
-    var wiggleEnabled = false // TODO midi
-    var wiggleMultiplier = 1f // TODO midi
-    var starfieldRotationEnabled = false
 
     val joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
     val beatDetectButton = galaxy.createToggleButton(0, 7, true)
@@ -42,6 +36,11 @@ class PolygonalSketch(override val sketch: PApplet,
     val starAccelPot = galaxy.createPot(0, 12, 0f, 1f, 0.4f)
     val asteroidSizePot = galaxy.createPot(0, 13, 0f, 1f, 0.2f)
     val asteroidSizeMultPot = galaxy.createPot(0, 14, 0f, 5f, 1f)
+    val flickerButton = galaxy.createToggleButton(0, 15, false)
+    val centerWeightButton = galaxy.createToggleButton(0, 16, false)
+    val wiggleButton = galaxy.createToggleButton(0, 17, false)
+    val starfieldRotationEnabledButton = galaxy.createToggleButton(0, 18, true)
+    val wiggleMultiplierPot = galaxy.createPot(0, 19, 0f, 20f, 5f)
 
     val regenerateBtn = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
     val motionZoomBtn = galaxy.createPushButton(0, 8) { starMotion = Starfield.Motion.ZOOMING }
@@ -70,13 +69,13 @@ class PolygonalSketch(override val sketch: PApplet,
 
     private fun regenerate() {
         triangloids.removeAt(0)
-        triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor))
+        triangloids.add(Asteroid(sketch, centerWeightButton.isPressed, audioProcessor))
     }
 
     override fun setup() {
         starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
         starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
-        repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightEnabled, audioProcessor)) })
+        repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightButton.isPressed, audioProcessor)) })
         fftLogger = FFTLogger(sketch, audioProcessor)
     }
 
@@ -119,13 +118,15 @@ class PolygonalSketch(override val sketch: PApplet,
             debugWindow()
         }
 
-        if (flickerEnabled && sketch.frameCount % 4 == 0) {
+        if (flickerButton.isPressed && sketch.frameCount % 4 == 0) {
             return
         }
 
         // Stars
-        starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f * starfieldRotationPot.value))
-        starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f * starfieldRotationPot.value))
+        if (starfieldRotationEnabledButton.isPressed) {
+            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f * starfieldRotationPot.value))
+            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f * starfieldRotationPot.value))
+        }
 
         starfield1.setCount(starCountPot.value.toInt())
         starfield2.setCount(starCountPot.value.toInt())
@@ -143,8 +144,8 @@ class PolygonalSketch(override val sketch: PApplet,
             triangloid.getShape().rotateX(0.005f * (index + 1) + vy)
             triangloid.getShape().rotateZ(0.010f)
 
-            if (wiggleEnabled) {
-                triangloid.wiggle(1.5f) // MIDI
+            if (wiggleButton.isPressed) {
+                triangloid.wiggle(wiggleMultiplierPot.value)
             }
 
             pushMatrix()
@@ -182,6 +183,7 @@ class PolygonalSketch(override val sketch: PApplet,
 
         translate(centerX() * 0.8f + 40f, centerY() * 0.8f - 20)
         rect(0f, 0f, -bassSum * 4, -5f)
+        rect(0f, -10f, -rmsSum * 200, -5f)
 
         popMatrix()
     }
@@ -202,12 +204,7 @@ class PolygonalSketch(override val sketch: PApplet,
         text(basicInfoStr, 12f, 24f)
 
         // menu
-        val menuStr = StringBuilder()
-                .append("[d] toggle debug mode").newLine()
-                .append("[f] flicker: $flickerEnabled").newLine()
-                .append("[c] center-weighted triangloids: $centerWeightEnabled").newLine()
-                .append("[w] wiggle: $wiggleEnabled").newLine()
-                .toString()
+        val menuStr = "If you see this, find Matsem and tell him that he left debug mode on"
 
         noStroke()
         fill(hue, sat, bri)
@@ -253,18 +250,5 @@ class PolygonalSketch(override val sketch: PApplet,
 
     override fun mouseClicked() {
         regenerate()
-    }
-
-    override fun keyPressed(event: KeyEvent?) {
-        event?.let {
-            when (event.key) {
-                'f' -> flickerEnabled = !flickerEnabled
-                'c' -> centerWeightEnabled = !centerWeightEnabled
-                'w' -> wiggleEnabled = !wiggleEnabled
-                'r' -> starfieldRotationEnabled = !starfieldRotationEnabled
-            }
-        }
-
-        super.keyPressed(event)
     }
 }
