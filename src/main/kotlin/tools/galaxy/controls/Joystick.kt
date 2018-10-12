@@ -89,4 +89,8 @@ class Joystick internal constructor(
         midiBus.sendControllerChange(ch, ccZ, 127 / 2)
         z = 0f
     }
+
+    fun flipped() = apply {
+        flipped = true
+    }
 }

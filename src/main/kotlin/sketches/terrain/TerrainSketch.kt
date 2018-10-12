@@ -2,10 +2,8 @@ package sketches.terrain
 
 import centerX
 import centerY
-import midiRange
 import newLine
 import processing.core.PApplet
-import processing.core.PApplet.lerp
 import processing.core.PApplet.map
 import processing.core.PConstants
 import processing.core.PConstants.TRIANGLE_STRIP
@@ -47,12 +45,21 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     // region prefs
 
-    private var rotationZEnabled = false
-    private var drawMode = 0
-    private var terrainMode = 0
-    private var rotationX = 0f
-    private var rotationZ = 0f
-    private var ellSize = 0f
+    var rotationZEnabled = false
+    var drawMode = 0
+    var terrainMode = 0
+
+    var rotX = 0f
+    var rotY = 0f
+    var rotZ = 0f
+    val joystick = galaxy.createJoystick(1, 0, 1, 2, 3, 4, 5).flipped()
+    val terrainAmpPot = galaxy.createPot(1, 6, 0f, 200f, 100f)
+    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 2f)
+    val rotationResetButton = galaxy.createPushButton(1, 8) {
+        rotX = 0f
+        rotY = 0f
+        rotZ = 0f
+    }
 
     // endregion
 
@@ -77,8 +84,6 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     // endregion
 
-    // endregion
-
     private lateinit var fftLogger: FFTLogger
 
     override fun setup() {
@@ -91,6 +96,10 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     }
 
     override fun draw() {
+        rotX += joystick.y * .02f
+        rotY += joystick.x * .02f
+        rotZ += joystick.z * .02f
+
         background(258f, 84f, 25f)
 
         starfield.update(3)
@@ -103,23 +112,14 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         pushMatrix()
         translate(centerX(), centerY())
 
-        if (mousePressed) {
-            rotationX = lerp(rotationX, map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f), 0.1f)
-        }
-
-        if (rotationZEnabled) {
-            rotationZ += 0.002f
-        } else {
-            rotationZ = 0f
-        }
-
-        rotateX(rotationX)
-        rotateZ(rotationZ)
+        rotateX(rotX)
+        rotateY(rotY)
+        rotateZ(rotZ)
 
         translate(-w / 2, -h / 2)
 
         regenerate()
-        flying -= 0.05f
+        flying -= 0.05f // TODO midi
 
         for (y in 0 until rows - 1) {
             beginShape(TRIANGLE_STRIP)
@@ -157,7 +157,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
             val amp = if (x < audioProcessor.fft.avgSize()) {
-                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + galaxy.pot1.rawValue.midiRange(200f))
+                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + terrainAmpPot.value)
             } else {
                 0f
             }
@@ -201,10 +201,10 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
                         noise(xoff, yoff),
                         0f,
                         1f,
-                        -20f * galaxy.pot2.rawValue.midiRange(2f),
-                        50f * galaxy.pot2.rawValue.midiRange(2f)) + musicTerrain[y][x]
+                        -20f * perlinAmpPot.value,
+                        50f * perlinAmpPot.value) + musicTerrain[y][x]
 
-                xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f)
+                xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f) // TODO midi
             }
 
             yoff += 0.2f

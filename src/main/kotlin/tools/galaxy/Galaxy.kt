@@ -7,19 +7,11 @@ class Galaxy {
 
     lateinit var midiBus: MidiBus
 
-    lateinit var pot1: Pot
-    lateinit var pot2: Pot
-    lateinit var pot3: Pot
-
     val controls = mutableListOf<MidiControl>()
 
     fun connect() {
         midiBus = MidiBus(this, "TouchOSC Bridge", "TouchOSC Bridge")
         println("MidiBus connected")
-
-        pot1 = Pot(midiBus, 1, 1)
-        pot2 = Pot(midiBus, 1, 2)
-        pot3 = Pot(midiBus, 1, 3)
     }
 
     fun update() {

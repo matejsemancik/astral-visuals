@@ -28,7 +28,7 @@ class PolygonalSketch(override val sketch: PApplet,
     var shouldRegenerate = false
     var starMotion = Starfield.Motion.ZOOMING
 
-    val joystick = galaxy.createJoystick(0, 0, 1, 2, 20, 21, 22).apply { flipped = true }
+    val joystick = galaxy.createJoystick(0, 0, 1, 2, 20, 21, 22).flipped()
     val beatDetectButton = galaxy.createToggleButton(0, 7, true)
     val starSpeedPot = galaxy.createPot(0, 3, 0.5f, 5f, 0.5f).lerp(0.1f)
     val starCountPot = galaxy.createPot(0, 4, 0f, 1200f, 100f).lerp(0.005f)
