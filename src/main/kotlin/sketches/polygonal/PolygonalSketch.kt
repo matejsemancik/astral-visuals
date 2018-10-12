@@ -94,12 +94,6 @@ class PolygonalSketch(override val sketch: PApplet,
         vx *= 0.95f
         vy *= 0.95f
 
-//        centerWeightEnabled = kontrol.pad(0, 2).state
-//        wiggleEnabled = kontrol.pad(1, 0).state
-//        autoMouseEnabled = kontrol.pad(1, 1).state
-//        starCount = lerp(starCount.toFloat(), kontrol.knob1.midiRange(500f), 0.04f).toInt()
-//        hue = kontrol.encoder.midiRange(255f)starfieldRotation
-
         rmsSum += audioProcessor.audioInput.mix.level()
         rmsSum *= 0.2f
 
