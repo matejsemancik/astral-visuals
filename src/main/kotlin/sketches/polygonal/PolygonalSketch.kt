@@ -28,7 +28,7 @@ class PolygonalSketch(override val sketch: PApplet,
     var shouldRegenerate = false
     var starMotion = Starfield.Motion.ZOOMING
 
-    val joystick = galaxy.createJoystick(0, 0, 1, 2).apply { flipped = true }
+    val joystick = galaxy.createJoystick(0, 0, 1, 2, 20, 21, 22).apply { flipped = true }
     val beatDetectButton = galaxy.createToggleButton(0, 7, true)
     val starSpeedPot = galaxy.createPot(0, 3, 0.5f, 5f, 0.5f).lerp(0.1f)
     val starCountPot = galaxy.createPot(0, 4, 0f, 1200f, 100f).lerp(0.005f)
@@ -66,6 +66,7 @@ class PolygonalSketch(override val sketch: PApplet,
     var bassSum = 0f
     var vx = 0f
     var vy = 0f
+    var vz = 0f
 
     private fun regenerate() {
         triangloids.removeAt(0)
@@ -91,8 +92,10 @@ class PolygonalSketch(override val sketch: PApplet,
 
         vx += joystick.x * .01f
         vy += joystick.y * .01f
+        vz += joystick.z * .01f
         vx *= 0.95f
         vy *= 0.95f
+        vz *= 0.95f
 
         rmsSum += audioProcessor.audioInput.mix.level()
         rmsSum *= 0.2f
@@ -136,7 +139,7 @@ class PolygonalSketch(override val sketch: PApplet,
         for ((index, triangloid) in triangloids.withIndex()) {
             triangloid.getShape().rotateY(0f + map(bassSum, 0f, 50f, 0f, 0.05f) + vx)
             triangloid.getShape().rotateX(0.005f * (index + 1) + vy)
-            triangloid.getShape().rotateZ(0.010f)
+            triangloid.getShape().rotateZ(0.010f + vz)
 
             if (wiggleButton.isPressed) {
                 triangloid.wiggle(wiggleMultiplierPot.value)

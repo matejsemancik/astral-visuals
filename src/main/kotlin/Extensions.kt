@@ -43,3 +43,5 @@ fun Int.midiRange(start: Float, end: Float): Float {
 fun Int.midiRange(top: Float): Float {
     return this.midiRange(0f, top)
 }
+
+fun Boolean.midiValue(): Int = if (this) 127 else 0

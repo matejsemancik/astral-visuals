@@ -26,8 +26,8 @@ class Galaxy {
         controls.forEach { it.onUpdate() }
     }
 
-    fun createJoystick(channel: Int, ccX: Int, ccY: Int, ccTouch: Int): Joystick =
-            Joystick(midiBus, channel, ccX, ccY, ccTouch).also { controls.add(it) }
+    fun createJoystick(channel: Int, ccX: Int, ccY: Int, ccTouchXY: Int, ccZ: Int, ccTouchZ: Int, ccFeedbackEnabled: Int): Joystick =
+            Joystick(midiBus, channel, ccX, ccY, ccTouchXY, ccZ, ccTouchZ, ccFeedbackEnabled).also { controls.add(it) }
 
     fun createPushButton(channel: Int, cc: Int, onPress: () -> Unit) =
             PushButton(midiBus, channel, cc, onPress).also { controls.add(it) }
