@@ -55,13 +55,13 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     var rotZ = 0f
     val joystick = galaxy.createJoystick(1, 0, 1, 2, 3, 4, 5).flipped()
     val terrainAmpPot = galaxy.createPot(1, 6, 0f, 200f, 100f)
-    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 2f, 1f)
+    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 2f, 1.5f)
     val rotationResetButton = galaxy.createPushButton(1, 8) {
         rotX = 0f + PConstants.PI / 2f
         rotY = 0f
         rotZ = 0f
     }
-    val perlinResPot = galaxy.createPot(1, 9, 0f, 0.5f, 0.2f)
+    val perlinResPot = galaxy.createPot(1, 9, 0f, 0.5f, 0.4f)
 
     // endregion
 
@@ -83,6 +83,8 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     // region other shit
 
     private lateinit var starfield: Starfield
+    private lateinit var starfield2: Starfield
+    val font = sketch.createFont("georgiab.ttf", 24f, true)
 
     // endregion
 
@@ -90,7 +92,12 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     override fun setup() {
         fftLogger = FFTLogger(sketch, audioProcessor)
-        starfield = Starfield(sketch, 800)
+        starfield = Starfield(sketch, 1200).apply {
+            setColor(258f, 100f, 100f)
+        }
+        starfield2 = Starfield(sketch, 1200).apply {
+            setColor(258f, 100f, 100f)
+        }
     }
 
     override fun onBecameActive() {
@@ -98,14 +105,16 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     }
 
     override fun draw() {
-        rotX += joystick.y * .02f
+        rotX += joystick.y * .02f + 0.005f
         rotY += joystick.x * .02f
         rotZ += joystick.z * .02f
 
         background(258f, 84f, 25f)
 
-        starfield.update(3)
+        starfield.update(3 + (audioProcessor.getRange(6000f..12000f) * 5f).toInt())
         starfield.draw()
+        starfield2.update(3 + (audioProcessor.getRange(2500f..2600f) * 3f).toInt())
+        starfield2.draw()
 
         stroke(130f, 255f, 255f)
         strokeWeight(1.4f)
@@ -136,6 +145,21 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
         translate(-w / 2, -h / 2, longerDimension() / 4f)
         drawTerrain(-1f)
+        popMatrix()
+
+        pushMatrix()
+        translate(centerX(), centerY())
+        scale(1f + audioProcessor.getFftAvg(0) * 0.0004f)
+        sketch.textFont(font)
+        sketch.textAlign(PConstants.CENTER)
+        noStroke()
+        fill(130f, 100f, 100f)
+        textSize(48f)
+        text("BOP (RU) at Astral", 0f, 0f)
+        textSize(32f)
+        text("Lixx (SK) / Soul Ex Machina", 0f, 42f)
+        textSize(32f)
+        text("09/11/18 / Kabinet Múz", 0f, 92f)
         popMatrix()
 
         if (isInDebugMode) {

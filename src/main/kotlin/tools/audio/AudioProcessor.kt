@@ -43,7 +43,20 @@ class AudioProcessor constructor(
         ranges.addAll(newRanges)
     }
 
-    fun getRange(range: ClosedFloatingPointRange<Float>): Float = fft.calcAvg(range.start, range.endInclusive) * gain
+    fun getRange(range: ClosedFloatingPointRange<Float>): Float {
+        if (isInRenderMode) {
+            val values = mutableListOf<Float>()
+            for (i in 0 until mockLeft.size) {
+                if (range.contains(fft.getAverageCenterFrequency(i))) {
+                    values.add((mockLeft[i] + mockRight[i]) / 2f)
+                }
+            }
+
+            return values.average().toFloat() * gain
+        } else {
+            return fft.calcAvg(range.start, range.endInclusive) * gain
+        }
+    }
 
     fun getFftAvg(i: Int): Float {
         return if (isInRenderMode) {
