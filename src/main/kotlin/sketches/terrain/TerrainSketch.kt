@@ -2,6 +2,7 @@ package sketches.terrain
 
 import centerX
 import centerY
+import longerDimension
 import newLine
 import processing.core.PApplet
 import processing.core.PApplet.map
@@ -49,24 +50,25 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     var drawMode = 0
     var terrainMode = 0
 
-    var rotX = 0f
-    var rotY = 0f
+    var rotX = 0f + PConstants.PI / 2f
+    var rotY = 0f + PConstants.PI / 2f
     var rotZ = 0f
     val joystick = galaxy.createJoystick(1, 0, 1, 2, 3, 4, 5).flipped()
     val terrainAmpPot = galaxy.createPot(1, 6, 0f, 200f, 100f)
-    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 2f)
+    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 2f, 1f)
     val rotationResetButton = galaxy.createPushButton(1, 8) {
-        rotX = 0f
+        rotX = 0f + PConstants.PI / 2f
         rotY = 0f
         rotZ = 0f
     }
+    val perlinResPot = galaxy.createPot(1, 9, 0f, 0.5f, 0.2f)
 
     // endregion
 
     // region Terrain
-    private val w = 720f
-    private val h = 900f
-    private var scale = 20f
+    private val w = 1280f
+    private val h = 1080f
+    private var scale = 60f
 
     private var cols = (w / scale).toInt()
     private var rows = (h / scale).toInt()
@@ -109,6 +111,10 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         strokeWeight(1.4f)
         fill(258f, 84f, 25f)
 
+        regenerate()
+        flying -= 0.05f // TODO midi
+
+        // First terrain
         pushMatrix()
         translate(centerX(), centerY())
 
@@ -116,38 +122,49 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         rotateY(rotY)
         rotateZ(rotZ)
 
-        translate(-w / 2, -h / 2)
+        translate(-w / 2, -h / 2, -longerDimension() / 4f)
+        drawTerrain(1f)
+        popMatrix()
 
-        regenerate()
-        flying -= 0.05f // TODO midi
+        // Second terrain
+        pushMatrix()
+        translate(centerX(), centerY())
 
+        rotateX(rotX)
+        rotateY(rotY)
+        rotateZ(rotZ)
+
+        translate(-w / 2, -h / 2, longerDimension() / 4f)
+        drawTerrain(-1f)
+        popMatrix()
+
+        if (isInDebugMode) {
+            debugWindow()
+        }
+    }
+
+    fun drawTerrain(multiplier: Float) {
         for (y in 0 until rows - 1) {
             beginShape(TRIANGLE_STRIP)
 
             for (x in 0 until cols) {
                 when (RENDER_MODES[drawMode]) {
                     RENDER_MODE_TRIANGLE_STRIP -> {
-                        vertex(x * scale, y * scale, terrain[y][x])
-                        vertex(x * scale, (y + 1) * scale, terrain[y + 1][x])
+                        vertex(x * scale, y * scale, terrain[y][x] * multiplier)
+                        vertex(x * scale, (y + 1) * scale, terrain[y + 1][x] * multiplier)
                     }
 
                     RENDER_MODE_LINES_Z -> {
-                        vertex(x * scale, y * scale, terrain[y][x])
+                        vertex(x * scale, y * scale, terrain[y][x] * multiplier)
                     }
 
                     RENDER_MODE_LINES_Y -> {
-                        vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), 0f)
+                        vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), 0f * multiplier)
                     }
                 }
             }
 
             endShape()
-        }
-
-        popMatrix()
-
-        if (isInDebugMode) {
-            debugWindow()
         }
     }
 
@@ -204,7 +221,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
                         -20f * perlinAmpPot.value,
                         50f * perlinAmpPot.value) + musicTerrain[y][x]
 
-                xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f) // TODO midi
+                xoff += perlinResPot.value
             }
 
             yoff += 0.2f

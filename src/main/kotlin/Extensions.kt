@@ -45,3 +45,19 @@ fun Int.midiRange(top: Float): Float {
 }
 
 fun Boolean.midiValue(): Int = if (this) 127 else 0
+
+fun BaseSketch.shorterDimension(): Int {
+    return if (width < height) {
+        width
+    } else {
+        height
+    }
+}
+
+fun BaseSketch.longerDimension(): Int {
+    return if (width > height) {
+        width
+    } else {
+        height
+    }
+}
