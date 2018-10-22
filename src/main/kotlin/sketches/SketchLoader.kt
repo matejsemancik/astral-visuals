@@ -31,7 +31,7 @@ class SketchLoader : PApplet() {
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
 
-    val isInRenderMode = true
+    val isInRenderMode = false
     val audioFilePath = "bop2.wav"
     val sep = "|"
     val movieFps = 30f
@@ -47,8 +47,8 @@ class SketchLoader : PApplet() {
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
-        size(720, 1280, PConstants.P3D)
-        smooth(4)
+        size(1280, 720, PConstants.P3D)
+        noSmooth()
     }
 
     override fun setup() {
@@ -194,8 +194,8 @@ class SketchLoader : PApplet() {
         val fftL = FFT(fftSize, sampleRate)
         val fftR = FFT(fftSize, sampleRate)
 
-        fftL.logAverages(22, 1)
-        fftR.logAverages(22, 1)
+        fftL.logAverages(22, 3)
+        fftR.logAverages(22, 3)
 
         val totalChunks = samplesL.size / fftSize + 1
         val fftSlices = fftL.avgSize()

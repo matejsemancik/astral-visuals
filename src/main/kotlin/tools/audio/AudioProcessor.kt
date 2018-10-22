@@ -29,7 +29,7 @@ class AudioProcessor constructor(
         if (!isInRenderMode) addListener(this@AudioProcessor)
     }
     val fft = FFT(audioInput.bufferSize(), audioInput.sampleRate()).apply {
-        logAverages(22, 1)
+        logAverages(22, 3)
     }
     val beatDetect = BeatDetect(audioInput.bufferSize(), audioInput.sampleRate()).apply {
         setSensitivity(150)

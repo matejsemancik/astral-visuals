@@ -2,7 +2,6 @@ package sketches.terrain
 
 import centerX
 import centerY
-import longerDimension
 import newLine
 import processing.core.PApplet
 import processing.core.PApplet.map
@@ -46,12 +45,11 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     // region prefs
 
-    var rotationZEnabled = false
     var drawMode = 0
     var terrainMode = 0
 
     var rotX = 0f + PConstants.PI / 2f
-    var rotY = 0f + PConstants.PI / 2f
+    var rotY = 0f
     var rotZ = 0f
     val joystick = galaxy.createJoystick(1, 0, 1, 2, 3, 4, 5).flipped()
     val terrainAmpPot = galaxy.createPot(1, 6, 0f, 200f, 100f)
@@ -62,13 +60,14 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         rotZ = 0f
     }
     val perlinResPot = galaxy.createPot(1, 9, 0f, 0.5f, 0.4f)
+    val distancePot = galaxy.createPot(1, 10, -width / 1.5f, width / 1.5f, 0f).lerp(0.05f)
 
     // endregion
 
     // region Terrain
-    private val w = 1280f
+    private val w = 1600f
     private val h = 1080f
-    private var scale = 60f
+    private var scale = 50f
 
     private var cols = (w / scale).toInt()
     private var rows = (h / scale).toInt()
@@ -105,7 +104,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     }
 
     override fun draw() {
-        rotX += joystick.y * .02f + 0.005f
+        rotX += joystick.y * .02f
         rotY += joystick.x * .02f
         rotZ += joystick.z * .02f
 
@@ -131,7 +130,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         rotateY(rotY)
         rotateZ(rotZ)
 
-        translate(-w / 2, -h / 2, -longerDimension() / 4f)
+        translate(-w / 2, -h / 2, -distancePot.value)
         drawTerrain(1f)
         popMatrix()
 
@@ -143,23 +142,8 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         rotateY(rotY)
         rotateZ(rotZ)
 
-        translate(-w / 2, -h / 2, longerDimension() / 4f)
+        translate(-w / 2, -h / 2, distancePot.value)
         drawTerrain(-1f)
-        popMatrix()
-
-        pushMatrix()
-        translate(centerX(), centerY())
-        scale(1f + audioProcessor.getFftAvg(0) * 0.0004f)
-        sketch.textFont(font)
-        sketch.textAlign(PConstants.CENTER)
-        noStroke()
-        fill(130f, 100f, 100f)
-        textSize(48f)
-        text("BOP (RU) at Astral", 0f, 0f)
-        textSize(32f)
-        text("Lixx (SK) / Soul Ex Machina", 0f, 42f)
-        textSize(32f)
-        text("09/11/18 / Kabinet Múz", 0f, 92f)
         popMatrix()
 
         if (isInDebugMode) {
@@ -272,7 +256,6 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         // menu
         val menuStr = StringBuilder()
                 .append("[d] toggle debug mode").newLine()
-                .append("[r] Z rotation: $rotationZEnabled").newLine()
                 .append("[m] drawing mode: ${RENDER_MODES[drawMode]}").newLine()
                 .append("[t] terrain mode: ${TERRAIN_MODES[terrainMode]}")
                 .toString()
@@ -286,7 +269,6 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             when (event.key) {
-                'r' -> rotationZEnabled = !rotationZEnabled
                 'm' -> {
                     drawMode++
                     if (drawMode >= RENDER_MODES.size) {
