@@ -100,10 +100,8 @@ class PolygonalSketch(override val sketch: PApplet,
         rmsSum += audioProcessor.audioInput.mix.level()
         rmsSum *= 0.2f
 
-        if (audioProcessor.fft.avgSize() >= 2) {
-            bassSum += audioProcessor.getFftAvg(0)
-            bassSum *= 0.2f
-        }
+        bassSum += audioProcessor.getRange(0f..50f)
+        bassSum *= 0.2f
 
         if (beatDetectButton.isPressed && audioProcessor.beatDetect.isSnare) {
             regenerate()
