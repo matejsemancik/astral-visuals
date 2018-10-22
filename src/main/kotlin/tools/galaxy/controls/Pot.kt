@@ -41,6 +41,10 @@ open class Pot internal constructor(
         value = PApplet.lerp(value, PApplet.map(rawValue.toFloat(), 0f, 127f, min, max), lerp)
     }
 
+    override fun sendClientUpdate() {
+        midiBus.sendControllerChange(ch, cc, rawValue)
+    }
+
     fun lerp(lerp: Float) = apply {
         this.lerp = lerp
     }

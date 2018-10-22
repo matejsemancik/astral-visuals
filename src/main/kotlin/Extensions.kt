@@ -44,6 +44,8 @@ fun Int.midiRange(top: Float): Float {
     return this.midiRange(0f, top)
 }
 
+fun Float.toMidi(low: Float, high: Float): Int = PApplet.map(this, low, high, 0f, 127f).toInt()
+
 fun Boolean.midiValue(): Int = if (this) 127 else 0
 
 fun BaseSketch.shorterDimension(): Int {

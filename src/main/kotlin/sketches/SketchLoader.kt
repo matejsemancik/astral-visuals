@@ -30,6 +30,7 @@ class SketchLoader : PApplet() {
     private val galaxy: Galaxy = Galaxy()
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
+    private lateinit var resendButton: PushButton
 
     val isInRenderMode = false
     val audioFilePath = "bop2.wav"
@@ -59,6 +60,9 @@ class SketchLoader : PApplet() {
 
         gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
         debugButton = galaxy.createToggleButton(15, 65, false)
+        resendButton = galaxy.createPushButton(15, 66) {
+            galaxy.sendClientUpdates()
+        }
 
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
 

@@ -3,6 +3,7 @@ package tools.galaxy.controls
 import midiRange
 import midiValue
 import themidibus.MidiBus
+import toMidi
 import tools.galaxy.SimpleMidiListenerAdapter
 
 class Joystick internal constructor(
@@ -88,6 +89,12 @@ class Joystick internal constructor(
     private fun centerZ() {
         midiBus.sendControllerChange(ch, ccZ, 127 / 2)
         z = 0f
+    }
+
+    override fun sendClientUpdate() {
+        midiBus.sendControllerChange(ch, if (!flipped) ccX else ccY, x.toMidi(-1f, 1f))
+        midiBus.sendControllerChange(ch, if (!flipped) ccY else ccX, y.toMidi(-1f, 1f))
+        midiBus.sendControllerChange(ch, ccZ, z.toMidi(-1f, 1f))
     }
 
     fun flipped() = apply {

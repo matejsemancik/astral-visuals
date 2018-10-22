@@ -31,6 +31,10 @@ class Galaxy {
             Pot(midiBus, channel, cc, min, max, initialValue).also { controls.add(it) }
 
     fun controllerChange(channel: Int, cc: Int, value: Int) {
-//        println("channel: $channel cc: $cc value: $value")
+        println("channel: $channel cc: $cc value: $value")
+    }
+
+    fun sendClientUpdates() {
+        controls.forEach { it.sendClientUpdate() }
     }
 }
