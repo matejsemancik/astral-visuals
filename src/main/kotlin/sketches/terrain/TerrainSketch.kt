@@ -53,7 +53,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     var rotZ = 0f
     val joystick = galaxy.createJoystick(1, 0, 1, 2, 3, 4, 5).flipped()
     val terrainAmpPot = galaxy.createPot(1, 6, 0f, 200f, 100f)
-    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 2f, 1.5f)
+    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 4f, 1.5f)
     val rotationResetButton = galaxy.createPushButton(1, 8) {
         rotX = 0f + PConstants.PI / 2f
         rotY = 0f
@@ -61,12 +61,15 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     }
     val perlinResPot = galaxy.createPot(1, 9, 0f, 0.5f, 0.4f)
     val distancePot = galaxy.createPot(1, 10, -width / 1.5f, width / 1.5f, 0f).lerp(0.05f)
+    val flyingPot = galaxy.createPot(1, 11, -0.1f, 0.1f, 0f).lerp(0.05f)
+    val perlinBoostPot = galaxy.createPot(1, 12, 0f, 5f, 0f)
+    val secondTerrainButton = galaxy.createToggleButton(1, 13, true)
 
     // endregion
 
     // region Terrain
     private val w = 1600f
-    private val h = 1080f
+    private val h = 1920f
     private var scale = 50f
 
     private var cols = (w / scale).toInt()
@@ -120,19 +123,21 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         fill(258f, 84f, 25f)
 
         regenerate()
-        flying -= 0.05f // TODO midi
+        flying += flyingPot.value
 
-        // First terrain
-        pushMatrix()
-        translate(centerX(), centerY())
+        // First terrain (upper)
+        if (secondTerrainButton.isPressed) {
+            pushMatrix()
+            translate(centerX(), centerY())
 
-        rotateX(rotX)
-        rotateY(rotY)
-        rotateZ(rotZ)
+            rotateX(rotX)
+            rotateY(rotY)
+            rotateZ(rotZ)
 
-        translate(-w / 2, -h / 2, -distancePot.value)
-        drawTerrain(1f)
-        popMatrix()
+            translate(-w / 2, -h / 2, -distancePot.value)
+            drawTerrain(1f)
+            popMatrix()
+        }
 
         // Second terrain
         pushMatrix()
@@ -227,7 +232,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
                         0f,
                         1f,
                         -20f * perlinAmpPot.value,
-                        50f * perlinAmpPot.value) + musicTerrain[y][x]
+                        50f * perlinAmpPot.value) + musicTerrain[y][x] + audioProcessor.getRange(6000f..12000f) * perlinBoostPot.value
 
                 xoff += perlinResPot.value
             }
