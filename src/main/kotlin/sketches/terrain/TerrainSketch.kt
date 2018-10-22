@@ -7,7 +7,6 @@ import processing.core.PApplet
 import processing.core.PApplet.map
 import processing.core.PConstants
 import processing.core.PConstants.TRIANGLE_STRIP
-import processing.event.KeyEvent
 import sketches.BaseSketch
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
@@ -45,7 +44,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     // region prefs
 
-    var drawMode = 0
+    var renderMode = 0
     var terrainMode = 0
 
     var rotX = 0f + PConstants.PI / 2f
@@ -64,6 +63,8 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     val flyingPot = galaxy.createPot(1, 11, -0.1f, 0.1f, 0f).lerp(0.05f)
     val perlinBoostPot = galaxy.createPot(1, 12, 0f, 5f, 0f)
     val secondTerrainButton = galaxy.createToggleButton(1, 13, true)
+    val renderModeButtons = galaxy.createButtonGroup(1, listOf(14, 15, 16), listOf(14))
+    val terrainModeButtons = galaxy.createButtonGroup(1, listOf(17, 18, 19, 20), listOf(17))
 
     // endregion
 
@@ -107,6 +108,9 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     }
 
     override fun draw() {
+        renderMode = renderModeButtons.activeButtons().first()
+        terrainMode = terrainModeButtons.activeButtons().first()
+
         rotX += joystick.y * .02f
         rotY += joystick.x * .02f
         rotZ += joystick.z * .02f
@@ -161,7 +165,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
             beginShape(TRIANGLE_STRIP)
 
             for (x in 0 until cols) {
-                when (RENDER_MODES[drawMode]) {
+                when (RENDER_MODES[renderMode]) {
                     RENDER_MODE_TRIANGLE_STRIP -> {
                         vertex(x * scale, y * scale, terrain[y][x] * multiplier)
                         vertex(x * scale, (y + 1) * scale, terrain[y + 1][x] * multiplier)
@@ -261,7 +265,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         // menu
         val menuStr = StringBuilder()
                 .append("[d] toggle debug mode").newLine()
-                .append("[m] drawing mode: ${RENDER_MODES[drawMode]}").newLine()
+                .append("[m] drawing mode: ${RENDER_MODES[renderMode]}").newLine()
                 .append("[t] terrain mode: ${TERRAIN_MODES[terrainMode]}")
                 .toString()
 
@@ -269,26 +273,5 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         fill(0f, 255f, 100f)
         textSize(14f)
         text(menuStr, 12f, height - menuStr.lines().size * 20f)
-    }
-
-    override fun keyPressed(event: KeyEvent?) {
-        event?.let {
-            when (event.key) {
-                'm' -> {
-                    drawMode++
-                    if (drawMode >= RENDER_MODES.size) {
-                        drawMode = 0
-                    }
-                }
-                't' -> {
-                    terrainMode++
-                    if (terrainMode >= TERRAIN_MODES.size) {
-                        terrainMode = 0
-                    }
-                }
-            }
-        }
-
-        super.keyPressed(event)
     }
 }
