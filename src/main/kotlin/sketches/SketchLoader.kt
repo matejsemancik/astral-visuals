@@ -31,6 +31,7 @@ class SketchLoader : PApplet() {
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
     private lateinit var resendButton: PushButton
+    private lateinit var colorResetButton: PushButton
 
     private var bgHue = 258f
     private var bgSat = 84f
@@ -85,17 +86,22 @@ class SketchLoader : PApplet() {
             galaxy.sendClientUpdates()
         }
 
-        bgHuePot = galaxy.createPot(15, 67, 0f, 360f, bgHue)
-        bgSatPot = galaxy.createPot(15, 68, 0f, 100f, bgSat)
-        bgBriPot = galaxy.createPot(15, 69, 0f, 100f, bgBri)
+        val colorPots = mutableListOf<Pot>()
+        colorResetButton = galaxy.createPushButton(15, 76) {
+            colorPots.forEach { it.reset() }
+        }
 
-        fgHuePot = galaxy.createPot(15, 70, 0f, 360f, fgHue)
-        fgSatPot = galaxy.createPot(15, 71, 0f, 100f, fgSat)
-        fgBriPot = galaxy.createPot(15, 72, 0f, 100f, fgBri)
+        bgHuePot = galaxy.createPot(15, 67, 0f, 360f, bgHue).also { colorPots.add(it) }
+        bgSatPot = galaxy.createPot(15, 68, 0f, 100f, bgSat).also { colorPots.add(it) }
+        bgBriPot = galaxy.createPot(15, 69, 0f, 100f, bgBri).also { colorPots.add(it) }
 
-        accentHuePot = galaxy.createPot(15, 73, 0f, 360f, accentHue)
-        accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentSat)
-        accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentBri)
+        fgHuePot = galaxy.createPot(15, 70, 0f, 360f, fgHue).also { colorPots.add(it) }
+        fgSatPot = galaxy.createPot(15, 71, 0f, 100f, fgSat).also { colorPots.add(it) }
+        fgBriPot = galaxy.createPot(15, 72, 0f, 100f, fgBri).also { colorPots.add(it) }
+
+        accentHuePot = galaxy.createPot(15, 73, 0f, 360f, accentHue).also { colorPots.add(it) }
+        accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentSat).also { colorPots.add(it) }
+        accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentBri).also { colorPots.add(it) }
 
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
 

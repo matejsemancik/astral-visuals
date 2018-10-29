@@ -45,6 +45,12 @@ open class Pot internal constructor(
         midiBus.sendControllerChange(ch, cc, rawValue)
     }
 
+    fun reset() {
+        value = initialValue
+        rawValue = PApplet.map(initialValue, min, max, 0f, 127f).toInt()
+        midiBus.sendControllerChange(ch, cc, rawValue)
+    }
+
     fun lerp(lerp: Float) = apply {
         this.lerp = lerp
     }
