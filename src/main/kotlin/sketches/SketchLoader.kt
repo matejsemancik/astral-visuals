@@ -32,6 +32,27 @@ class SketchLoader : PApplet() {
     private lateinit var gainPot: Pot
     private lateinit var resendButton: PushButton
 
+    private var bgHue = 258f
+    private var bgSat = 84f
+    private var bgBri = 25f
+    lateinit var bgHuePot: Pot
+    lateinit var bgSatPot: Pot
+    lateinit var bgBriPot: Pot
+
+    private var fgHue = 258f
+    private var fgSat = 100f
+    private var fgBri = 100f
+    lateinit var fgHuePot: Pot
+    lateinit var fgSatPot: Pot
+    lateinit var fgBriPot: Pot
+
+    private var accentHue = 130f
+    private var accentSat = 100f
+    private var accentBri = 100f
+    lateinit var accentHuePot: Pot
+    lateinit var accentSatPot: Pot
+    lateinit var accentBriPot: Pot
+
     val isInRenderMode = false
     val audioFilePath = "bop2.wav"
     val sep = "|"
@@ -44,7 +65,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '2'
+    var selector = '1'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -63,6 +84,18 @@ class SketchLoader : PApplet() {
         resendButton = galaxy.createPushButton(15, 66) {
             galaxy.sendClientUpdates()
         }
+
+        bgHuePot = galaxy.createPot(15, 67, 0f, 360f, bgHue)
+        bgSatPot = galaxy.createPot(15, 68, 0f, 100f, bgSat)
+        bgBriPot = galaxy.createPot(15, 69, 0f, 100f, bgBri)
+
+        fgHuePot = galaxy.createPot(15, 70, 0f, 360f, fgHue)
+        fgSatPot = galaxy.createPot(15, 71, 0f, 100f, fgSat)
+        fgBriPot = galaxy.createPot(15, 72, 0f, 100f, fgBri)
+
+        accentHuePot = galaxy.createPot(15, 73, 0f, 360f, accentHue)
+        accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentSat)
+        accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentBri)
 
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
 
@@ -107,7 +140,7 @@ class SketchLoader : PApplet() {
             audioProcessor.gain = 2f
             activeSketch().isInDebugMode = false
 
-            var line: String? = null
+            var line: String?
             try {
                 line = reader.readLine()
             } catch (exception: IOException) {

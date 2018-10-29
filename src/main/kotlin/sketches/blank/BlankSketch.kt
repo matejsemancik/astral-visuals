@@ -1,11 +1,11 @@
 package sketches.blank
 
-import processing.core.PApplet
 import sketches.BaseSketch
+import sketches.SketchLoader
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
-class BlankSketch(override val sketch: PApplet,
+class BlankSketch(override val sketch: SketchLoader,
                   audioProcessor: AudioProcessor,
                   galaxy: Galaxy)
     : BaseSketch(sketch, audioProcessor, galaxy) {

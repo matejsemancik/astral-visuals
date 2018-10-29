@@ -6,6 +6,7 @@ import processing.core.PApplet
 import processing.core.PApplet.*
 import processing.core.PConstants
 import sketches.BaseSketch
+import sketches.SketchLoader
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
@@ -13,7 +14,7 @@ import tools.galaxy.Galaxy
  * Based on https://www.openprocessing.org/sketch/103897
  */
 class FibSphereSketch(
-        override val sketch: PApplet,
+        override val sketch: SketchLoader,
         val audioProcessor: AudioProcessor,
         val galaxy: Galaxy)
     : BaseSketch(sketch, audioProcessor, galaxy) {

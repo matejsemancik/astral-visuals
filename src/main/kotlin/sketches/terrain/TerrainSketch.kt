@@ -3,17 +3,17 @@ package sketches.terrain
 import centerX
 import centerY
 import newLine
-import processing.core.PApplet
 import processing.core.PApplet.map
 import processing.core.PConstants
 import processing.core.PConstants.TRIANGLE_STRIP
 import sketches.BaseSketch
+import sketches.SketchLoader
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
-class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProcessor, val galaxy: Galaxy)
+class TerrainSketch(override val sketch: SketchLoader, val audioProcessor: AudioProcessor, val galaxy: Galaxy)
     : BaseSketch(sketch, audioProcessor, galaxy), PConstants {
 
     companion object {
@@ -95,12 +95,8 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     override fun setup() {
         fftLogger = FFTLogger(sketch, audioProcessor)
-        starfield = Starfield(sketch, 1200).apply {
-            setColor(258f, 100f, 100f)
-        }
-        starfield2 = Starfield(sketch, 1200).apply {
-            setColor(258f, 100f, 100f)
-        }
+        starfield = Starfield(sketch, 1200)
+        starfield2 = Starfield(sketch, 1200)
     }
 
     override fun onBecameActive() {
@@ -115,16 +111,18 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         rotY += joystick.x * .02f
         rotZ += joystick.z * .02f
 
-        background(258f, 84f, 25f)
+        background(bgHue, bgSat, bgBrightness)
 
         starfield.update(3 + (audioProcessor.getRange(6000f..12000f) * 5f).toInt())
+        starfield.setColor(fgHue, fgSat, fgBrightness)
         starfield.draw()
         starfield2.update(3 + (audioProcessor.getRange(2500f..2600f) * 3f).toInt())
+        starfield2.setColor(fgHue + 2, fgSat, fgBrightness)
         starfield2.draw()
 
-        stroke(130f, 255f, 255f)
+        stroke(accentHue, accentSat, accentBrightness)
         strokeWeight(1.4f)
-        fill(258f, 84f, 25f)
+        fill(bgHue, bgSat, bgBrightness)
 
         regenerate()
         flying += flyingPot.value

@@ -1,14 +1,14 @@
 package sketches.starglitch
 
 import newLine
-import processing.core.PApplet
 import processing.event.KeyEvent
 import sketches.BaseSketch
+import sketches.SketchLoader
 import sketches.starglitch.star.Starfield2
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
-class StarGlitchSketch(override val sketch: PApplet,
+class StarGlitchSketch(override val sketch: SketchLoader,
                        val audioProcessor: AudioProcessor,
                        val galaxy: Galaxy)
     : BaseSketch(sketch, audioProcessor, galaxy) {
