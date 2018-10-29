@@ -3,18 +3,18 @@ package sketches.polygonal
 import centerX
 import centerY
 import newLine
-import processing.core.PApplet
 import processing.core.PApplet.map
 import processing.core.PApplet.sin
 import processing.core.PConstants
 import sketches.BaseSketch
+import sketches.SketchLoader
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
-class PolygonalSketch(override val sketch: PApplet,
+class PolygonalSketch(override val sketch: SketchLoader,
                       val audioProcessor: AudioProcessor,
                       val galaxy: Galaxy)
     : BaseSketch(sketch, audioProcessor, galaxy) {
@@ -28,7 +28,7 @@ class PolygonalSketch(override val sketch: PApplet,
     var shouldRegenerate = false
     var starMotion = Starfield.Motion.ZOOMING
 
-    val joystick = galaxy.createJoystick(0, 0, 1, 2, 20, 21, 22).apply { flipped = true }
+    val joystick = galaxy.createJoystick(0, 0, 1, 2, 20, 21, 22).flipped()
     val beatDetectButton = galaxy.createToggleButton(0, 7, true)
     val starSpeedPot = galaxy.createPot(0, 3, 0.5f, 5f, 0.5f).lerp(0.1f)
     val starCountPot = galaxy.createPot(0, 4, 0f, 1200f, 100f).lerp(0.005f)
@@ -46,10 +46,6 @@ class PolygonalSketch(override val sketch: PApplet,
     val motionZoomBtn = galaxy.createPushButton(0, 8) { starMotion = Starfield.Motion.ZOOMING }
     val motionTranslateBWDBtn = galaxy.createPushButton(0, 9) { starMotion = Starfield.Motion.TRANSLATING_BACKWARD }
     val motionTranslateFWDBtn = galaxy.createPushButton(0, 11) { starMotion = Starfield.Motion.TRANSLATING_FORWARD }
-
-    var hue = 130f
-    var sat = 255f
-    var bri = 255f
 
     // endregion
 
@@ -100,16 +96,14 @@ class PolygonalSketch(override val sketch: PApplet,
         rmsSum += audioProcessor.audioInput.mix.level()
         rmsSum *= 0.2f
 
-        if (audioProcessor.fft.avgSize() >= 2) {
-            bassSum += audioProcessor.getFftAvg(0)
-            bassSum *= 0.2f
-        }
+        bassSum += audioProcessor.getRange(0f..50f)
+        bassSum *= 0.2f
 
         if (beatDetectButton.isPressed && audioProcessor.beatDetect.isSnare) {
             regenerate()
         }
 
-        background(258f, 84f, 25f)
+        background(bgHue, bgSat, bgBrightness)
 
         if (isInDebugMode) {
             debugWindow()
@@ -129,8 +123,8 @@ class PolygonalSketch(override val sketch: PApplet,
         starfield2.setCount(starCountPot.value.toInt())
         starfield1.update(speed = (2 * starSpeedPot.value).toInt() + (bassSum * starAccelPot.value).toInt())
         starfield2.update(speed = (4 * starSpeedPot.value).toInt())
-        starfield1.setColor(hue, sat, bri)
-        starfield2.setColor(hue, sat, bri)
+        starfield1.setColor(accentHue, accentSat, accentBrightness)
+        starfield2.setColor(accentHue, accentSat, accentBrightness)
         starfield1.motion = starMotion
         starfield2.motion = starMotion
         starfield1.draw()
@@ -149,8 +143,8 @@ class PolygonalSketch(override val sketch: PApplet,
             translate(width / 2f, height / 2f)
             scale(asteroidSizePot.value + (rmsSum * asteroidSizeMultPot.value))
 
-            triangloid.setStrokeColor(hue, sat, bri)
-            triangloid.setFillColor(258f, 84f, 25f)
+            triangloid.setStrokeColor(accentHue, accentSat, accentBrightness)
+            triangloid.setFillColor(bgHue, bgSat, bgBrightness)
             triangloid.draw()
 
             popMatrix()
@@ -161,6 +155,8 @@ class PolygonalSketch(override val sketch: PApplet,
 
     fun hud() {
         pushMatrix()
+        fill(accentHue, accentSat, accentBrightness)
+        stroke(accentHue, accentSat, accentBrightness)
         translate(centerX(), centerY())
         rotateX(sin(millis() * 0.0005f) * PConstants.PI / 100f)
         rotateZ(sin(millis() * 0.0005f) * PConstants.PI / 100f)
@@ -195,7 +191,7 @@ class PolygonalSketch(override val sketch: PApplet,
                 .toString()
 
         noStroke()
-        fill(hue, sat, bri)
+        fill(accentHue, accentSat, accentBrightness)
 
         textSize(14f)
         text(basicInfoStr, 12f, 24f)
@@ -204,7 +200,7 @@ class PolygonalSketch(override val sketch: PApplet,
         val menuStr = "If you see this, find Matsem and tell him that he left debug mode on"
 
         noStroke()
-        fill(hue, sat, bri)
+        fill(accentHue, accentSat, accentBrightness)
         textSize(14f)
         text(menuStr, 12f, height - menuStr.lines().size * 20f)
 
@@ -214,11 +210,11 @@ class PolygonalSketch(override val sketch: PApplet,
         translate(12f, 100f)
 
         // audio RMS
-        fill(hue, sat, bri)
+        fill(accentHue, accentSat, accentBrightness)
         rect(0f, 1f * rectHeight, rmsSum * 200, rectHeight.toFloat())
 
         // bass RMS
-        fill(hue, sat, bri)
+        fill(accentHue, accentSat, accentBrightness)
         rect(0f, 2f * rectHeight, bassSum, rectHeight.toFloat())
 
         popMatrix()
@@ -228,11 +224,11 @@ class PolygonalSketch(override val sketch: PApplet,
         translate(12f, 130f)
         for (i in 0 until audioProcessor.fft.avgSize()) {
             // Draw frequency band
-            fill(hue, sat, bri)
+            fill(accentHue, accentSat, accentBrightness)
             rect(0f, i.toFloat() * rectHeight, audioProcessor.getFftAvg(i), rectHeight.toFloat())
 
             // Draw band frequency value
-            fill(hue, sat, bri)
+            fill(accentHue, accentSat, accentBrightness)
             textSize(10f)
             text("${audioProcessor.fft.getAverageCenterFrequency(i)} Hz", 0f, i.toFloat() * rectHeight + rectHeight)
         }
@@ -240,7 +236,7 @@ class PolygonalSketch(override val sketch: PApplet,
         popMatrix()
 
         // Star count noStroke()
-        fill(hue, sat, bri)
+        fill(accentHue, accentSat, accentBrightness)
         textSize(14f)
         text("Star count: ${starCountPot.value}", mouseX.toFloat(), mouseY.toFloat())
     }

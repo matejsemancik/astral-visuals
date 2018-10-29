@@ -5,4 +5,8 @@ abstract class MidiControl {
     open fun onUpdate() {
 
     }
+
+    open fun sendClientUpdate() {
+
+    }
 }

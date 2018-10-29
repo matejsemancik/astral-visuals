@@ -7,19 +7,11 @@ class Galaxy {
 
     lateinit var midiBus: MidiBus
 
-    lateinit var pot1: Pot
-    lateinit var pot2: Pot
-    lateinit var pot3: Pot
-
     val controls = mutableListOf<MidiControl>()
 
     fun connect() {
         midiBus = MidiBus(this, "TouchOSC Bridge", "TouchOSC Bridge")
         println("MidiBus connected")
-
-        pot1 = Pot(midiBus, 1, 1)
-        pot2 = Pot(midiBus, 1, 2)
-        pot3 = Pot(midiBus, 1, 3)
     }
 
     fun update() {
@@ -38,7 +30,14 @@ class Galaxy {
     fun createPot(channel: Int, cc: Int, min: Float = 0f, max: Float = 1f, initialValue: Float = 0f) =
             Pot(midiBus, channel, cc, min, max, initialValue).also { controls.add(it) }
 
+    fun createButtonGroup(channel: Int, ccs: List<Int>, activeCCs: List<Int>) =
+            ButtonGroup(midiBus, channel, ccs, activeCCs).also { controls.add(it) }
+
     fun controllerChange(channel: Int, cc: Int, value: Int) {
-        println("channel: $channel cc: $cc value: $value")
+//        println("channel: $channel cc: $cc value: $value")
+    }
+
+    fun sendClientUpdates() {
+        controls.forEach { it.sendClientUpdate() }
     }
 }

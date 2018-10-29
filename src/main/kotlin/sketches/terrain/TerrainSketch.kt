@@ -2,21 +2,18 @@ package sketches.terrain
 
 import centerX
 import centerY
-import midiRange
 import newLine
-import processing.core.PApplet
-import processing.core.PApplet.lerp
 import processing.core.PApplet.map
 import processing.core.PConstants
 import processing.core.PConstants.TRIANGLE_STRIP
-import processing.event.KeyEvent
 import sketches.BaseSketch
+import sketches.SketchLoader
 import sketches.polygonal.star.Starfield
 import tools.FFTLogger
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
-class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProcessor, val galaxy: Galaxy)
+class TerrainSketch(override val sketch: SketchLoader, val audioProcessor: AudioProcessor, val galaxy: Galaxy)
     : BaseSketch(sketch, audioProcessor, galaxy), PConstants {
 
     companion object {
@@ -47,19 +44,34 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     // region prefs
 
-    private var rotationZEnabled = false
-    private var drawMode = 0
-    private var terrainMode = 0
-    private var rotationX = 0f
-    private var rotationZ = 0f
-    private var ellSize = 0f
+    var renderMode = 0
+    var terrainMode = 0
+
+    var rotX = 0f + PConstants.PI / 2f
+    var rotY = 0f
+    var rotZ = 0f
+    val joystick = galaxy.createJoystick(1, 0, 1, 2, 3, 4, 5).flipped()
+    val terrainAmpPot = galaxy.createPot(1, 6, 0f, 200f, 100f)
+    val perlinAmpPot = galaxy.createPot(1, 7, 0f, 4f, 1.5f)
+    val rotationResetButton = galaxy.createPushButton(1, 8) {
+        rotX = 0f + PConstants.PI / 2f
+        rotY = 0f
+        rotZ = 0f
+    }
+    val perlinResPot = galaxy.createPot(1, 9, 0f, 0.5f, 0.4f)
+    val distancePot = galaxy.createPot(1, 10, -width / 1.5f, width / 1.5f, 0f).lerp(0.05f)
+    val flyingPot = galaxy.createPot(1, 11, -0.1f, 0.1f, 0f).lerp(0.05f)
+    val perlinBoostPot = galaxy.createPot(1, 12, 0f, 5f, 0f)
+    val secondTerrainButton = galaxy.createToggleButton(1, 13, true)
+    val renderModeButtons = galaxy.createButtonGroup(1, listOf(14, 15, 16), listOf(14))
+    val terrainModeButtons = galaxy.createButtonGroup(1, listOf(17, 18, 19, 20), listOf(17))
 
     // endregion
 
     // region Terrain
-    private val w = 720f
-    private val h = 900f
-    private var scale = 20f
+    private val w = 1600f
+    private val h = 1920f
+    private var scale = 50f
 
     private var cols = (w / scale).toInt()
     private var rows = (h / scale).toInt()
@@ -74,8 +86,8 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     // region other shit
 
     private lateinit var starfield: Starfield
-
-    // endregion
+    private lateinit var starfield2: Starfield
+    val font = sketch.createFont("georgiab.ttf", 24f, true)
 
     // endregion
 
@@ -83,7 +95,8 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
 
     override fun setup() {
         fftLogger = FFTLogger(sketch, audioProcessor)
-        starfield = Starfield(sketch, 800)
+        starfield = Starfield(sketch, 1200)
+        starfield2 = Starfield(sketch, 1200)
     }
 
     override fun onBecameActive() {
@@ -91,63 +104,82 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
     }
 
     override fun draw() {
-        background(258f, 84f, 25f)
+        renderMode = renderModeButtons.activeButtons().first()
+        terrainMode = terrainModeButtons.activeButtons().first()
 
-        starfield.update(3)
+        rotX += joystick.y * .02f
+        rotY += joystick.x * .02f
+        rotZ += joystick.z * .02f
+
+        background(bgHue, bgSat, bgBrightness)
+
+        starfield.update(3 + (audioProcessor.getRange(6000f..12000f) * 5f).toInt())
+        starfield.setColor(fgHue, fgSat, fgBrightness)
         starfield.draw()
+        starfield2.update(3 + (audioProcessor.getRange(2500f..2600f) * 3f).toInt())
+        starfield2.setColor(fgHue + 2, fgSat, fgBrightness)
+        starfield2.draw()
 
-        stroke(130f, 255f, 255f)
+        stroke(accentHue, accentSat, accentBrightness)
         strokeWeight(1.4f)
-        fill(258f, 84f, 25f)
+        fill(bgHue, bgSat, bgBrightness)
 
+        regenerate()
+        flying += flyingPot.value
+
+        // First terrain (upper)
+        if (secondTerrainButton.isPressed) {
+            pushMatrix()
+            translate(centerX(), centerY())
+
+            rotateX(rotX)
+            rotateY(rotY)
+            rotateZ(rotZ)
+
+            translate(-w / 2, -h / 2, -distancePot.value)
+            drawTerrain(1f)
+            popMatrix()
+        }
+
+        // Second terrain
         pushMatrix()
         translate(centerX(), centerY())
 
-        if (mousePressed) {
-            rotationX = lerp(rotationX, map(mouseY.toFloat(), height.toFloat(), 0f, PConstants.PI, 0f), 0.1f)
+        rotateX(rotX)
+        rotateY(rotY)
+        rotateZ(rotZ)
+
+        translate(-w / 2, -h / 2, distancePot.value)
+        drawTerrain(-1f)
+        popMatrix()
+
+        if (isInDebugMode) {
+            debugWindow()
         }
+    }
 
-        if (rotationZEnabled) {
-            rotationZ += 0.002f
-        } else {
-            rotationZ = 0f
-        }
-
-        rotateX(rotationX)
-        rotateZ(rotationZ)
-
-        translate(-w / 2, -h / 2)
-
-        regenerate()
-        flying -= 0.05f
-
+    fun drawTerrain(multiplier: Float) {
         for (y in 0 until rows - 1) {
             beginShape(TRIANGLE_STRIP)
 
             for (x in 0 until cols) {
-                when (RENDER_MODES[drawMode]) {
+                when (RENDER_MODES[renderMode]) {
                     RENDER_MODE_TRIANGLE_STRIP -> {
-                        vertex(x * scale, y * scale, terrain[y][x])
-                        vertex(x * scale, (y + 1) * scale, terrain[y + 1][x])
+                        vertex(x * scale, y * scale, terrain[y][x] * multiplier)
+                        vertex(x * scale, (y + 1) * scale, terrain[y + 1][x] * multiplier)
                     }
 
                     RENDER_MODE_LINES_Z -> {
-                        vertex(x * scale, y * scale, terrain[y][x])
+                        vertex(x * scale, y * scale, terrain[y][x] * multiplier)
                     }
 
                     RENDER_MODE_LINES_Y -> {
-                        vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), 0f)
+                        vertex(x * scale, y * scale + map(terrain[y][x], 0f, 10f, 0f, 5f), 0f * multiplier)
                     }
                 }
             }
 
             endShape()
-        }
-
-        popMatrix()
-
-        if (isInDebugMode) {
-            debugWindow()
         }
     }
 
@@ -157,7 +189,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         buff.add(0, FloatArray(cols))
         for (x in 0 until cols) {
             val amp = if (x < audioProcessor.fft.avgSize()) {
-                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + galaxy.pot1.rawValue.midiRange(200f))
+                map(audioProcessor.getFftAvg(x), 0f, 80f, 0f, 20f + terrainAmpPot.value)
             } else {
                 0f
             }
@@ -201,10 +233,10 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
                         noise(xoff, yoff),
                         0f,
                         1f,
-                        -20f * galaxy.pot2.rawValue.midiRange(2f),
-                        50f * galaxy.pot2.rawValue.midiRange(2f)) + musicTerrain[y][x]
+                        -20f * perlinAmpPot.value,
+                        50f * perlinAmpPot.value) + musicTerrain[y][x] + audioProcessor.getRange(6000f..12000f) * perlinBoostPot.value
 
-                xoff += map(mouseX.toFloat(), 0f, width.toFloat(), 0f, 0.5f)
+                xoff += perlinResPot.value
             }
 
             yoff += 0.2f
@@ -231,8 +263,7 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         // menu
         val menuStr = StringBuilder()
                 .append("[d] toggle debug mode").newLine()
-                .append("[r] Z rotation: $rotationZEnabled").newLine()
-                .append("[m] drawing mode: ${RENDER_MODES[drawMode]}").newLine()
+                .append("[m] drawing mode: ${RENDER_MODES[renderMode]}").newLine()
                 .append("[t] terrain mode: ${TERRAIN_MODES[terrainMode]}")
                 .toString()
 
@@ -240,27 +271,5 @@ class TerrainSketch(override val sketch: PApplet, val audioProcessor: AudioProce
         fill(0f, 255f, 100f)
         textSize(14f)
         text(menuStr, 12f, height - menuStr.lines().size * 20f)
-    }
-
-    override fun keyPressed(event: KeyEvent?) {
-        event?.let {
-            when (event.key) {
-                'r' -> rotationZEnabled = !rotationZEnabled
-                'm' -> {
-                    drawMode++
-                    if (drawMode >= RENDER_MODES.size) {
-                        drawMode = 0
-                    }
-                }
-                't' -> {
-                    terrainMode++
-                    if (terrainMode >= TERRAIN_MODES.size) {
-                        terrainMode = 0
-                    }
-                }
-            }
-        }
-
-        super.keyPressed(event)
     }
 }

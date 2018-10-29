@@ -1,11 +1,10 @@
 package sketches
 
-import processing.core.PApplet
 import processing.event.KeyEvent
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
-abstract class BaseSketch(open val sketch: PApplet, audioProcess: AudioProcessor, galaxy: Galaxy) {
+abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioProcessor, galaxy: Galaxy) {
 
     var isInDebugMode = false
 
@@ -90,4 +89,16 @@ abstract class BaseSketch(open val sketch: PApplet, audioProcess: AudioProcessor
     fun sphereDetail(detail: Int) = sketch.sphereDetail(detail)
 
     fun sphere(radius: Float) = sketch.sphere(radius)
+
+    val bgHue: Float get() = sketch.bgHuePot.value
+    val bgSat: Float get() = sketch.bgSatPot.value
+    val bgBrightness: Float get() = sketch.bgBriPot.value
+
+    val fgHue: Float get() = sketch.fgHuePot.value
+    val fgSat: Float get() = sketch.fgSatPot.value
+    val fgBrightness: Float get() = sketch.fgBriPot.value
+
+    val accentHue: Float get() = sketch.accentHuePot.value
+    val accentSat: Float get() = sketch.accentSatPot.value
+    val accentBrightness: Float get() = sketch.accentBriPot.value
 }

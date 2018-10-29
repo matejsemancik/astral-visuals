@@ -30,9 +30,32 @@ class SketchLoader : PApplet() {
     private val galaxy: Galaxy = Galaxy()
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
+    private lateinit var resendButton: PushButton
+    private lateinit var colorResetButton: PushButton
+
+    private var bgHue = 258f
+    private var bgSat = 84f
+    private var bgBri = 25f
+    lateinit var bgHuePot: Pot
+    lateinit var bgSatPot: Pot
+    lateinit var bgBriPot: Pot
+
+    private var fgHue = 258f
+    private var fgSat = 100f
+    private var fgBri = 100f
+    lateinit var fgHuePot: Pot
+    lateinit var fgSatPot: Pot
+    lateinit var fgBriPot: Pot
+
+    private var accentHue = 130f
+    private var accentSat = 100f
+    private var accentBri = 100f
+    lateinit var accentHuePot: Pot
+    lateinit var accentSatPot: Pot
+    lateinit var accentBriPot: Pot
 
     val isInRenderMode = false
-    val audioFilePath = "bop.wav"
+    val audioFilePath = "bop2.wav"
     val sep = "|"
     val movieFps = 30f
     val frameDuration = 1f / movieFps
@@ -48,7 +71,7 @@ class SketchLoader : PApplet() {
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
-        smooth(4)
+        noSmooth()
     }
 
     override fun setup() {
@@ -59,6 +82,26 @@ class SketchLoader : PApplet() {
 
         gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
         debugButton = galaxy.createToggleButton(15, 65, false)
+        resendButton = galaxy.createPushButton(15, 66) {
+            galaxy.sendClientUpdates()
+        }
+
+        val colorPots = mutableListOf<Pot>()
+        colorResetButton = galaxy.createPushButton(15, 76) {
+            colorPots.forEach { it.reset() }
+        }
+
+        bgHuePot = galaxy.createPot(15, 67, 0f, 360f, bgHue).also { colorPots.add(it) }
+        bgSatPot = galaxy.createPot(15, 68, 0f, 100f, bgSat).also { colorPots.add(it) }
+        bgBriPot = galaxy.createPot(15, 69, 0f, 100f, bgBri).also { colorPots.add(it) }
+
+        fgHuePot = galaxy.createPot(15, 70, 0f, 360f, fgHue).also { colorPots.add(it) }
+        fgSatPot = galaxy.createPot(15, 71, 0f, 100f, fgSat).also { colorPots.add(it) }
+        fgBriPot = galaxy.createPot(15, 72, 0f, 100f, fgBri).also { colorPots.add(it) }
+
+        accentHuePot = galaxy.createPot(15, 73, 0f, 360f, accentHue).also { colorPots.add(it) }
+        accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentSat).also { colorPots.add(it) }
+        accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentBri).also { colorPots.add(it) }
 
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
 
@@ -103,7 +146,7 @@ class SketchLoader : PApplet() {
             audioProcessor.gain = 2f
             activeSketch().isInDebugMode = false
 
-            var line: String? = null
+            var line: String?
             try {
                 line = reader.readLine()
             } catch (exception: IOException) {
@@ -194,8 +237,8 @@ class SketchLoader : PApplet() {
         val fftL = FFT(fftSize, sampleRate)
         val fftR = FFT(fftSize, sampleRate)
 
-        fftL.logAverages(22, 1)
-        fftR.logAverages(22, 1)
+        fftL.logAverages(22, 3)
+        fftR.logAverages(22, 3)
 
         val totalChunks = samplesL.size / fftSize + 1
         val fftSlices = fftL.avgSize()
