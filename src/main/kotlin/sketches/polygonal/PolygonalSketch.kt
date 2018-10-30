@@ -41,6 +41,7 @@ class PolygonalSketch(override val sketch: SketchLoader,
     val wiggleButton = galaxy.createToggleButton(0, 17, false)
     val starfieldRotationEnabledButton = galaxy.createToggleButton(0, 18, true)
     val wiggleMultiplierPot = galaxy.createPot(0, 19, 0f, 20f, 5f)
+    val hudButton = galaxy.createToggleButton(0, 23, true)
 
     val regenerateBtn = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
     val motionZoomBtn = galaxy.createPushButton(0, 8) { starMotion = Starfield.Motion.ZOOMING }
@@ -149,7 +150,9 @@ class PolygonalSketch(override val sketch: SketchLoader,
 
             popMatrix()
 
-            hud()
+            if (hudButton.isPressed) {
+                hud()
+            }
         }
     }
 
