@@ -5,6 +5,7 @@ import centerY
 import processing.core.PApplet
 import processing.core.PApplet.*
 import processing.core.PConstants
+import shorterDimension
 import sketches.BaseSketch
 import sketches.SketchLoader
 import tools.audio.AudioProcessor
@@ -28,7 +29,7 @@ class FibSphereSketch(
     companion object {
         val PHI = (PApplet.sqrt(5f) + 1f) / 2f - 1f
         val GA = PHI * PConstants.TWO_PI
-        const val KMAX_POINTS = 2000
+        const val MAX_POINTS = 2000
     }
 
     enum class DrawMode {
@@ -36,10 +37,10 @@ class FibSphereSketch(
         MODE_2
     }
 
-    val pts = Array(KMAX_POINTS) { SpherePoint(0f, 0f, 0f) }
+
     var numPoints = 100
+    val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
     var radius = 0f
-    var addPoints = false
 
     var rotationX = 0f
     var rotationY = 0f
@@ -47,7 +48,9 @@ class FibSphereSketch(
     var velocityY = 0f
     var pushBack = 0f
 
-    var drawMode = DrawMode.MODE_2
+    val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
+
+    var drawMode = DrawMode.MODE_1
     var bass = 0f
 
     fun initSphere(num: Int) {
@@ -68,7 +71,7 @@ class FibSphereSketch(
     }
 
     override fun setup() {
-        radius = height / 2f
+        radius = shorterDimension() / 2f
         sphereDetail(8)
         initSphere(numPoints)
     }
@@ -83,7 +86,7 @@ class FibSphereSketch(
         rotateY(yradiusot)
 
         noStroke()
-        fill(130f, 255f, 255f)
+        fill(fgHue, fgSat, fgBrightness)
 
         val radius = (sin(millis() * 0.0005f) * this.radius) / 4f + this.radius / 1.5f
         val bass = lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
@@ -130,14 +133,13 @@ class FibSphereSketch(
     }
 
     override fun draw() {
-        if (addPoints) {
-            numPoints++
-            numPoints = min(numPoints, KMAX_POINTS)
+        if (encoder.value != numPoints) {
+            numPoints = encoder.value
             initSphere(numPoints)
         }
 
-        background(258f, 84f, 25f)
-        renderGlobe(DrawMode.MODE_1)
+        background(bgHue, bgSat, bgBrightness)
+        renderGlobe(drawMode)
 
         rotationX += velocityX
         rotationY += velocityY
@@ -155,9 +157,5 @@ class FibSphereSketch(
 
     fun debugWindow() {
         audioProcessor.drawDebug()
-    }
-
-    override fun mouseClicked() {
-        addPoints = !addPoints
     }
 }

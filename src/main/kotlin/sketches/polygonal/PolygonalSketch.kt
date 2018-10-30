@@ -124,8 +124,8 @@ class PolygonalSketch(override val sketch: SketchLoader,
         starfield2.setCount(starCountPot.value.toInt())
         starfield1.update(speed = (2 * starSpeedPot.value).toInt() + (bassSum * starAccelPot.value).toInt())
         starfield2.update(speed = (4 * starSpeedPot.value).toInt())
-        starfield1.setColor(accentHue, accentSat, accentBrightness)
-        starfield2.setColor(accentHue, accentSat, accentBrightness)
+        starfield1.setColor(fgHue, fgSat, fgBrightness)
+        starfield2.setColor(fgHue, fgSat, fgBrightness)
         starfield1.motion = starMotion
         starfield2.motion = starMotion
         starfield1.draw()

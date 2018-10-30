@@ -33,8 +33,11 @@ class Galaxy {
     fun createButtonGroup(channel: Int, ccs: List<Int>, activeCCs: List<Int>) =
             ButtonGroup(midiBus, channel, ccs, activeCCs).also { controls.add(it) }
 
+    fun createEncoder(channel: Int, cc: Int, min: Int, max: Int, initialValue: Int = 0) =
+            Encoder(midiBus, channel, cc, min, max, initialValue)
+
     fun controllerChange(channel: Int, cc: Int, value: Int) {
-//        println("channel: $channel cc: $cc value: $value")
+        println("channel: $channel cc: $cc value: $value")
     }
 
     fun sendClientUpdates() {
