@@ -85,7 +85,7 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
 
         for (i in 0 until shapeVectors.size) {
             // scale by FFT
-            fftAverages[i] += audioProcessor.getFftAvg(i)
+            fftAverages[i] += audioProcessor.getRange(i * 50f..(i + 1) * 50f)
             fftAverages[i] = fftAverages[i] * 0.2f
 
             shapeVectors[i].add(shapeVectors[i].copy().mult(PApplet.map(fftAverages[i], 0f, 50f, 0f, 0.5f)))
