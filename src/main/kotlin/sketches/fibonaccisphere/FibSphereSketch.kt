@@ -34,14 +34,19 @@ class FibSphereSketch(
 
     enum class DrawMode {
         MODE_1,
-        MODE_2
+        MODE_2,
+        MODE_3,
+        MODE_4,
+        MODE_5
     }
 
+    var drawMode = DrawMode.MODE_1
+    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5), listOf(1))
 
     var numPoints = 100
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
-    var radius = 0f
 
+    var radius = shorterDimension() / 2f
     var rotationX = 0f
     var rotationY = 0f
     var velocityX = 0f
@@ -50,10 +55,10 @@ class FibSphereSketch(
 
     val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
 
-    var drawMode = DrawMode.MODE_1
     var bass = 0f
 
     fun initSphere(num: Int) {
+        drawModeButtons.activeButtonsIndices()
         for (i in 0 until num) {
             var lon = GA * i
             lon /= PConstants.TWO_PI
@@ -71,7 +76,6 @@ class FibSphereSketch(
     }
 
     override fun setup() {
-        radius = shorterDimension() / 2f
         sphereDetail(8)
         initSphere(numPoints)
     }
@@ -124,6 +128,31 @@ class FibSphereSketch(
                         sphere(map(bass, 0f, 300f, 5f, 15f))
                     }
                 }
+
+                DrawMode.MODE_3 -> {
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    translate(
+                            radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())),
+                            0f,
+                            0f
+                    )
+                    sphere(5f)
+                    translate(
+                            -radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())),
+                            0f,
+                            0f
+                    )
+
+
+                    translate(
+                            radius * map(bass, 0f, 300f, 1f, 2f),
+                            0f,
+                            0f
+                    )
+                    sphere(5f)
+                }
             }
 
             popMatrix()
@@ -137,6 +166,8 @@ class FibSphereSketch(
             numPoints = encoder.value
             initSphere(numPoints)
         }
+
+        drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
 
         background(bgHue, bgSat, bgBrightness)
         renderGlobe(drawMode)

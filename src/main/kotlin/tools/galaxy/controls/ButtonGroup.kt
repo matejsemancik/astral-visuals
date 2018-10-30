@@ -7,7 +7,7 @@ class ButtonGroup(
         private val midiBus: MidiBus,
         val ch: Int,
         val ccs: List<Int>,
-        val activeCCs: List<Int>
+        private val activeCCs: List<Int>
 ) : MidiControl() {
 
     val btns = mutableListOf<Boolean>()
@@ -31,7 +31,7 @@ class ButtonGroup(
         }
     }
 
-    fun activeButtons(): List<Int> {
+    fun activeButtonsIndices(): List<Int> {
         val activeButtons = mutableListOf<Int>()
         btns.withIndex().forEach { if (it.value) activeButtons.add(it.index) }
         if (activeButtons.isEmpty()) {

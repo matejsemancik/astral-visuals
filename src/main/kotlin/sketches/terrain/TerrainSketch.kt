@@ -104,8 +104,8 @@ class TerrainSketch(override val sketch: SketchLoader, val audioProcessor: Audio
     }
 
     override fun draw() {
-        renderMode = renderModeButtons.activeButtons().first()
-        terrainMode = terrainModeButtons.activeButtons().first()
+        renderMode = renderModeButtons.activeButtonsIndices().first()
+        terrainMode = terrainModeButtons.activeButtonsIndices().first()
 
         rotX += joystick.y * .02f
         rotY += joystick.x * .02f
