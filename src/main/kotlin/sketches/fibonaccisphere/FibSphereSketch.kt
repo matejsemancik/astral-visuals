@@ -43,7 +43,7 @@ class FibSphereSketch(
     var drawMode = DrawMode.MODE_1
     val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5), listOf(1))
 
-    var numPoints = 100
+    var numPoints = 400
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
 
     var radius = shorterDimension() / 2f
@@ -56,6 +56,11 @@ class FibSphereSketch(
     val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
 
     var bass = 0f
+
+    fun osc(
+            timeStretch: Float = 1f,
+            timeOffset: Float = 0f
+    ) = sin(millis() / 1000f * PConstants.PI * 2 * timeStretch + timeOffset)
 
     fun initSphere(num: Int) {
         drawModeButtons.activeButtonsIndices()
@@ -80,12 +85,38 @@ class FibSphereSketch(
         initSphere(numPoints)
     }
 
+    override fun draw() {
+        if (encoder.value != numPoints) {
+            numPoints = encoder.value
+            initSphere(numPoints)
+        }
+
+        drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
+
+        background(bgHue, bgSat, bgBrightness)
+        renderGlobe(drawMode)
+
+        rotationX += velocityX
+        rotationY += velocityY
+
+        velocityX *= 0.95f
+        velocityY *= 0.95f
+
+        velocityX += (mouseY - pmouseY) * 0.02f
+        velocityY += (mouseX - pmouseX) * 0.02f
+
+        if (isInDebugMode) {
+            debugWindow()
+        }
+    }
+
     fun renderGlobe(mode: DrawMode) {
         pushMatrix()
         translate(centerX(), centerY(), pushBack)
 
         val xradiusot = radians(-rotationX)
-        val yradiusot = radians(270 + rotationY + millis() * .06f)
+//        val yradiusot = radians(270 + rotationY + millis() * .06f)
+        val yradiusot = radians(270 + rotationY)
         rotateX(xradiusot)
         rotateY(yradiusot)
 
@@ -100,16 +131,19 @@ class FibSphereSketch(
 
             when (mode) {
                 DrawMode.MODE_1 -> {
+                    pushMatrix()
+                    rotateY(pt.lon + osc(0.5f, i + 10f) / 20f)
+                    rotateZ(-pt.lat)
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
-
-                    translate(if (i % 2 == 1) {
-                        radius * map(bass, 0f, 300f, 1f, 2f)
-                    } else {
-                        radius * bass / 8f + radius * 2f
-                    }, 0f, 0f)
-
+                    translate(radius * bass / 8f + radius * 2f, 0f, 0f)
                     sphere(5f)
+                    popMatrix()
                 }
 
                 DrawMode.MODE_2 -> {
@@ -159,31 +193,6 @@ class FibSphereSketch(
         }
 
         popMatrix()
-    }
-
-    override fun draw() {
-        if (encoder.value != numPoints) {
-            numPoints = encoder.value
-            initSphere(numPoints)
-        }
-
-        drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
-
-        background(bgHue, bgSat, bgBrightness)
-        renderGlobe(drawMode)
-
-        rotationX += velocityX
-        rotationY += velocityY
-
-        velocityX *= 0.95f
-        velocityY *= 0.95f
-
-        velocityX += (mouseY - pmouseY) * 0.02f
-        velocityY += (mouseX - pmouseX) * 0.02f
-
-        if (isInDebugMode) {
-            debugWindow()
-        }
     }
 
     fun debugWindow() {
