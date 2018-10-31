@@ -37,7 +37,7 @@ class Galaxy {
             Encoder(midiBus, channel, cc, min, max, initialValue)
 
     fun controllerChange(channel: Int, cc: Int, value: Int) {
-//        println("channel: $channel cc: $cc value: $value")
+        println("channel: $channel cc: $cc value: $value")
     }
 
     fun sendClientUpdates() {

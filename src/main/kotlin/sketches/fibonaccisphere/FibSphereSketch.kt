@@ -47,6 +47,9 @@ class FibSphereSketch(
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
 
     var radius = shorterDimension() / 2f
+
+    val joystick = galaxy.createJoystick(2, 11, 12, 13, 14, 15, 16)
+
     var rotationX = 0f
     var rotationY = 0f
     var velocityX = 0f
@@ -91,19 +94,18 @@ class FibSphereSketch(
             initSphere(numPoints)
         }
 
+        velocityX = lerp(velocityX, -joystick.x * 0.04f, 0.1f)
+        velocityY = lerp(velocityY, joystick.y * 0.04f, 0.1f)
+
+        rotationX += velocityX * millis() / 100f
+        rotationY += velocityY * millis() / 100f
+
+        println("velocityx: $velocityX; velocityy: $velocityY")
+
         drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
 
         background(bgHue, bgSat, bgBrightness)
         renderGlobe(drawMode)
-
-        rotationX += velocityX
-        rotationY += velocityY
-
-        velocityX *= 0.95f
-        velocityY *= 0.95f
-
-        velocityX += (mouseY - pmouseY) * 0.02f
-        velocityY += (mouseX - pmouseX) * 0.02f
 
         if (isInDebugMode) {
             debugWindow()
@@ -115,8 +117,7 @@ class FibSphereSketch(
         translate(centerX(), centerY(), pushBack)
 
         val xradiusot = radians(-rotationX)
-//        val yradiusot = radians(270 + rotationY + millis() * .06f)
-        val yradiusot = radians(270 + rotationY)
+        val yradiusot = radians(rotationY + 270)
         rotateX(xradiusot)
         rotateY(yradiusot)
 
