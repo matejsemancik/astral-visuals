@@ -250,7 +250,7 @@ class FibSphereSketch(
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     stroke(fgHue, fgSat, fgBrightness)
-                    strokeWeight(5f)
+                    strokeWeight(6f)
                     sketch.line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     popMatrix()
                 }
