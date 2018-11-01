@@ -94,13 +94,13 @@ class FibSphereSketch(
             initSphere(numPoints)
         }
 
-        velocityX = lerp(velocityX, -joystick.x * 0.04f, 0.1f)
-        velocityY = lerp(velocityY, joystick.y * 0.04f, 0.1f)
+        velocityX += joystick.x * .15f
+        velocityY += joystick.y * .15f
+        velocityX *= 0.95f
+        velocityY *= 0.95f
 
-        rotationX += velocityX * millis() / 100f
-        rotationY += velocityY * millis() / 100f
-
-        println("velocityx: $velocityX; velocityy: $velocityY")
+        rotationX += velocityX
+        rotationY += velocityY
 
         drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
 
@@ -116,7 +116,7 @@ class FibSphereSketch(
         pushMatrix()
         translate(centerX(), centerY(), pushBack)
 
-        val xradiusot = radians(-rotationX)
+        val xradiusot = radians(rotationX)
         val yradiusot = radians(rotationY + 270)
         rotateX(xradiusot)
         rotateY(yradiusot)
@@ -160,7 +160,7 @@ class FibSphereSketch(
                     if (i % 2 == 0) {
                         sphere(5f)
                     } else {
-                        sphere(map(bass, 0f, 300f, 5f, 15f))
+                        sphere(map(bass, 0f, 100f, 5f, 20f))
                     }
                 }
 
