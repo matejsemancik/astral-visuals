@@ -125,9 +125,6 @@ class FibSphereSketch(
         rotateY(radians(rotationY + 270))
         rotateZ(radians(rotationZ))
 
-        noStroke()
-        fill(fgHue, fgSat, fgBrightness)
-
         val radius = (sin(millis() * 0.0005f) * this.radius) / 4f + this.radius / 1.5f
         val bass = lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
         for (i in 0 until min(numPoints, pts.size)) {
@@ -136,6 +133,9 @@ class FibSphereSketch(
 
             when (mode) {
                 DrawMode.MODE_1 -> {
+                    noStroke()
+                    fill(fgHue, fgSat, fgBrightness)
+
                     pushMatrix()
                     rotateY(pt.lon + osc(0.5f, i + 10f) / 20f)
                     rotateZ(-pt.lat)
@@ -152,6 +152,9 @@ class FibSphereSketch(
                 }
 
                 DrawMode.MODE_2 -> {
+                    noStroke()
+                    fill(fgHue, fgSat, fgBrightness)
+
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
 
@@ -169,6 +172,9 @@ class FibSphereSketch(
                 }
 
                 DrawMode.MODE_3 -> {
+                    noStroke()
+                    fill(fgHue, fgSat, fgBrightness)
+
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
 
@@ -187,6 +193,65 @@ class FibSphereSketch(
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
                     sphere(5f)
+                    popMatrix()
+                }
+
+                DrawMode.MODE_4 -> {
+                    noStroke()
+                    fill(fgHue, fgSat, fgBrightness)
+
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    pushMatrix()
+                    translate(radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+                    translate(radius * bass / 8f + radius * 2f, 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    stroke(accentHue, accentSat, accentBrightness)
+                    strokeWeight(2.5f)
+                    sketch.line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    popMatrix()
+                }
+
+                DrawMode.MODE_5 -> {
+                    noStroke()
+                    fill(fgHue, fgSat, fgBrightness)
+
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    pushMatrix()
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+                    translate(radius * bass / 8f + radius * 2f, 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    stroke(fgHue, fgSat, fgBrightness)
+                    strokeWeight(5f)
+                    sketch.line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     popMatrix()
                 }
             }
