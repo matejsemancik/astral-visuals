@@ -52,8 +52,10 @@ class FibSphereSketch(
 
     var rotationX = 0f
     var rotationY = 0f
+    var rotationZ = 0f
     var velocityX = 0f
     var velocityY = 0f
+    var velocityZ = 0f
     var pushBack = 0f
 
     val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
@@ -96,11 +98,14 @@ class FibSphereSketch(
 
         velocityX += joystick.x * .15f
         velocityY += joystick.y * .15f
+        velocityZ += joystick.z * .15f
         velocityX *= 0.95f
         velocityY *= 0.95f
+        velocityZ *= 0.95f
 
         rotationX += velocityX
         rotationY += velocityY
+        rotationZ += velocityZ
 
         drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
 
@@ -116,10 +121,9 @@ class FibSphereSketch(
         pushMatrix()
         translate(centerX(), centerY(), pushBack)
 
-        val xradiusot = radians(rotationX)
-        val yradiusot = radians(rotationY + 270)
-        rotateX(xradiusot)
-        rotateY(yradiusot)
+        rotateX(radians(rotationX))
+        rotateY(radians(rotationY + 270))
+        rotateZ(radians(rotationZ))
 
         noStroke()
         fill(fgHue, fgSat, fgBrightness)
