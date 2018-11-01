@@ -172,25 +172,22 @@ class FibSphereSketch(
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
 
-                    translate(
-                            radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())),
-                            0f,
-                            0f
-                    )
+                    pushMatrix()
+                    translate(radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     sphere(5f)
-                    translate(
-                            -radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())),
-                            0f,
-                            0f
-                    )
+                    popMatrix()
 
-
-                    translate(
-                            radius * map(bass, 0f, 300f, 1f, 2f),
-                            0f,
-                            0f
-                    )
+                    pushMatrix()
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+                    translate(radius * bass / 8f + radius * 2f, 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
                 }
             }
 
