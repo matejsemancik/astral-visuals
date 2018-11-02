@@ -3,8 +3,7 @@ package sketches.polygonal
 import centerX
 import centerY
 import newLine
-import processing.core.PApplet.map
-import processing.core.PApplet.sin
+import processing.core.PApplet.*
 import processing.core.PConstants
 import sketches.BaseSketch
 import sketches.SketchLoader
@@ -42,6 +41,10 @@ class PolygonalSketch(override val sketch: SketchLoader,
     val starfieldRotationEnabledButton = galaxy.createToggleButton(0, 18, true)
     val wiggleMultiplierPot = galaxy.createPot(0, 19, 0f, 20f, 5f)
     val hudButton = galaxy.createToggleButton(0, 23, true)
+    val rotationZPot = galaxy.createPot(0, 24, -1f, 1f, 0f)
+    val rotationZResetButton = galaxy.createPushButton(0, 25) {
+        rotationZPot.reset()
+    }
 
     val regenerateBtn = galaxy.createPushButton(0, 6) { shouldRegenerate = true }
     val motionZoomBtn = galaxy.createPushButton(0, 8) { starMotion = Starfield.Motion.ZOOMING }
@@ -64,6 +67,8 @@ class PolygonalSketch(override val sketch: SketchLoader,
     var vx = 0f
     var vy = 0f
     var vz = 0f
+    var starVz = 0f
+    var starRotationZ = 0f
 
     private fun regenerate() {
         triangloids.removeAt(0)
@@ -86,6 +91,10 @@ class PolygonalSketch(override val sketch: SketchLoader,
             regenerate()
             shouldRegenerate = false
         }
+
+        starVz += rotationZPot.value * 0.15f
+        starVz *= 0.95f
+        starRotationZ += starVz
 
         vx += joystick.x * .01f
         vy += joystick.y * .01f
@@ -116,8 +125,8 @@ class PolygonalSketch(override val sketch: SketchLoader,
 
         // Stars
         if (starfieldRotationEnabledButton.isPressed) {
-            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f * starfieldRotationPot.value))
-            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f * starfieldRotationPot.value))
+            starfield1.rotate(map(bassSum, 0f, 50f, 0f, 0.04f * starfieldRotationPot.value) + radians(starRotationZ))
+            starfield2.rotate(map(bassSum, 0f, 50f, 0f, 0.08f * starfieldRotationPot.value) + radians(starRotationZ))
         }
 
         starfield1.setCount(starCountPot.value.toInt())
