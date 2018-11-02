@@ -6,6 +6,7 @@ import ddf.minim.Minim
 import ddf.minim.analysis.FFT
 import processing.core.PApplet
 import processing.core.PConstants
+import processing.core.PVector
 import processing.event.KeyEvent
 import sketches.blank.BlankSketch
 import sketches.fibonaccisphere.FibSphereSketch
@@ -33,31 +34,30 @@ class SketchLoader : PApplet() {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private var bgHue = 258f
-    private var bgSat = 84f
-    private var bgBri = 25f
+//    private val bgColor = PVector(258f, 84f, 25f)
+//    private val fgColor = PVector(258f, 100f, 100f)
+//    private val accentColor = PVector(130f, 100f, 100f)
+
+    private val bgColor = PVector(0f, 0f, 10f)
+    private val fgColor = PVector(0f, 0f, 90f)
+    private val accentColor = PVector(30f, 100f, 100f)
+
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
     lateinit var bgBriPot: Pot
 
-    private var fgHue = 258f
-    private var fgSat = 100f
-    private var fgBri = 100f
     lateinit var fgHuePot: Pot
     lateinit var fgSatPot: Pot
     lateinit var fgBriPot: Pot
 
-    private var accentHue = 130f
-    private var accentSat = 100f
-    private var accentBri = 100f
     lateinit var accentHuePot: Pot
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
     val isInRenderMode = false
-    val audioFilePath = "bop2.wav"
+    val audioFilePath = "bop3.wav"
     val sep = "|"
-    val movieFps = 30f
+    val movieFps = 60f
     val frameDuration = 1f / movieFps
 
     lateinit var videoExport: VideoExport
@@ -91,17 +91,17 @@ class SketchLoader : PApplet() {
             colorPots.forEach { it.reset() }
         }
 
-        bgHuePot = galaxy.createPot(15, 67, 0f, 360f, bgHue).also { colorPots.add(it) }
-        bgSatPot = galaxy.createPot(15, 68, 0f, 100f, bgSat).also { colorPots.add(it) }
-        bgBriPot = galaxy.createPot(15, 69, 0f, 100f, bgBri).also { colorPots.add(it) }
+        bgHuePot = galaxy.createPot(15, 67, 0f, 360f, bgColor.x).also { colorPots.add(it) }
+        bgSatPot = galaxy.createPot(15, 68, 0f, 100f, bgColor.y).also { colorPots.add(it) }
+        bgBriPot = galaxy.createPot(15, 69, 0f, 100f, bgColor.z).also { colorPots.add(it) }
 
-        fgHuePot = galaxy.createPot(15, 70, 0f, 360f, fgHue).also { colorPots.add(it) }
-        fgSatPot = galaxy.createPot(15, 71, 0f, 100f, fgSat).also { colorPots.add(it) }
-        fgBriPot = galaxy.createPot(15, 72, 0f, 100f, fgBri).also { colorPots.add(it) }
+        fgHuePot = galaxy.createPot(15, 70, 0f, 360f, fgColor.x).also { colorPots.add(it) }
+        fgSatPot = galaxy.createPot(15, 71, 0f, 100f, fgColor.y).also { colorPots.add(it) }
+        fgBriPot = galaxy.createPot(15, 72, 0f, 100f, fgColor.z).also { colorPots.add(it) }
 
-        accentHuePot = galaxy.createPot(15, 73, 0f, 360f, accentHue).also { colorPots.add(it) }
-        accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentSat).also { colorPots.add(it) }
-        accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentBri).also { colorPots.add(it) }
+        accentHuePot = galaxy.createPot(15, 73, 0f, 360f, accentColor.x).also { colorPots.add(it) }
+        accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentColor.y).also { colorPots.add(it) }
+        accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentColor.z).also { colorPots.add(it) }
 
         blankSketch = BlankSketch(this, audioProcessor, galaxy)
 

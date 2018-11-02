@@ -37,13 +37,14 @@ class FibSphereSketch(
         MODE_2,
         MODE_3,
         MODE_4,
-        MODE_5
+        MODE_5,
+        MODE_6
     }
 
-    var drawMode = DrawMode.MODE_1
-    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5), listOf(1))
+    var drawMode = DrawMode.MODE_6
+    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6), listOf(6))
 
-    var numPoints = 400
+    var numPoints = 500
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
 
     var radius = shorterDimension() / 2f
@@ -59,8 +60,8 @@ class FibSphereSketch(
     var pushBack = 0f
 
     val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
-
     var bass = 0f
+    val font = sketch.createFont("georgiaz.ttf", 64f, true)
 
     fun osc(
             timeStretch: Float = 1f,
@@ -104,7 +105,7 @@ class FibSphereSketch(
         velocityZ *= 0.95f
 
         rotationX += velocityX
-        rotationY += velocityY
+        rotationY += velocityY + 0.4f
         rotationZ += velocityZ
 
         drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
@@ -223,8 +224,8 @@ class FibSphereSketch(
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     stroke(accentHue, accentSat, accentBrightness)
-                    strokeWeight(2.5f)
-                    sketch.line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    strokeWeight(4f)
+                    sketch.line(0f, 0f, 0f, 0.5f * audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     popMatrix()
                 }
 
@@ -252,6 +253,32 @@ class FibSphereSketch(
                     stroke(fgHue, fgSat, fgBrightness)
                     strokeWeight(6f)
                     sketch.line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    popMatrix()
+                }
+
+                DrawMode.MODE_6 -> {
+                    noStroke()
+                    fill(accentHue, accentSat, accentBrightness)
+
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    pushMatrix()
+                    translate(radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    fill(fgHue, fgSat, fgBrightness)
+                    pushMatrix()
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    sphere(5f)
+                    popMatrix()
+
+                    pushMatrix()
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+                    translate(radius * bass / 8f + radius * 2f, 0f, 0f)
+                    sphere(5f)
                     popMatrix()
                 }
             }
