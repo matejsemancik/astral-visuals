@@ -59,9 +59,14 @@ class FibSphereSketch(
     var velocityZ = 0f
     var pushBack = 0f
 
+    val sphereSizePot = galaxy.createPot(2, 17, 0f, 10f, 5f)
+    val spikeSizePot = galaxy.createPot(2, 18, 0f, 8f, 4f)
+    val oscSpeedPot = galaxy.createPot(2, 19, 0f, 1f, 0.1f)
+    val oscLowPot = galaxy.createPot(2, 20, 0f, radius * 2f, 0f)
+    val oscHiPot = galaxy.createPot(2, 21, 0f, radius * 2f, radius * 2f)
+
     val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
     var bass = 0f
-    val font = sketch.createFont("georgiaz.ttf", 64f, true)
 
     fun osc(
             timeStretch: Float = 1f,
@@ -126,7 +131,14 @@ class FibSphereSketch(
         rotateY(radians(rotationY + 270))
         rotateZ(radians(rotationZ))
 
-        val radius = (sin(millis() * 0.0005f) * this.radius) / 4f + this.radius / 1.5f
+        val radius = map(
+                osc(oscSpeedPot.value),
+                -1f,
+                1f,
+                oscLowPot.value,
+                oscHiPot.value
+        )
+
         val bass = lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
         for (i in 0 until min(numPoints, pts.size)) {
             val pt = pts[i]
@@ -166,9 +178,9 @@ class FibSphereSketch(
                     }, 0f, 0f)
 
                     if (i % 2 == 0) {
-                        sphere(5f)
+                        sphere(sphereSizePot.value)
                     } else {
-                        sphere(map(bass, 0f, 100f, 5f, 20f))
+                        sphere(map(bass, 0f, 80f, sphereSizePot.value, sphereSizePot.value * 5f))
                     }
                 }
 
@@ -181,19 +193,19 @@ class FibSphereSketch(
 
                     pushMatrix()
                     translate(radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
                 }
 
@@ -206,25 +218,25 @@ class FibSphereSketch(
 
                     pushMatrix()
                     translate(radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     stroke(accentHue, accentSat, accentBrightness)
-                    strokeWeight(4f)
+                    strokeWeight(spikeSizePot.value)
                     sketch.line(0f, 0f, 0f, 0.5f * audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     popMatrix()
                 }
@@ -238,20 +250,20 @@ class FibSphereSketch(
 
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     stroke(fgHue, fgSat, fgBrightness)
-                    strokeWeight(6f)
+                    strokeWeight(spikeSizePot.value + 2f)
                     sketch.line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     popMatrix()
                 }
@@ -265,20 +277,20 @@ class FibSphereSketch(
 
                     pushMatrix()
                     translate(radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     fill(fgHue, fgSat, fgBrightness)
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
                 }
             }
