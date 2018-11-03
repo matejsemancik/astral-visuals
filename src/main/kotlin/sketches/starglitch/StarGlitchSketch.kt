@@ -19,14 +19,6 @@ class StarGlitchSketch(override val sketch: SketchLoader,
     var starCount = 400
     var starMode = 0
 
-    var hue = 130f
-    var sat = 255f
-    var bri = 255f
-
-    // endregion
-
-    // region TouchOSC
-
     // endregion
 
     lateinit var starfield1: Starfield2
@@ -45,7 +37,7 @@ class StarGlitchSketch(override val sketch: SketchLoader,
     }
 
     override fun draw() {
-        background(258f, 84f, 25f)
+        background(bgHue, bgSat, bgBrightness)
 
         if (isInDebugMode) {
             debugWindow()
@@ -56,8 +48,8 @@ class StarGlitchSketch(override val sketch: SketchLoader,
         starfield2.setCount(starCount)
         starfield1.update(speed = (2 * starSpeed).toInt())
         starfield2.update(speed = (4 * starSpeed).toInt())
-        starfield1.setColor(hue, sat, bri)
-        starfield2.setColor(hue, sat, bri)
+        starfield1.setColor(fgHue, fgSat, fgBrightness)
+        starfield2.setColor(fgHue, fgSat, fgBrightness)
         starfield1.mode = starMode
         starfield2.mode = starMode
         starfield1.draw()
@@ -75,7 +67,7 @@ class StarGlitchSketch(override val sketch: SketchLoader,
                 .toString()
 
         noStroke()
-        fill(hue, sat, bri)
+        fill(fgHue, fgSat, fgBrightness)
 
         textSize(14f)
         text(basicInfoStr, 12f, 24f)

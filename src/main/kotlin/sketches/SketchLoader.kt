@@ -66,7 +66,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '3'
+    var selector = '4'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -122,6 +122,7 @@ class SketchLoader : PApplet() {
         PushButton(galaxy.midiBus, 15, 1) { switchSketch('1') }
         PushButton(galaxy.midiBus, 15, 2) { switchSketch('2') }
         PushButton(galaxy.midiBus, 15, 3) { switchSketch('3') }
+        PushButton(galaxy.midiBus, 15, 4) { switchSketch('4') }
 
         if (isInRenderMode) {
             frameRate(1000f)
