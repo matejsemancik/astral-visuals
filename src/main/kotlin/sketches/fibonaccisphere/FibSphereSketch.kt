@@ -38,11 +38,15 @@ class FibSphereSketch(
         MODE_3,
         MODE_4,
         MODE_5,
-        MODE_6
+        MODE_6,
+        MODE_7,
+        MODE_8,
+        MODE_9,
+        MODE_10
     }
 
     var drawMode = DrawMode.MODE_6
-    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6), listOf(6))
+    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), listOf(1))
 
     var numPoints = 500
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
@@ -110,7 +114,7 @@ class FibSphereSketch(
         velocityZ *= 0.95f
 
         rotationX += velocityX
-        rotationY += velocityY + 0.4f
+        rotationY += velocityY
         rotationZ += velocityZ
 
         drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
@@ -292,6 +296,10 @@ class FibSphereSketch(
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
+                }
+
+                else -> {
+                    // Nothing
                 }
             }
 
