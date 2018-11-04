@@ -31,6 +31,13 @@ class ButtonGroup(
         }
     }
 
+    fun switchToRandom() {
+        val indices = btns.withIndex().map { it.index }
+        indices.forEach { btns[it] = false }
+        btns[indices.shuffled().first()] = true
+        sendClientUpdate()
+    }
+
     fun activeButtonsIndices(): List<Int> {
         val activeButtons = mutableListOf<Int>()
         btns.withIndex().forEach { if (it.value) activeButtons.add(it.index) }

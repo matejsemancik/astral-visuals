@@ -46,7 +46,7 @@ class FibSphereSketch(
     }
 
     var drawMode = DrawMode.MODE_6
-    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), listOf(1))
+    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6), listOf(1))
 
     var numPoints = 500
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
@@ -71,6 +71,10 @@ class FibSphereSketch(
 
     val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
     var bass = 0f
+
+    val drawModeTimerButtton = galaxy.createToggleButton(2, 22, false)
+    val timerIntervalPot = galaxy.createPot(2, 23, 500f, 60000f, 1000f)
+    var timerLastTick = 0
 
     fun osc(
             timeStretch: Float = 1f,
@@ -101,6 +105,11 @@ class FibSphereSketch(
     }
 
     override fun draw() {
+        if (millis() > timerLastTick + timerIntervalPot.value) {
+            timerLastTick = millis()
+            onTimerTick()
+        }
+
         if (encoder.value != numPoints) {
             numPoints = encoder.value
             initSphere(numPoints)
@@ -124,6 +133,12 @@ class FibSphereSketch(
 
         if (isInDebugMode) {
             debugWindow()
+        }
+    }
+
+    fun onTimerTick() {
+        if (drawModeTimerButtton.isPressed) {
+            drawModeButtons.switchToRandom()
         }
     }
 
