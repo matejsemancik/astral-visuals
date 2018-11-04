@@ -80,7 +80,7 @@ class SketchLoader : PApplet() {
         galaxy.connect()
         audioProcessor = AudioProcessor(this, isInRenderMode)
 
-        gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
+        gainPot = galaxy.createPot(15, 64, 0f, 5f, 2f)
         debugButton = galaxy.createToggleButton(15, 65, false)
         resendButton = galaxy.createPushButton(15, 66) {
             galaxy.sendClientUpdates()

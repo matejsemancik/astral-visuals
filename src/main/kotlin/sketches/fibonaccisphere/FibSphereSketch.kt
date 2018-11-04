@@ -45,8 +45,7 @@ class FibSphereSketch(
         MODE_10
     }
 
-    var drawMode = DrawMode.MODE_6
-    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6), listOf(1))
+    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6, 7, 8), listOf(8))
 
     var numPoints = 500
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
@@ -66,8 +65,8 @@ class FibSphereSketch(
     val sphereSizePot = galaxy.createPot(2, 17, 0f, 10f, 5f)
     val spikeSizePot = galaxy.createPot(2, 18, 0f, 8f, 4f)
     val oscSpeedPot = galaxy.createPot(2, 19, 0f, 1f, 0.1f)
-    val oscLowPot = galaxy.createPot(2, 20, 0f, radius * 2f, 0f)
-    val oscHiPot = galaxy.createPot(2, 21, 0f, radius * 2f, radius * 2f)
+    val oscLowPot = galaxy.createPot(2, 20, 0f, radius * 2f, radius)
+    val oscHiPot = galaxy.createPot(2, 21, 0f, radius * 2f, radius)
 
     val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
     var bass = 0f
@@ -126,7 +125,7 @@ class FibSphereSketch(
         rotationY += velocityY
         rotationZ += velocityZ
 
-        drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
+        val drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
 
         background(bgHue, bgSat, bgBrightness)
         renderGlobe(drawMode)
@@ -172,14 +171,14 @@ class FibSphereSketch(
                     rotateY(pt.lon + osc(0.5f, i + 10f) / 20f)
                     rotateZ(-pt.lat)
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
-                    sphere(5f)
+                    sphere(sphereSizePot.value)
                     popMatrix()
                 }
 
@@ -300,6 +299,56 @@ class FibSphereSketch(
                     popMatrix()
 
                     fill(fgHue, fgSat, fgBrightness)
+                    pushMatrix()
+                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    sphere(sphereSizePot.value)
+                    popMatrix()
+
+                    pushMatrix()
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+                    translate(radius * bass / 8f + radius * 2f, 0f, 0f)
+                    sphere(sphereSizePot.value)
+                    popMatrix()
+                }
+
+                DrawMode.MODE_7 -> {
+                    noStroke()
+
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    (0..4).forEach {
+                        pushMatrix()
+                        val spacing = audioProcessor.getRange((100f..200f)) * 0.1f
+                        translate(radius + sphereSizePot.value * it + (it * spacing), 0f, 0f)
+                        fill(fgHue + it * 15f, fgSat, fgBrightness)
+                        sphere(sphereSizePot.value - it * .8f)
+                        popMatrix()
+                    }
+
+                    pushMatrix()
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+                    translate(radius * bass / 4f + radius * 2f, 0f, 0f)
+                    fill(fgHue, fgSat, fgBrightness)
+                    sphere(sphereSizePot.value + 1f)
+                    popMatrix()
+                }
+
+                DrawMode.MODE_8 -> {
+                    noStroke()
+                    val hue = (i % audioProcessor.fft.avgSize()) * 2 + fgHue
+                    fill(hue, fgSat, fgBrightness)
+
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+
+                    pushMatrix()
+                    translate(radius + audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    sphere(sphereSizePot.value)
+                    popMatrix()
+
                     pushMatrix()
                     translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(sphereSizePot.value)
