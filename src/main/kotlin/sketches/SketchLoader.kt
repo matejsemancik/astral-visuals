@@ -71,6 +71,7 @@ class SketchLoader : PApplet() {
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
+//        fullScreen(P3D, 2)
         noSmooth()
     }
 
@@ -80,7 +81,7 @@ class SketchLoader : PApplet() {
         galaxy.connect()
         audioProcessor = AudioProcessor(this, isInRenderMode)
 
-        gainPot = galaxy.createPot(15, 64, 0f, 5f, 2f)
+        gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
         debugButton = galaxy.createToggleButton(15, 65, false)
         resendButton = galaxy.createPushButton(15, 66) {
             galaxy.sendClientUpdates()
