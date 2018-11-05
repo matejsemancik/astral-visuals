@@ -1,7 +1,6 @@
 package sketches.starglitch
 
 import newLine
-import processing.event.KeyEvent
 import sketches.BaseSketch
 import sketches.SketchLoader
 import sketches.starglitch.star.Starfield2
@@ -15,15 +14,25 @@ class StarGlitchSketch(override val sketch: SketchLoader,
 
     // region params
 
+    val starModeButtons = galaxy.createButtonGroup(
+            3,
+            listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15),
+            listOf(1)
+    )
+
+    val starMotionButtons = galaxy.createButtonGroup(
+            3,
+            listOf(16, 17, 19),
+            listOf(16)
+    )
+
     var starSpeed = 1f
     var starCount = 400
-    var starMode = 0
 
     // endregion
 
     lateinit var starfield1: Starfield2
     lateinit var starfield2: Starfield2
-
 
     override fun setup() {
         starfield1 = Starfield2(sketch, 300).apply { motion = Starfield2.Motion.TRANSLATING_FORWARD }
@@ -37,6 +46,15 @@ class StarGlitchSketch(override val sketch: SketchLoader,
     }
 
     override fun draw() {
+        val starMotion = when (starMotionButtons.activeButtonsIndices().first()) {
+            0 -> Starfield2.Motion.ZOOMING
+            1 -> Starfield2.Motion.TRANSLATING_BACKWARD
+            2 -> Starfield2.Motion.TRANSLATING_FORWARD
+            else -> Starfield2.Motion.ZOOMING
+        }
+
+        val starMode = starModeButtons.activeButtonsIndices().first()
+
         background(bgHue, bgSat, bgBrightness)
 
         if (isInDebugMode) {
@@ -52,6 +70,8 @@ class StarGlitchSketch(override val sketch: SketchLoader,
         starfield2.setColor(fgHue, fgSat, fgBrightness)
         starfield1.mode = starMode
         starfield2.mode = starMode
+        starfield1.motion = starMotion
+        starfield2.motion = starMotion
         starfield1.draw()
         starfield2.draw()
     }
@@ -84,16 +104,5 @@ class StarGlitchSketch(override val sketch: SketchLoader,
 
         starfield1.motion = newMotion
         starfield2.motion = newMotion
-    }
-
-    override fun keyPressed(event: KeyEvent?) {
-        event?.let {
-            if (event.key.toInt() in 97..122) {
-                starMode = event.key.toInt() - 97
-                println("mode: $starMode")
-            }
-        }
-
-        super.keyPressed(event)
     }
 }
