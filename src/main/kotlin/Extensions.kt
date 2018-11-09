@@ -1,5 +1,6 @@
 import processing.core.PApplet
 import sketches.BaseSketch
+import kotlin.math.absoluteValue
 
 fun Float.toRad(): Float {
     if (this < 0f) {
@@ -19,6 +20,14 @@ fun Float.containToRange(lower: Float, upper: Float): Float {
     }
 
     return this
+}
+
+fun Float.threshold(threshold: Float): Float {
+    return if (this.absoluteValue > threshold) {
+        this
+    } else {
+        0f
+    }
 }
 
 fun StringBuilder.newLine(): StringBuilder {

@@ -9,6 +9,7 @@ import sketches.BaseSketch
 import sketches.SketchLoader
 import sketches.polygonal.asteroid.Asteroid
 import sketches.polygonal.star.Starfield
+import threshold
 import tools.FFTLogger
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
@@ -92,7 +93,7 @@ class PolygonalSketch(override val sketch: SketchLoader,
             shouldRegenerate = false
         }
 
-        starVz += rotationZPot.value * 0.15f
+        starVz += rotationZPot.value.threshold(0.05f) * 0.15f
         starVz *= 0.95f
         starRotationZ += starVz
 

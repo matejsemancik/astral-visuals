@@ -1,9 +1,11 @@
 package sketches.starglitch
 
 import newLine
+import processing.core.PApplet
 import sketches.BaseSketch
 import sketches.SketchLoader
 import sketches.starglitch.star.Starfield2
+import threshold
 import tools.audio.AudioProcessor
 import tools.galaxy.Galaxy
 
@@ -26,8 +28,20 @@ class StarGlitchSketch(override val sketch: SketchLoader,
             listOf(16)
     )
 
-    var starSpeed = 1f
-    var starCount = 400
+    val starModeTimerButtton = galaxy.createToggleButton(3, 21, false)
+    val timerIntervalPot = galaxy.createPot(3, 20, 500f, 60000f, 1000f)
+    var timerLastTick = 0
+
+    val starSpeedPot = galaxy.createPot(3, 22, 0.5f, 5f, 0.5f).lerp(0.1f)
+    val starCountPot = galaxy.createPot(3, 23, 0f, 1200f, 100f).lerp(0.005f)
+    val starfieldBassRotationPot = galaxy.createPot(3, 24, 0f, 3f, 1f)
+    val starfieldRotationZPot = galaxy.createPot(3, 25, -1f, 1f, 0f)
+    val starfieldRotationZResetBtn = galaxy.createPushButton(3, 26) { starfieldRotationZPot.reset() }
+    val starAccelPot = galaxy.createPot(3, 27, 0f, 1f, 0f)
+
+    var bassSum = 0f
+    var starVz = 0f
+    var starfieldRotationZ = 0f
 
     // endregion
 
@@ -45,7 +59,25 @@ class StarGlitchSketch(override val sketch: SketchLoader,
 
     }
 
+    fun onTimerTick() {
+        if (starModeTimerButtton.isPressed) {
+            starModeButtons.switchToRandom()
+        }
+    }
+
     override fun draw() {
+        if (millis() > timerLastTick + timerIntervalPot.value) {
+            timerLastTick = millis()
+            onTimerTick()
+        }
+
+        bassSum += audioProcessor.getRange(0f..50f)
+        bassSum *= 0.2f
+
+        starVz += starfieldRotationZPot.value.threshold(0.05f) * 0.15f
+        starVz *= 0.95f
+        starfieldRotationZ += starVz
+
         val starMotion = when (starMotionButtons.activeButtonsIndices().first()) {
             0 -> Starfield2.Motion.ZOOMING
             1 -> Starfield2.Motion.TRANSLATING_BACKWARD
@@ -62,10 +94,12 @@ class StarGlitchSketch(override val sketch: SketchLoader,
         }
 
         // Stars
-        starfield1.setCount(starCount)
-        starfield2.setCount(starCount)
-        starfield1.update(speed = (2 * starSpeed).toInt())
-        starfield2.update(speed = (4 * starSpeed).toInt())
+        starfield1.rotate(PApplet.map(bassSum, 0f, 50f, 0f, 0.04f * starfieldBassRotationPot.value) + PApplet.radians(starfieldRotationZ))
+        starfield2.rotate(PApplet.map(bassSum, 0f, 50f, 0f, 0.08f * starfieldBassRotationPot.value) + PApplet.radians(starfieldRotationZ))
+        starfield1.setCount(starCountPot.value.toInt())
+        starfield2.setCount(starCountPot.value.toInt())
+        starfield1.update(speed = (2 * starSpeedPot.value).toInt() + (bassSum * starAccelPot.value).toInt())
+        starfield2.update(speed = (4 * starSpeedPot.value).toInt())
         starfield1.setColor(fgHue, fgSat, fgBrightness)
         starfield2.setColor(fgHue, fgSat, fgBrightness)
         starfield1.mode = starMode
