@@ -1,6 +1,7 @@
 package tools.galaxy.controls
 
 import processing.core.PApplet
+import random
 import themidibus.MidiBus
 import tools.galaxy.SimpleMidiListenerAdapter
 
@@ -43,6 +44,11 @@ open class Pot internal constructor(
 
     override fun sendClientUpdate() {
         midiBus.sendControllerChange(ch, cc, rawValue)
+    }
+
+    fun random() {
+        rawValue = (0..127).random()
+        sendClientUpdate()
     }
 
     fun reset() {

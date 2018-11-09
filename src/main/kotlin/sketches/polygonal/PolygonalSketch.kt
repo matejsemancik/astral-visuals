@@ -84,7 +84,7 @@ class PolygonalSketch(override val sketch: SketchLoader,
     }
 
     override fun onBecameActive() {
-
+        rectMode(PConstants.CORNER)
     }
 
     override fun draw() {

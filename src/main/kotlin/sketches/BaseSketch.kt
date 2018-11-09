@@ -74,6 +74,8 @@ abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioPr
 
     fun rect(a: Float, b: Float, c: Float, d: Float) = sketch.rect(a, b, c, d)
 
+    fun rectMode(mode: Int) = sketch.rectMode(mode)
+
     fun noise(x: Float) = sketch.noise(x)
 
     fun noise(x: Float, y: Float) = sketch.noise(x, y)

@@ -10,6 +10,7 @@ import processing.core.PVector
 import processing.event.KeyEvent
 import sketches.blank.BlankSketch
 import sketches.fibonaccisphere.FibSphereSketch
+import sketches.patterns.PatternsSketch
 import sketches.polygonal.PolygonalSketch
 import sketches.starglitch.StarGlitchSketch
 import sketches.terrain.TerrainSketch
@@ -34,13 +35,13 @@ class SketchLoader : PApplet() {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-//    private val bgColor = PVector(258f, 84f, 25f)
-//    private val fgColor = PVector(258f, 100f, 100f)
-//    private val accentColor = PVector(130f, 100f, 100f)
+    private val bgColor = PVector(258f, 84f, 25f)
+    private val fgColor = PVector(258f, 100f, 100f)
+    private val accentColor = PVector(130f, 100f, 100f)
 
-    private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(0f, 0f, 90f)
-    private val accentColor = PVector(30f, 100f, 100f)
+//    private val bgColor = PVector(0f, 0f, 10f)
+//    private val fgColor = PVector(0f, 0f, 90f)
+//    private val accentColor = PVector(30f, 100f, 100f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -66,7 +67,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '3'
+    var selector = '5'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -112,6 +113,7 @@ class SketchLoader : PApplet() {
             put('2', TerrainSketch(this@SketchLoader, audioProcessor, galaxy))
             put('3', FibSphereSketch(this@SketchLoader, audioProcessor, galaxy))
             put('4', StarGlitchSketch(this@SketchLoader, audioProcessor, galaxy))
+            put('5', PatternsSketch(this@SketchLoader, audioProcessor, galaxy))
         }
 
         sketches.forEach { key, sketch ->
@@ -124,6 +126,7 @@ class SketchLoader : PApplet() {
         PushButton(galaxy.midiBus, 15, 2) { switchSketch('2') }
         PushButton(galaxy.midiBus, 15, 3) { switchSketch('3') }
         PushButton(galaxy.midiBus, 15, 4) { switchSketch('4') }
+        PushButton(galaxy.midiBus, 15, 5) { switchSketch('5') }
 
         if (isInRenderMode) {
             frameRate(1000f)

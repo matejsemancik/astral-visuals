@@ -1,5 +1,6 @@
 import processing.core.PApplet
 import sketches.BaseSketch
+import java.util.*
 import kotlin.math.absoluteValue
 
 fun Float.toRad(): Float {
@@ -72,3 +73,12 @@ fun BaseSketch.longerDimension(): Int {
         height
     }
 }
+
+fun Float.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
+        PApplet.map(this, start1, end1, start2, end2)
+
+fun Int.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
+        PApplet.map(this.toFloat(), start1, end1, start2, end2)
+
+fun IntRange.random() =
+        Random().nextInt((endInclusive + 1) - start) +  start

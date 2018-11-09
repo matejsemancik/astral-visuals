@@ -1,5 +1,6 @@
 package tools.galaxy.controls
 
+import random
 import themidibus.MidiBus
 import tools.galaxy.SimpleMidiListenerAdapter
 
@@ -33,5 +34,9 @@ class Encoder(
                 }
             }
         })
+    }
+
+    fun random() {
+        value = (min..max).random()
     }
 }
