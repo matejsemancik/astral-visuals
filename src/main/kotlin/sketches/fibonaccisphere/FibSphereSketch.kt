@@ -45,7 +45,7 @@ class FibSphereSketch(
         MODE_10
     }
 
-    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6, 7, 8), listOf(8))
+    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6, 7, 8, 9), listOf(9))
 
     var numPoints = 500
     val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
@@ -355,6 +355,32 @@ class FibSphereSketch(
                     popMatrix()
 
                     pushMatrix()
+                    rotateY(pt.lon)
+                    rotateZ(-pt.lat)
+                    translate(radius * bass / 8f + radius * 2f, 0f, 0f)
+                    sphere(sphereSizePot.value)
+                    popMatrix()
+                }
+
+                DrawMode.MODE_9 -> {
+                    noStroke()
+                    rotateY(pt.lon + if (i % 2 == 0) millis() * 0.0001f else millis() * -0.0001f)
+                    rotateZ(-pt.lat)
+
+                    pushMatrix()
+                    fill(fgHue, fgSat, fgBrightness)
+                    translate(radius, 0f, 0f)
+                    sphere(sphereSizePot.value)
+                    popMatrix()
+
+                    pushMatrix()
+                    fill(fgHue + 20f, fgSat, fgBrightness)
+                    translate(radius * 0.6f, 0f, 0f)
+                    sphere(sphereSizePot.value)
+                    popMatrix()
+
+                    pushMatrix()
+                    fill(accentHue, accentBrightness, accentSat)
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
