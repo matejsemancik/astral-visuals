@@ -67,7 +67,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '5'
+    var selector = '1'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
