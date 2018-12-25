@@ -14,13 +14,9 @@ abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioPr
 
     abstract fun draw()
 
-    open fun keyPressed(event: KeyEvent?) {
+    open fun keyPressed(event: KeyEvent?) = Unit
 
-    }
-
-    open fun mouseClicked() {
-
-    }
+    open fun mouseClicked() = Unit
 
     val width: Int get() = sketch.width
 
@@ -58,15 +54,21 @@ abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioPr
 
     fun background(p1: Float, p2: Float, p3: Float) = sketch.background(p1, p2, p3)
 
+    fun background(rgb: Int) = sketch.background(rgb)
+
     fun noStroke() = sketch.noStroke()
 
     fun stroke(p1: Float, p2: Float, p3: Float) = sketch.stroke(p1, p2, p3)
+
+    fun stroke(rgb: Int) = sketch.stroke(rgb)
 
     fun strokeWeight(weight: Float) = sketch.strokeWeight(weight)
 
     fun noFill() = sketch.noFill()
 
     fun fill(p1: Float, p2: Float, p3: Float) = sketch.fill(p1, p2, p3)
+
+    fun fill(rgb: Int) = sketch.fill(rgb)
 
     fun textSize(size: Float) = sketch.textSize(size)
 
@@ -92,15 +94,20 @@ abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioPr
 
     fun sphere(radius: Float) = sketch.sphere(radius)
 
+    fun color(v1: Int, v2: Int, v3: Int) = sketch.color(v1, v2, v3)
+
     val bgHue: Float get() = sketch.bgHuePot.value
     val bgSat: Float get() = sketch.bgSatPot.value
     val bgBrightness: Float get() = sketch.bgBriPot.value
+    val bgColor: Int get() = sketch.color(bgHue, bgSat, bgBrightness)
 
     val fgHue: Float get() = sketch.fgHuePot.value
     val fgSat: Float get() = sketch.fgSatPot.value
     val fgBrightness: Float get() = sketch.fgBriPot.value
+    val fgColor: Int get() = sketch.color(fgHue, fgSat, fgBrightness)
 
     val accentHue: Float get() = sketch.accentHuePot.value
     val accentSat: Float get() = sketch.accentSatPot.value
     val accentBrightness: Float get() = sketch.accentBriPot.value
+    val accentColor: Int get() = sketch.color(accentHue, accentSat, accentBrightness)
 }
