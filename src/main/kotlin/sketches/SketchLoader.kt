@@ -231,6 +231,10 @@ class SketchLoader : PApplet() {
         activeSketch().mouseClicked()
     }
 
+    override fun mousePressed() {
+        activeSketch().mousePressed()
+    }
+
     fun audioToTextFile(fileName: String) {
         val output: PrintWriter = createWriter(dataPath("$fileName.txt"))
 

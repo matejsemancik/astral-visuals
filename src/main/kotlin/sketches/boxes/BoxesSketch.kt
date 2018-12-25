@@ -26,19 +26,17 @@ class BoxesSketch(
 
     override fun draw() {
         background(bgColor)
-        noFill()
-        stroke(accentColor)
-        strokeWeight(3f)
 
         boxes.forEach {
-            pushMatrix()
-            translate(it.x, it.y)
-            sketch.box(it.size)
-            popMatrix()
+            it.draw()
         }
     }
 
-    override fun mouseClicked() {
-        boxes.add(Box(mouseX.toFloat(), mouseY.toFloat()))
+    override fun mousePressed() {
+        boxes.add(
+                Box(sketch, mouseX.toFloat(), mouseY.toFloat()).apply {
+                    color = accentColor
+                }
+        )
     }
 }
