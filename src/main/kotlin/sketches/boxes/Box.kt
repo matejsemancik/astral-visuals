@@ -4,12 +4,14 @@ import org.jbox2d.collision.shapes.PolygonShape
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.*
 import processing.core.PApplet
+import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing
 
 class Box(private val sketch: PApplet, private val box2d: Box2DProcessing, val x: Float, val y: Float) {
     var size = 25f
     var color = 0
     var strokeWeight = 3f
+    var rotationConstant = sketch.random(6f, 10f)
 
     val body: Body
     val fixture: Fixture
@@ -18,6 +20,7 @@ class Box(private val sketch: PApplet, private val box2d: Box2DProcessing, val x
         val bd = BodyDef().apply {
             position.set(box2d.coordPixelsToWorld(x, y))
             type = BodyType.DYNAMIC
+            linearDamping = 0.2f
         }
 
         body = box2d.createBody(bd)
@@ -29,8 +32,8 @@ class Box(private val sketch: PApplet, private val box2d: Box2DProcessing, val x
 
         val fd = FixtureDef().apply {
             this.shape = shape
-            density = 0.5f
-            friction = 0.0f
+            density = 1f
+            friction = 1f
             restitution = 0.3f
         }
 
@@ -61,6 +64,7 @@ class Box(private val sketch: PApplet, private val box2d: Box2DProcessing, val x
             val coords = box2d.getBodyPixelCoord(body)
             val angle = -body.angle
             translate(coords.x, coords.y)
+            rotateX(millis() / 1000f * PConstants.TWO_PI / rotationConstant)
             rotateZ(angle)
             sketch.box(size)
             popMatrix()
