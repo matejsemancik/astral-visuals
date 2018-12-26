@@ -37,13 +37,13 @@ class SketchLoader : PApplet() {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(258f, 0f, 10f)
-    private val fgColor = PVector(258f, 0f, 100f)
-    private val accentColor = PVector(130f, 100f, 100f)
-
-//    private val bgColor = PVector(258f, 84f, 25f)
-//    private val fgColor = PVector(258f, 100f, 100f)
+//    private val bgColor = PVector(258f, 0f, 10f)
+//    private val fgColor = PVector(258f, 0f, 100f)
 //    private val accentColor = PVector(130f, 100f, 100f)
+
+    private val bgColor = PVector(258f, 84f, 25f)
+    private val fgColor = PVector(258f, 100f, 100f)
+    private val accentColor = PVector(130f, 100f, 100f)
 
 //    private val bgColor = PVector(0f, 0f, 10f)
 //    private val fgColor = PVector(0f, 0f, 90f)

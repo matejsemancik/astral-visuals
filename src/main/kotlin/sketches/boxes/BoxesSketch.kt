@@ -52,12 +52,12 @@ class BoxesSketch(
             )
         }
 
-        background(bgColor)
-
         amp += audioProcessor.getRange((20f..40f))
         amp *= 0.60f
         staticSphere.radius = 100f + amp
         staticSphere.color = accentColor
+
+        background(bgColor)
         staticSphere.draw()
         boxes.forEach {
             if (mousePressed) {
