@@ -20,7 +20,7 @@ class Box(private val sketch: PApplet, private val box2d: Box2DProcessing, val x
         val bd = BodyDef().apply {
             position.set(box2d.coordPixelsToWorld(x, y))
             type = BodyType.DYNAMIC
-            linearDamping = 0.2f
+            linearDamping = 0.5f
         }
 
         body = box2d.createBody(bd)
