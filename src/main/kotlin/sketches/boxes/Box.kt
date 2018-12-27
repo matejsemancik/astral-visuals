@@ -12,9 +12,11 @@ class Box(
         private val box2d: Box2DProcessing,
         val x: Float,
         val y: Float
-) : DynamicBody {
+) {
 
-    override var color = 0
+    var accentColor = 0
+    var fgColor = 0
+
     var size = 25f
     var strokeWeight = 3f
     var rotationConstant = sketch.random(6f, 10f)
@@ -50,7 +52,7 @@ class Box(
         body.applyForce(force, body.worldCenter)
     }
 
-    override fun attract(x: Float, y: Float, force: Float) {
+    fun attract(x: Float, y: Float, force: Float) {
         val targetVec = box2d.coordPixelsToWorld(x, y)
         val bodyVec = body.worldCenter
 
@@ -60,10 +62,10 @@ class Box(
         body.applyForce(targetVec, bodyVec)
     }
 
-    override fun draw() {
+    fun draw() {
         with(sketch) {
-            noFill()
-            stroke(color)
+            fill(fgColor)
+            stroke(accentColor)
             strokeWeight(strokeWeight)
 
             pushMatrix()

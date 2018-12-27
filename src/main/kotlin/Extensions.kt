@@ -1,4 +1,5 @@
 import processing.core.PApplet
+import processing.core.PConstants
 import sketches.BaseSketch
 import java.util.*
 import kotlin.math.absoluteValue
@@ -74,6 +75,10 @@ fun BaseSketch.longerDimension(): Int {
     }
 }
 
+fun BaseSketch.angularVelocity(seconds: Float): Float {
+    return millis() / 1000f * PConstants.TWO_PI / seconds
+}
+
 fun Float.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
         PApplet.map(this, start1, end1, start2, end2)
 
@@ -81,4 +86,4 @@ fun Int.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
         PApplet.map(this.toFloat(), start1, end1, start2, end2)
 
 fun IntRange.random() =
-        Random().nextInt((endInclusive + 1) - start) +  start
+        Random().nextInt((endInclusive + 1) - start) + start

@@ -15,7 +15,8 @@ class StaticSphere(private val sketch: PApplet, private val box2d: Box2DProcessi
             fixture.shape.radius = box2d.scalarPixelsToWorld(radius)
         }
 
-    var color = 0
+    var accentColor = 0
+    var fgColor = 0
 
     val body: Body
     val shape: CircleShape
@@ -43,8 +44,8 @@ class StaticSphere(private val sketch: PApplet, private val box2d: Box2DProcessi
 
     fun draw() {
         with(sketch) {
-            noFill()
-            stroke(color)
+            fill(fgColor)
+            stroke(accentColor)
             strokeWeight(4f)
 
             pushMatrix()

@@ -1,8 +1,10 @@
 package sketches.boxes
 
+import angularVelocity
 import centerX
 import centerY
 import org.jbox2d.common.Vec2
+import processing.core.PApplet
 import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing
 import shorterDimension
@@ -20,9 +22,8 @@ class BoxesSketch(
         audioProcessor,
         galaxy
 ) {
-    lateinit var boundary: Boundary
     lateinit var staticSphere: StaticSphere
-    private val bodies = arrayListOf<DynamicBody>()
+    private val bodies = arrayListOf<Box>()
     val box2d = Box2DProcessing(sketch)
 
     override fun onBecameActive() {
@@ -34,9 +35,9 @@ class BoxesSketch(
     override fun setup() {
         box2d.createWorld(Vec2(0f, 0f))
         box2d.setContinuousPhysics(true)
-//        boundary = Boundary(sketch, box2d)
-        staticSphere = StaticSphere(sketch, box2d, centerX(), centerY()).apply {
-            color = accentColor
+        staticSphere = StaticSphere(sketch, box2d, 0f, 0f).apply {
+            fgColor = this@BoxesSketch.fgColor
+            accentColor = this@BoxesSketch.accentColor
             radius = shorterDimension() / 4f
         }
     }
@@ -48,8 +49,9 @@ class BoxesSketch(
             when (sketch.key) {
                 'b' -> {
                     bodies.add(
-                            Box(sketch, box2d, mouseX.toFloat(), mouseY.toFloat()).apply {
-                                color = accentColor
+                            Box(sketch, box2d, mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f).apply {
+                                accentColor = this@BoxesSketch.accentColor
+                                fgColor = this@BoxesSketch.fgColor
                                 size = sketch.random(15f, 30f)
                             }
                     )
@@ -57,24 +59,36 @@ class BoxesSketch(
             }
         }
 
-        amp += audioProcessor.getRange((20f..200f)) * 0.5f
+        amp += audioProcessor.getRange((200f..300f)) * 1f
         amp *= 0.80f
-        staticSphere.radius = 100f + amp
-        staticSphere.color = accentColor
+        staticSphere.apply {
+            radius = 100f + amp
+            accentColor = this@BoxesSketch.accentColor
+            fgColor = this@BoxesSketch.fgColor
+        }
 
         background(bgColor)
-        staticSphere.draw()
 
+        pushMatrix()
+        translate(centerX(), centerY())
+        rotateY(angularVelocity(8f))
+        pushMatrix()
+        rotateX(PApplet.radians(60f))
+        staticSphere.draw()
         bodies.forEach {
             if (mousePressed) {
-                it.attract(mouseX.toFloat(), mouseY.toFloat(), 20000f)
+                it.attract(mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f, 20000f)
             }
 
             it.attract(staticSphere.x, staticSphere.y, 2000f)
 
-            it.color = accentColor
+            it.accentColor = accentColor
+            it.fgColor = fgColor
             it.draw()
         }
+
+        popMatrix()
+        popMatrix()
 
         box2d.step()
     }
