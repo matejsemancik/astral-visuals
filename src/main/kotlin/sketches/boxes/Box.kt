@@ -26,7 +26,7 @@ class Box(
         val bd = BodyDef().apply {
             position.set(box2d.coordPixelsToWorld(x, y))
             type = BodyType.DYNAMIC
-            linearDamping = 0.2f
+            linearDamping = 0.01f
         }
 
         body = box2d.createBody(bd)
@@ -38,9 +38,9 @@ class Box(
 
         val fd = FixtureDef().apply {
             this.shape = shape
-            density = 2f
+            density = sketch.random(1.2f, 2.2f)
             friction = 1f
-            restitution = 0.2f
+            restitution = sketch.random(0.2f, 0.9f)
         }
 
         fixture = body.createFixture(fd)

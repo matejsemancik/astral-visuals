@@ -25,7 +25,6 @@ class StaticSphere(private val sketch: PApplet, private val box2d: Box2DProcessi
         val bd = BodyDef().apply {
             position.set(box2d.coordPixelsToWorld(x, y))
             type = BodyType.STATIC
-            isBullet = true
         }
 
         body = box2d.createBody(bd)
@@ -55,7 +54,7 @@ class StaticSphere(private val sketch: PApplet, private val box2d: Box2DProcessi
             rotateY(millis() / 1000f * PConstants.TWO_PI / 24f)
             rotateZ(millis() / 1000f * PConstants.TWO_PI / 32f)
 
-            sphere(radius * 0.4f)
+            sphere(radius * 0.8f)
             popMatrix()
         }
     }

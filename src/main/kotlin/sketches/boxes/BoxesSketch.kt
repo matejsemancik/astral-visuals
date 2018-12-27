@@ -50,15 +50,15 @@ class BoxesSketch(
                     bodies.add(
                             Box(sketch, box2d, mouseX.toFloat(), mouseY.toFloat()).apply {
                                 color = accentColor
-                                size = sketch.random(15f, 25f)
+                                size = sketch.random(15f, 30f)
                             }
                     )
                 }
             }
         }
 
-        amp += audioProcessor.getRange((20f..40f)) * 0.6f
-        amp *= 0.45f
+        amp += audioProcessor.getRange((20f..200f)) * 0.5f
+        amp *= 0.80f
         staticSphere.radius = 100f + amp
         staticSphere.color = accentColor
 
@@ -70,7 +70,7 @@ class BoxesSketch(
                 it.attract(mouseX.toFloat(), mouseY.toFloat(), 20000f)
             }
 
-            it.attract(staticSphere.x, staticSphere.y, 4000f)
+            it.attract(staticSphere.x, staticSphere.y, 2000f)
 
             it.color = accentColor
             it.draw()
