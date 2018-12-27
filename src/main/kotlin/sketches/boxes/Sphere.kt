@@ -1,13 +1,13 @@
 package sketches.boxes
 
-import org.jbox2d.collision.shapes.PolygonShape
+import org.jbox2d.collision.shapes.CircleShape
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.*
 import processing.core.PApplet
 import processing.core.PConstants.TWO_PI
 import shiffman.box2d.Box2DProcessing
 
-class Box(
+class Sphere(
         private val sketch: PApplet,
         private val box2d: Box2DProcessing,
         val x: Float,
@@ -15,8 +15,8 @@ class Box(
 ) : DynamicBody {
 
     override var color = 0
-    var size = 25f
-    var strokeWeight = 3f
+    var radius = 25f
+    var strokeWeight = 2f
     var rotationConstant = sketch.random(6f, 10f)
 
     val body: Body
@@ -30,11 +30,8 @@ class Box(
         }
 
         body = box2d.createBody(bd)
-        val shape = PolygonShape()
-        shape.setAsBox(
-                box2d.scalarPixelsToWorld(size / 2f),
-                box2d.scalarPixelsToWorld(size / 2f)
-        )
+        val shape = CircleShape()
+        shape.radius = box2d.scalarPixelsToWorld(radius / 2f)
 
         val fd = FixtureDef().apply {
             this.shape = shape
@@ -72,7 +69,7 @@ class Box(
             translate(coords.x, coords.y)
             rotateX(millis() / 1000f * TWO_PI / rotationConstant)
             rotateZ(angle)
-            sketch.box(size)
+            sphere(radius)
             popMatrix()
         }
     }

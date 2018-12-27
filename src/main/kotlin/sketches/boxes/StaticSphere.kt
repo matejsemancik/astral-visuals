@@ -7,7 +7,9 @@ import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing
 
 class StaticSphere(private val sketch: PApplet, private val box2d: Box2DProcessing, val x: Float, val y: Float) {
-    var radius = 100f
+    // Init with maximum theoretical radius possible,
+    // bodies start to tunnel through when changing shape's radius above this value at runtime
+    var radius = sketch.width.toFloat()
         set(value) {
             field = value
             fixture.shape.radius = box2d.scalarPixelsToWorld(radius)
@@ -33,8 +35,8 @@ class StaticSphere(private val sketch: PApplet, private val box2d: Box2DProcessi
         val fd = FixtureDef().apply {
             this.shape = this@StaticSphere.shape
             density = 20f
-            friction = 0f
-            restitution = 0.2f
+            friction = 10f
+            restitution = 1.0f
         }
 
         fixture = body.createFixture(fd)
@@ -53,7 +55,7 @@ class StaticSphere(private val sketch: PApplet, private val box2d: Box2DProcessi
             rotateY(millis() / 1000f * PConstants.TWO_PI / 24f)
             rotateZ(millis() / 1000f * PConstants.TWO_PI / 32f)
 
-            sphere(radius)
+            sphere(radius * 0.4f)
             popMatrix()
         }
     }
