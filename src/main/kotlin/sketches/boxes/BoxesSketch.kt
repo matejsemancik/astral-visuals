@@ -34,7 +34,7 @@ class BoxesSketch(
     override fun setup() {
         box2d.createWorld(Vec2(0f, 0f))
         box2d.setContinuousPhysics(true)
-        boundary = Boundary(sketch, box2d)
+//        boundary = Boundary(sketch, box2d)
         staticSphere = StaticSphere(sketch, box2d, centerX(), centerY()).apply {
             color = accentColor
             radius = shorterDimension() / 4f
@@ -46,15 +46,6 @@ class BoxesSketch(
     override fun draw() {
         if (sketch.keyPressed) {
             when (sketch.key) {
-                's' -> {
-                    bodies.add(
-                            Sphere(sketch, box2d, mouseX.toFloat(), mouseY.toFloat()).apply {
-                                color = accentColor
-                                radius = sketch.random(15f, 25f)
-                            }
-                    )
-                }
-
                 'b' -> {
                     bodies.add(
                             Box(sketch, box2d, mouseX.toFloat(), mouseY.toFloat()).apply {
