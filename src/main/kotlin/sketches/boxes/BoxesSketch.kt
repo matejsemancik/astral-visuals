@@ -71,16 +71,17 @@ class BoxesSketch(
 
         pushMatrix()
         translate(centerX(), centerY())
-        rotateY(angularVelocity(8f))
+        rotateY(angularVelocity(16f))
         pushMatrix()
         rotateX(PApplet.radians(60f))
         staticSphere.draw()
         bodies.forEach {
-            if (mousePressed) {
-                it.attract(mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f, 20000f)
+            when {
+                mousePressed -> it.attract(mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f, 20000f)
+                sketch.keyPressed && sketch.key == 'f' -> it.boostOrbit(12000f)
+                audioProcessor.beatDetect.isKick -> it.boostOrbit(12000f)
+                else -> it.attract(staticSphere.x, staticSphere.y, 1000f)
             }
-
-            it.attract(staticSphere.x, staticSphere.y, 2000f)
 
             it.accentColor = accentColor
             it.fgColor = fgColor

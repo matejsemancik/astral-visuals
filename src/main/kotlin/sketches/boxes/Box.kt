@@ -4,8 +4,11 @@ import org.jbox2d.collision.shapes.PolygonShape
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.*
 import processing.core.PApplet
+import processing.core.PConstants
 import processing.core.PConstants.TWO_PI
 import shiffman.box2d.Box2DProcessing
+import toPVector
+import toVec2
 
 class Box(
         private val sketch: PApplet,
@@ -13,6 +16,10 @@ class Box(
         val x: Float,
         val y: Float
 ) {
+
+    companion object {
+        const val DEBUG = false
+    }
 
     var accentColor = 0
     var fgColor = 0
@@ -40,7 +47,7 @@ class Box(
 
         val fd = FixtureDef().apply {
             this.shape = shape
-            density = sketch.random(1.2f, 2.2f)
+            density = sketch.random(0.2f, 1.2f)
             friction = 1f
             restitution = sketch.random(0.2f, 0.9f)
         }
@@ -62,12 +69,22 @@ class Box(
         body.applyForce(targetVec, bodyVec)
     }
 
+    fun boostOrbit(force: Float) {
+        val coords = box2d.getBodyPixelCoord(body).toPVector()
+        val accelVec = coords.copy().normalize().rotate(PConstants.PI / 2f).normalize().mult(force)
+        val forceVec = coords.copy().add(accelVec)
+        val targetVec = box2d.coordPixelsToWorld(forceVec.toVec2())
+
+        body.applyForce(targetVec, body.worldCenter)
+    }
+
     fun draw() {
         with(sketch) {
             fill(fgColor)
             stroke(accentColor)
             strokeWeight(strokeWeight)
 
+            // Box itself
             pushMatrix()
             val coords = box2d.getBodyPixelCoord(body)
             val angle = -body.angle
@@ -76,6 +93,24 @@ class Box(
             rotateZ(angle)
             sketch.box(size)
             popMatrix()
+
+            // Debug vectors
+            if (DEBUG) {
+                val mainVec = coords.toPVector()
+                val accelVec = mainVec.copy().normalize().rotate(PConstants.PI / 2f).normalize().mult(50f)
+                val forceVec = mainVec.copy().add(accelVec)
+
+                noFill()
+                strokeWeight(2f)
+
+                pushMatrix()
+                stroke(fgColor)
+                line(0f, 0f, mainVec.x, mainVec.y)
+
+                stroke(accentColor)
+                line(mainVec.x, mainVec.y, forceVec.x, forceVec.y)
+                popMatrix()
+            }
         }
     }
 }

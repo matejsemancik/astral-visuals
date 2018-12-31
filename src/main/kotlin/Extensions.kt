@@ -1,5 +1,7 @@
+import org.jbox2d.common.Vec2
 import processing.core.PApplet
 import processing.core.PConstants
+import processing.core.PVector
 import sketches.BaseSketch
 import java.util.*
 import kotlin.math.absoluteValue
@@ -87,3 +89,7 @@ fun Int.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
 
 fun IntRange.random() =
         Random().nextInt((endInclusive + 1) - start) + start
+
+fun PVector.toVec2() = Vec2(x, y)
+
+fun Vec2.toPVector() = PVector(x, y)
