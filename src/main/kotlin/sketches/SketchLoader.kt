@@ -9,6 +9,7 @@ import processing.core.PConstants
 import processing.core.PVector
 import processing.event.KeyEvent
 import sketches.blank.BlankSketch
+import sketches.boxes.BoxesSketch
 import sketches.fibonaccisphere.FibSphereSketch
 import sketches.machina.MachinaSketch
 import sketches.patterns.PatternsSketch
@@ -36,13 +37,13 @@ class SketchLoader : PApplet() {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(258f, 0f, 10f)
-    private val fgColor = PVector(258f, 0f, 100f)
-    private val accentColor = PVector(130f, 100f, 100f)
-
-//    private val bgColor = PVector(258f, 84f, 25f)
-//    private val fgColor = PVector(258f, 100f, 100f)
+//    private val bgColor = PVector(258f, 0f, 10f)
+//    private val fgColor = PVector(258f, 0f, 100f)
 //    private val accentColor = PVector(130f, 100f, 100f)
+
+    private val bgColor = PVector(258f, 84f, 25f)
+    private val fgColor = PVector(258f, 100f, 100f)
+    private val accentColor = PVector(130f, 100f, 100f)
 
 //    private val bgColor = PVector(0f, 0f, 10f)
 //    private val fgColor = PVector(0f, 0f, 90f)
@@ -72,7 +73,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '6'
+    var selector = '7'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -120,6 +121,7 @@ class SketchLoader : PApplet() {
             put('4', StarGlitchSketch(this@SketchLoader, audioProcessor, galaxy))
             put('5', PatternsSketch(this@SketchLoader, audioProcessor, galaxy))
             put('6', MachinaSketch(this@SketchLoader, audioProcessor, galaxy))
+            put('7', BoxesSketch(this@SketchLoader, audioProcessor, galaxy))
         }
 
         sketches.forEach { key, sketch ->
@@ -227,6 +229,10 @@ class SketchLoader : PApplet() {
 
     override fun mouseClicked() {
         activeSketch().mouseClicked()
+    }
+
+    override fun mousePressed() {
+        activeSketch().mousePressed()
     }
 
     fun audioToTextFile(fileName: String) {

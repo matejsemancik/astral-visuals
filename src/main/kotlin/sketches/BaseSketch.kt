@@ -18,6 +18,8 @@ abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioPr
 
     open fun mouseClicked() = Unit
 
+    open fun mousePressed() = Unit
+
     val width: Int get() = sketch.width
 
     val height: Int get() = sketch.height
