@@ -13,6 +13,7 @@ class AudioProcessor constructor(
 
     private var mockLeft = arrayListOf<Float>()
     private var mockRight = arrayListOf<Float>()
+    private var beatDetectMock = BeatDetectData(false, false, false)
 
     override fun samples(p0: FloatArray?) {
         fft.forward(audioInput.mix)
@@ -28,12 +29,25 @@ class AudioProcessor constructor(
     val audioInput = minim.lineIn.apply {
         if (!isInRenderMode) addListener(this@AudioProcessor)
     }
+
     val fft = FFT(audioInput.bufferSize(), audioInput.sampleRate()).apply {
         logAverages(22, 3)
     }
+
     val beatDetect = BeatDetect(audioInput.bufferSize(), audioInput.sampleRate()).apply {
         setSensitivity(150)
     }
+
+    val beatDetectData: BeatDetectData
+        get() = if (isInRenderMode) {
+            beatDetectMock
+        } else {
+            BeatDetectData(
+                    beatDetect.isKick,
+                    beatDetect.isSnare,
+                    beatDetect.isHat
+            )
+        }
 
     var gain = 1f
     private val ranges = mutableListOf<ClosedFloatingPointRange<Float>>()
@@ -104,5 +118,9 @@ class AudioProcessor constructor(
         mockLeft = ArrayList(left)
         mockRight = ArrayList(right)
         beatDetect.detect(left.toFloatArray())
+    }
+
+    fun mockBeatDetect(data: BeatDetectData) {
+        beatDetectMock = data
     }
 }

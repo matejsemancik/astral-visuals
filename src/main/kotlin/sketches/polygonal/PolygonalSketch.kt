@@ -110,8 +110,8 @@ class PolygonalSketch(override val sketch: SketchLoader,
         bassSum += audioProcessor.getRange(0f..50f)
         bassSum *= 0.2f
 
-        if (beatDetectButton.isPressed && audioProcessor.beatDetect.isSnare) {
-            regenerate()
+        if (beatDetectButton.isPressed && audioProcessor.beatDetectData.isSnare) {
+            shouldRegenerate = true
         }
 
         background(bgHue, bgSat, bgBrightness)
@@ -255,6 +255,6 @@ class PolygonalSketch(override val sketch: SketchLoader,
     }
 
     override fun mouseClicked() {
-        regenerate()
+        shouldRegenerate = true
     }
 }
