@@ -79,9 +79,11 @@ class BoxesSketch(
             when {
                 mousePressed -> it.attract(mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f, 20000f)
                 sketch.keyPressed && sketch.key == 'f' -> it.boostOrbit(12000f)
-                audioProcessor.beatDetect.isKick -> it.boostOrbit(12000f)
-                else -> it.attract(staticSphere.x, staticSphere.y, 1000f)
+                audioProcessor.beatDetect.isKick -> it.attract(staticSphere.x, staticSphere.y, 20000f)
+                else -> it.boostOrbit(audioProcessor.getRange(20f..60f) * 100f)
             }
+
+            it.attract(staticSphere.x, staticSphere.y, 1000f)
 
             it.accentColor = accentColor
             it.fgColor = fgColor
