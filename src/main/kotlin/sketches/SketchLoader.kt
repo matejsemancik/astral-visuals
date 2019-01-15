@@ -39,17 +39,9 @@ class SketchLoader : PApplet() {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-//    private val bgColor = PVector(258f, 0f, 10f)
-//    private val fgColor = PVector(258f, 0f, 100f)
-//    private val accentColor = PVector(130f, 100f, 100f)
-
     private val bgColor = PVector(0f, 0f, 10f)
     private val fgColor = PVector(0f, 0f, 80f)
     private val accentColor = PVector(0f, 0f, 100f)
-
-//    private val bgColor = PVector(0f, 0f, 10f)
-//    private val fgColor = PVector(0f, 0f, 90f)
-//    private val accentColor = PVector(30f, 100f, 100f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -63,8 +55,8 @@ class SketchLoader : PApplet() {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
-    private val isInRenderMode = false
-    private val audioFilePath = "yoga.mp3"
+    private val isInRenderMode = true
+    private val audioFilePath = "bop.wav"
     private val sep = "|"
     private val movieFps = 30f
     private val frameDuration = 1f / movieFps
@@ -192,7 +184,7 @@ class SketchLoader : PApplet() {
                 while (videoExport.currentTime < soundTime + frameDuration * 0.5) {
                     val channelLeft = mutableListOf<Float>()
                     val channelRight = mutableListOf<Float>()
-                    val beat = parseBoolean(p[1])
+                    val beat = parseInt(p[1])
 
                     for (i in 2 until p.size) {
                         val value = parseFloat(p[i])
@@ -204,7 +196,7 @@ class SketchLoader : PApplet() {
                     }
 
                     audioProcessor.mockFft(channelLeft, channelRight)
-                    audioProcessor.mockBeatDetect(BeatDetectData(beat, false, false))
+                    audioProcessor.mockBeatDetect(BeatDetectData(beat == 1, beat == 2, beat == 3))
                     activeSketch().draw()
                     videoExport.saveFrame()
                 }
@@ -291,7 +283,14 @@ class SketchLoader : PApplet() {
             // and they go towards high frequency as we advance towards
             // the end of the line.
             val msg = StringBuilder(PApplet.nf(chunkStartIndex / sampleRate, 0, 3).replace(',', '.'))
-            msg.append(sep + if (beatDetect.isKick) "true" else "false")
+            val beat = when {
+                beatDetect.isKick -> 1
+                beatDetect.isSnare -> 2
+                beatDetect.isHat -> 3
+                else -> 0
+            }
+
+            msg.append(sep + beat.toString())
             for (i in 0 until fftSlices) {
                 msg.append(sep + nf(fftL.getAvg(i), 0, 4).replace(',', '.'))
                 msg.append(sep + nf(fftR.getAvg(i), 0, 4).replace(',', '.'))
