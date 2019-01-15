@@ -63,11 +63,11 @@ class SketchLoader : PApplet() {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
-    val isInRenderMode = true
-    val audioFilePath = "bop.wav"
-    val sep = "|"
-    val movieFps = 60f
-    val frameDuration = 1f / movieFps
+    private val isInRenderMode = false
+    private val audioFilePath = "yoga.mp3"
+    private val sep = "|"
+    private val movieFps = 30f
+    private val frameDuration = 1f / movieFps
 
     lateinit var videoExport: VideoExport
     lateinit var reader: BufferedReader
@@ -158,7 +158,7 @@ class SketchLoader : PApplet() {
             activeSketch().isInDebugMode = debugButton.isPressed
             activeSketch().draw()
         } else {
-            audioProcessor.gain = 2f
+            audioProcessor.gain = 1.5f
             activeSketch().isInDebugMode = false
 
             val line: String?
@@ -192,7 +192,7 @@ class SketchLoader : PApplet() {
                 while (videoExport.currentTime < soundTime + frameDuration * 0.5) {
                     val channelLeft = mutableListOf<Float>()
                     val channelRight = mutableListOf<Float>()
-                    val isBeatDetectSnare = parseBoolean(p[1])
+                    val beat = parseBoolean(p[1])
 
                     for (i in 2 until p.size) {
                         val value = parseFloat(p[i])
@@ -204,7 +204,7 @@ class SketchLoader : PApplet() {
                     }
 
                     audioProcessor.mockFft(channelLeft, channelRight)
-                    audioProcessor.mockBeatDetect(BeatDetectData(false, isBeatDetectSnare, false))
+                    audioProcessor.mockBeatDetect(BeatDetectData(beat, false, false))
                     activeSketch().draw()
                     videoExport.saveFrame()
                 }
@@ -291,7 +291,7 @@ class SketchLoader : PApplet() {
             // and they go towards high frequency as we advance towards
             // the end of the line.
             val msg = StringBuilder(PApplet.nf(chunkStartIndex / sampleRate, 0, 3).replace(',', '.'))
-            msg.append(sep + if (beatDetect.isSnare) "true" else "false")
+            msg.append(sep + if (beatDetect.isKick) "true" else "false")
             for (i in 0 until fftSlices) {
                 msg.append(sep + nf(fftL.getAvg(i), 0, 4).replace(',', '.'))
                 msg.append(sep + nf(fftR.getAvg(i), 0, 4).replace(',', '.'))
