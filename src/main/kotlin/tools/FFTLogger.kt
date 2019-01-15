@@ -6,7 +6,7 @@ import tools.audio.AudioProcessor
 class FFTLogger(private val sketch: PApplet, private val audioProcessor: AudioProcessor) {
 
     companion object {
-        val BAR_HEIGHT = 14f
+        const val BAR_HEIGHT = 8f
     }
 
     init {
