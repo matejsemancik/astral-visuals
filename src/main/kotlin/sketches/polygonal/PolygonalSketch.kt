@@ -110,8 +110,8 @@ class PolygonalSketch(override val sketch: SketchLoader,
         bassSum += audioProcessor.getRange(0f..50f)
         bassSum *= 0.2f
 
-        if (beatDetectButton.isPressed && audioProcessor.beatDetect.isSnare) {
-            regenerate()
+        if (beatDetectButton.isPressed && audioProcessor.beatDetectData.isKick) {
+            shouldRegenerate = true
         }
 
         background(bgHue, bgSat, bgBrightness)
@@ -174,9 +174,9 @@ class PolygonalSketch(override val sketch: SketchLoader,
         rotateX(sin(millis() * 0.0005f) * PConstants.PI / 100f)
         rotateZ(sin(millis() * 0.0005f) * PConstants.PI / 100f)
         rotateY(sin(millis() * 0.0005f) * PConstants.PI / 20f)
-        translate(0f, 0f, sin(millis() * 0.001f) * PConstants.PI / 50f)
+        translate(0f, 0f, sin(millis() * 0.001f) * PConstants.PI / 50f + 100f)
 
-        translate(-centerX() * 0.8f, -centerY() * 0.8f)
+        translate(-centerX() * 0.65f, -centerY() * 0.65f)
         fftLogger.draw()
         popMatrix()
 
@@ -255,6 +255,6 @@ class PolygonalSketch(override val sketch: SketchLoader,
     }
 
     override fun mouseClicked() {
-        regenerate()
+        shouldRegenerate = true
     }
 }

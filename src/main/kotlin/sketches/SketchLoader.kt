@@ -3,6 +3,7 @@ package sketches
 import com.hamoid.VideoExport
 import ddf.minim.AudioSample
 import ddf.minim.Minim
+import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
 import processing.core.PApplet
 import processing.core.PConstants
@@ -17,6 +18,7 @@ import sketches.polygonal.PolygonalSketch
 import sketches.starglitch.StarGlitchSketch
 import sketches.terrain.TerrainSketch
 import tools.audio.AudioProcessor
+import tools.audio.BeatDetectData
 import tools.galaxy.Galaxy
 import tools.galaxy.controls.Pot
 import tools.galaxy.controls.PushButton
@@ -37,17 +39,9 @@ class SketchLoader : PApplet() {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-//    private val bgColor = PVector(258f, 0f, 10f)
-//    private val fgColor = PVector(258f, 0f, 100f)
-//    private val accentColor = PVector(130f, 100f, 100f)
-
-    private val bgColor = PVector(258f, 84f, 25f)
-    private val fgColor = PVector(258f, 100f, 100f)
-    private val accentColor = PVector(130f, 100f, 100f)
-
-//    private val bgColor = PVector(0f, 0f, 10f)
-//    private val fgColor = PVector(0f, 0f, 90f)
-//    private val accentColor = PVector(30f, 100f, 100f)
+    private val bgColor = PVector(0f, 0f, 10f)
+    private val fgColor = PVector(0f, 0f, 80f)
+    private val accentColor = PVector(0f, 0f, 100f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -61,11 +55,11 @@ class SketchLoader : PApplet() {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
-    val isInRenderMode = false
-    val audioFilePath = "bop3.wav"
-    val sep = "|"
-    val movieFps = 60f
-    val frameDuration = 1f / movieFps
+    private val isInRenderMode = true
+    private val audioFilePath = "bop.wav"
+    private val sep = "|"
+    private val movieFps = 30f
+    private val frameDuration = 1f / movieFps
 
     lateinit var videoExport: VideoExport
     lateinit var reader: BufferedReader
@@ -73,7 +67,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '7'
+    var selector = '1'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -156,15 +150,15 @@ class SketchLoader : PApplet() {
             activeSketch().isInDebugMode = debugButton.isPressed
             activeSketch().draw()
         } else {
-            audioProcessor.gain = 2f
+            audioProcessor.gain = 1.5f
             activeSketch().isInDebugMode = false
 
-            var line: String?
-            try {
-                line = reader.readLine()
+            val line: String?
+            line = try {
+                reader.readLine()
             } catch (exception: IOException) {
                 println(exception.toString())
-                line = null
+                null
             }
 
             if (line == null) {
@@ -190,7 +184,9 @@ class SketchLoader : PApplet() {
                 while (videoExport.currentTime < soundTime + frameDuration * 0.5) {
                     val channelLeft = mutableListOf<Float>()
                     val channelRight = mutableListOf<Float>()
-                    for (i in 1 until p.size) {
+                    val beat = parseInt(p[1])
+
+                    for (i in 2 until p.size) {
                         val value = parseFloat(p[i])
                         if (i % 2 == 1) {
                             channelLeft.add(value)
@@ -200,6 +196,7 @@ class SketchLoader : PApplet() {
                     }
 
                     audioProcessor.mockFft(channelLeft, channelRight)
+                    audioProcessor.mockBeatDetect(BeatDetectData(beat == 1, beat == 2, beat == 3))
                     activeSketch().draw()
                     videoExport.saveFrame()
                 }
@@ -245,6 +242,8 @@ class SketchLoader : PApplet() {
         val fftSize = 1024
         val sampleRate = track.sampleRate()
 
+        val beatDetect = BeatDetect(fftSize, sampleRate)
+
         val fftSamplesL = FloatArray(fftSize)
         val fftSamplesR = FloatArray(fftSize)
 
@@ -272,17 +271,26 @@ class SketchLoader : PApplet() {
             }
 
             fftL.forward(fftSamplesL)
-            fftR.forward(fftSamplesL)
+            fftR.forward(fftSamplesR)
+            beatDetect.detect(fftSamplesL)
 
             // The format of the saved txt file.
             // The file contains many rows. Each row looks like this:
-            // T|L|R|L|R|L|R|... etc
-            // where T is the time in seconds
+            // T|B|L|R|L|R|L|R|... etc
+            // where T is the time in seconds and B is BeatDetect data
             // Then we alternate left and right channel FFT values
             // The first L and R values in each row are low frequencies (bass)
             // and they go towards high frequency as we advance towards
             // the end of the line.
             val msg = StringBuilder(PApplet.nf(chunkStartIndex / sampleRate, 0, 3).replace(',', '.'))
+            val beat = when {
+                beatDetect.isKick -> 1
+                beatDetect.isSnare -> 2
+                beatDetect.isHat -> 3
+                else -> 0
+            }
+
+            msg.append(sep + beat.toString())
             for (i in 0 until fftSlices) {
                 msg.append(sep + nf(fftL.getAvg(i), 0, 4).replace(',', '.'))
                 msg.append(sep + nf(fftR.getAvg(i), 0, 4).replace(',', '.'))
