@@ -55,7 +55,7 @@ class SketchLoader : PApplet() {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
-    private val isInRenderMode = true
+    private val isInRenderMode = false
     private val audioFilePath = "bop.wav"
     private val sep = "|"
     private val movieFps = 30f
