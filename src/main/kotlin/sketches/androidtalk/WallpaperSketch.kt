@@ -11,8 +11,8 @@ class WallpaperSketch : PApplet() {
 
     var numX = 20
     var numY = 30
-    var paddingVerticalPx = 80
     var paddingHorizontalPx = 80
+    var paddingVerticalPx = 80
     var dotSize = 8f
     val lineWeight = 2f
     var dotPositions = Array(numX) { Array(numY) { PVector() } }
@@ -38,15 +38,15 @@ class WallpaperSketch : PApplet() {
                         x.toFloat(),
                         0f,
                         numX.toFloat() - 1,
-                        -width / 2f + paddingVerticalPx,
-                        width / 2f - paddingVerticalPx
+                        -width / 2f + paddingHorizontalPx,
+                        width / 2f - paddingHorizontalPx
                 )
                 val posY = PApplet.map(
                         y.toFloat(),
                         0f,
                         numY.toFloat() - 1,
-                        -height / 2f + paddingHorizontalPx,
-                        height / 2f - paddingHorizontalPx
+                        -height / 2f + paddingVerticalPx,
+                        height / 2f - paddingVerticalPx
                 )
 
                 dotPositions[x][y] = PVector(posX, posY, 0f)
