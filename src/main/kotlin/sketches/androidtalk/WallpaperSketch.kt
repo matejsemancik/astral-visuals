@@ -15,7 +15,7 @@ class WallpaperSketch : PApplet() {
     var dotSize = 5f
 
     override fun settings() {
-        size(480, 720, PConstants.P3D)
+        size(480, 720, PConstants.P2D)
 //        fullScreen(PConstants.P2D)
 //        fullScreen(PConstants.P3D)
     }
