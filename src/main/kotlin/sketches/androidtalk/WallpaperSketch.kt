@@ -16,7 +16,6 @@ class WallpaperSketch : PApplet() {
     var dotSize = 8f
     val lineWeight = 2f
     var dotPositions = Array(numX) { Array(numY) { PVector() } }
-    var fingerVector: PVector? = null
 
     override fun settings() {
         size(480, 720, PConstants.P3D)
@@ -90,13 +89,5 @@ class WallpaperSketch : PApplet() {
                 popMatrix()
             }
         }
-    }
-
-    override fun mouseDragged() {
-        fingerVector = PVector(mouseX.toFloat(), mouseY.toFloat())
-    }
-
-    override fun mouseReleased() {
-        fingerVector = null
     }
 }
