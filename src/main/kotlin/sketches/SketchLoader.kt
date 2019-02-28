@@ -40,8 +40,8 @@ class SketchLoader : PApplet() {
     private lateinit var colorResetButton: PushButton
 
     private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(0f, 0f, 80f)
-    private val accentColor = PVector(0f, 0f, 100f)
+    private val fgColor = PVector(97f, 100f, 60f)
+    private val accentColor = PVector(97f, 100f, 100f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -72,7 +72,7 @@ class SketchLoader : PApplet() {
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
-//        fullScreen(P3D, 2)
+        // fullScreen(P3D, 2) - use in live environment (projector extends desktop)
         noSmooth()
     }
 

@@ -5,6 +5,8 @@ import centerX
 import centerY
 import org.jbox2d.common.Vec2
 import processing.core.PApplet
+import processing.core.PApplet.radians
+import processing.core.PApplet.sin
 import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing
 import shorterDimension
@@ -73,13 +75,13 @@ class BoxesSketch(
         translate(centerX(), centerY())
         rotateY(angularVelocity(16f))
         pushMatrix()
-        rotateX(PApplet.radians(60f))
+        rotateX(PApplet.map(sin(angularVelocity(30f)), -1f, 1f, radians(-180f), radians(180f)))
         staticSphere.draw()
         bodies.forEach {
             when {
                 mousePressed -> it.attract(mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f, 20000f)
                 sketch.keyPressed && sketch.key == 'f' -> it.boostOrbit(12000f)
-                audioProcessor.beatDetect.isKick -> it.attract(staticSphere.x, staticSphere.y, 20000f)
+                audioProcessor.beatDetect.isKick -> it.attract(staticSphere.x, staticSphere.y, 10000f)
                 else -> it.boostOrbit(audioProcessor.getRange(20f..60f) * 100f)
             }
 
