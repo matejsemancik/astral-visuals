@@ -77,19 +77,19 @@ class BoxesSketch(
         pushMatrix()
         rotateX(PApplet.map(sin(angularVelocity(30f)), -1f, 1f, radians(-180f), radians(180f)))
         staticSphere.draw()
-        bodies.forEach {
+        bodies.withIndex().forEach {
             when {
-                mousePressed -> it.attract(mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f, 20000f)
-                sketch.keyPressed && sketch.key == 'f' -> it.boostOrbit(12000f)
-                audioProcessor.beatDetect.isKick -> it.attract(staticSphere.x, staticSphere.y, 10000f)
-                else -> it.boostOrbit(audioProcessor.getRange(20f..60f) * 100f)
+                mousePressed -> it.value.attract(mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f, 20000f)
+                sketch.keyPressed && sketch.key == 'f' -> it.value.boostOrbit(12000f)
+                audioProcessor.beatDetect.isKick -> it.value.attract(staticSphere.x, staticSphere.y, 10000f)
+                else -> if (it.index % 2 == 0) it.value.boostOrbit(audioProcessor.getRange(20f..60f) * 100f)
             }
 
-            it.attract(staticSphere.x, staticSphere.y, 1000f)
+            it.value.attract(staticSphere.x, staticSphere.y, 1000f)
 
-            it.accentColor = accentColor
-            it.fgColor = fgColor
-            it.draw()
+            it.value.accentColor = accentColor
+            it.value.fgColor = fgColor
+            it.value.draw()
         }
 
         popMatrix()
