@@ -42,8 +42,8 @@ class SpikesSketch(
         background(bgColor)
 
         positions.flatten().forEach {
-            var dotSize = 5f
-            var lineWeight = 1f
+            var dotSize = kontrol.slider2.midiRange(0f, 10f)
+            var lineWeight = kontrol.slider3.midiRange(0f, 10f)
 
             var noiseGain: Float = kontrol.slider1.midiRange(200f)
             var noiseResX: Float = kontrol.knob1.midiRange(0.1f)
