@@ -15,7 +15,7 @@ import tools.kontrol.KontrolF1
 
 class SpikesSketch(
         sketch: SketchLoader,
-        audioProcessor: AudioProcessor,
+        private val audioProcessor: AudioProcessor,
         galaxy: Galaxy
 ) : BaseSketch(
         sketch,
@@ -24,12 +24,18 @@ class SpikesSketch(
 ) {
 
     lateinit var positions: Array<Array<PVector>>
+    lateinit var fftMapping: Array<IntArray>
+
+    var numX = 45
+    var numY = 25
+    var rotationEnabled = false
+
     private val kontrol = KontrolF1()
 
     override fun setup() {
         createArray(
-                numX = 45,
-                numY = 25,
+                numX = numX,
+                numY = numY,
                 paddHorizontal = 100f,
                 paddVertical = 100f
         )
@@ -40,41 +46,54 @@ class SpikesSketch(
     override fun onBecameActive() = Unit
 
     override fun draw() {
+        rotationEnabled = kontrol.pad(0, 0).state
+
         background(bgColor)
-
         translate(centerX(), centerY())
-        rotateY((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / 200f))
+        if (rotationEnabled) {
+            rotateY((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / kontrol.encoder.midiRange(500f)))
+        } else {
+            rotateY(0f)
+        }
 
-        positions.flatten().forEach {
-            var dotSize = kontrol.slider2.midiRange(0f, 10f)
-            var lineWeight = kontrol.slider3.midiRange(0f, 10f)
+        for (x in 0 until numX) {
+            for (y in 0 until numY) {
+                var dotSize = kontrol.slider2.midiRange(0f, 10f)
+                var lineWeight = kontrol.slider3.midiRange(0f, 10f)
 
-            var noiseGain: Float = kontrol.slider1.midiRange(200f)
-            var noiseResX: Float = kontrol.knob1.midiRange(0.1f)
-            var noiseRexY: Float = kontrol.knob2.midiRange(0.1f)
-            var noiseTravelX: Float = kontrol.knob3.midiRange(0.01f)
-            var noiseTravelY: Float = kontrol.knob4.midiRange(0.01f)
+                var noiseGain: Float = kontrol.slider1.midiRange(200f)
+                var noiseResX: Float = kontrol.knob1.midiRange(0.1f)
+                var noiseRexY: Float = kontrol.knob2.midiRange(0.1f)
+                var noiseTravelX: Float = kontrol.knob3.midiRange(0.01f)
+                var noiseTravelY: Float = kontrol.knob4.midiRange(0.01f)
+                var audioGain: Float = kontrol.slider4.midiRange(10f)
 
-            val noise = noise(
-                    it.x * noiseResX + millis() * noiseTravelX,
-                    it.y * noiseRexY + millis() * noiseTravelY
-            ) * noiseGain
+                val pos = positions[x][y]
 
-            // Draw line
-            noFill()
-            stroke(fgColor)
-            strokeWeight(lineWeight)
+                val audio = audioProcessor.getFftAvg(fftMapping[x][y]) * audioGain
+                val noise = noise(
+                        pos.x * noiseResX + millis() * noiseTravelX,
+                        pos.y * noiseRexY + millis() * noiseTravelY
+                ) * noiseGain
 
-            sketch.line(it.x, it.y, 0f, it.x, it.y, noise)
+                val elevation = noise + audio
 
-            // Draw dot
-            noStroke()
-            fill(fgColor)
+                // Draw line
+                noFill()
+                stroke(fgColor)
+                strokeWeight(lineWeight)
 
-            pushMatrix()
-            translate(it.x, it.y, noise)
-            sphere(dotSize)
-            popMatrix()
+                sketch.line(pos.x, pos.y, 0f, pos.x, pos.y, elevation)
+
+                // Draw dot
+                noStroke()
+                fill(fgColor)
+
+                pushMatrix()
+                translate(pos.x, pos.y, elevation)
+                sphere(dotSize)
+                popMatrix()
+            }
         }
     }
 
@@ -94,5 +113,7 @@ class SpikesSketch(
                 )
             }
         }
+
+        fftMapping = Array(numX) { IntArray(numY) { sketch.random(audioProcessor.fft.avgSize().toFloat()).toInt() } }
     }
 }
