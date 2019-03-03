@@ -1,5 +1,7 @@
 package sketches.spikes
 
+import centerX
+import centerY
 import midiRange
 import processing.core.PApplet
 import processing.core.PConstants
@@ -84,8 +86,8 @@ class SpikesSketch(
         for (x in 0 until numX) {
             for (y in 0 until numY) {
                 positions[x][y] = PVector(
-                        PApplet.map(x.toFloat(), 0f, numX - 1f, 0f + paddHorizontal, width.toFloat() - paddHorizontal),
-                        PApplet.map(y.toFloat(), 0f, numY - 1f, 0f + paddVertical, height.toFloat() - paddVertical),
+                        PApplet.map(x.toFloat(), 0f, numX - 1f, -centerX() + paddHorizontal, centerX() - paddHorizontal),
+                        PApplet.map(y.toFloat(), 0f, numY - 1f, -centerY() + paddVertical, centerY() - paddVertical),
                         0f
                 )
             }
