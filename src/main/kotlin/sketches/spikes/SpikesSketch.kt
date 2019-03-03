@@ -6,6 +6,7 @@ import midiRange
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
+import quantize
 import sketches.BaseSketch
 import sketches.SketchLoader
 import tools.audio.AudioProcessor
@@ -36,12 +37,13 @@ class SpikesSketch(
         kontrol.connect()
     }
 
-    override fun onBecameActive() {
-        ellipseMode(PConstants.CENTER)
-    }
+    override fun onBecameActive() = Unit
 
     override fun draw() {
         background(bgColor)
+
+        translate(centerX(), centerY())
+        rotateY((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / 200f))
 
         positions.flatten().forEach {
             var dotSize = kontrol.slider2.midiRange(0f, 10f)
@@ -71,7 +73,7 @@ class SpikesSketch(
 
             pushMatrix()
             translate(it.x, it.y, noise)
-            ellipse(0f, 0f, dotSize, dotSize)
+            sphere(dotSize)
             popMatrix()
         }
     }

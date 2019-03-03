@@ -93,3 +93,5 @@ fun IntRange.random() =
 fun PVector.toVec2() = Vec2(x, y)
 
 fun Vec2.toPVector() = PVector(x, y)
+
+fun Float.quantize(step: Float): Float = (this / step).toInt() * step
