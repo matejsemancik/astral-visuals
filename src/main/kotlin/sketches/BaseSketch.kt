@@ -98,6 +98,10 @@ abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioPr
 
     fun color(v1: Int, v2: Int, v3: Int) = sketch.color(v1, v2, v3)
 
+    fun ellipseMode(mode: Int) = sketch.ellipseMode(mode)
+
+    fun ellipse(a: Float, b: Float, c: Float, d: Float) = sketch.ellipse(a, b, c, d)
+
     val bgHue: Float get() = sketch.bgHuePot.value
     val bgSat: Float get() = sketch.bgSatPot.value
     val bgBrightness: Float get() = sketch.bgBriPot.value

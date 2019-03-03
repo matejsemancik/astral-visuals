@@ -91,7 +91,7 @@ class KontrolF1 {
         }
     }
 
-    fun pad(y: Int, x: Int) =
+    fun pad(x: Int, y: Int) =
             if (y < 4 && x < 4) {
                 pads.first { it.y == y && it.x == x }
             } else {

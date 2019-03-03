@@ -17,6 +17,7 @@ import sketches.patterns.PatternsSketch
 import sketches.polygonal.PolygonalSketch
 import sketches.starglitch.StarGlitchSketch
 import sketches.terrain.TerrainSketch
+import sketches.spikes.SpikesSketch
 import tools.audio.AudioProcessor
 import tools.audio.BeatDetectData
 import tools.galaxy.Galaxy
@@ -39,9 +40,9 @@ class SketchLoader : PApplet() {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(97f, 100f, 60f)
-    private val accentColor = PVector(97f, 100f, 100f)
+    private val bgColor = PVector(0f, 0f, 100f)
+    private val fgColor = PVector(97f, 100f, 0f)
+    private val accentColor = PVector(97f, 100f, 0f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -67,7 +68,7 @@ class SketchLoader : PApplet() {
     // endregion
 
     lateinit var blankSketch: BaseSketch
-    var selector = '1'
+    var selector = '8'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -116,6 +117,7 @@ class SketchLoader : PApplet() {
             put('5', PatternsSketch(this@SketchLoader, audioProcessor, galaxy))
             put('6', MachinaSketch(this@SketchLoader, audioProcessor, galaxy))
             put('7', BoxesSketch(this@SketchLoader, audioProcessor, galaxy))
+            put('8', SpikesSketch(this@SketchLoader, audioProcessor, galaxy))
         }
 
         sketches.forEach { key, sketch ->

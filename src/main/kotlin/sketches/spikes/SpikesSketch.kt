@@ -1,0 +1,94 @@
+package sketches.spikes
+
+import midiRange
+import processing.core.PApplet
+import processing.core.PConstants
+import processing.core.PVector
+import sketches.BaseSketch
+import sketches.SketchLoader
+import tools.audio.AudioProcessor
+import tools.galaxy.Galaxy
+import tools.kontrol.KontrolF1
+
+class SpikesSketch(
+        sketch: SketchLoader,
+        audioProcessor: AudioProcessor,
+        galaxy: Galaxy
+) : BaseSketch(
+        sketch,
+        audioProcessor,
+        galaxy
+) {
+
+    lateinit var positions: Array<Array<PVector>>
+    private val kontrol = KontrolF1()
+
+    override fun setup() {
+        createArray(
+                numX = 45,
+                numY = 25,
+                paddHorizontal = 100f,
+                paddVertical = 100f
+        )
+
+        kontrol.connect()
+    }
+
+    override fun onBecameActive() {
+        ellipseMode(PConstants.CENTER)
+    }
+
+    override fun draw() {
+        background(bgColor)
+
+        positions.flatten().forEach {
+            var dotSize = 5f
+            var lineWeight = 1f
+
+            var noiseGain: Float = kontrol.slider1.midiRange(200f)
+            var noiseResX: Float = kontrol.knob1.midiRange(0.1f)
+            var noiseRexY: Float = kontrol.knob2.midiRange(0.1f)
+            var noiseTravelX: Float = kontrol.knob3.midiRange(0.01f)
+            var noiseTravelY: Float = kontrol.knob4.midiRange(0.01f)
+
+            val noise = noise(
+                    it.x * noiseResX + millis() * noiseTravelX,
+                    it.y * noiseRexY + millis() * noiseTravelY
+            ) * noiseGain
+
+            // Draw line
+            noFill()
+            stroke(fgColor)
+            strokeWeight(lineWeight)
+
+            sketch.line(it.x, it.y, 0f, it.x, it.y, noise)
+
+            // Draw dot
+            noStroke()
+            fill(fgColor)
+
+            pushMatrix()
+            translate(it.x, it.y, noise)
+            ellipse(0f, 0f, dotSize, dotSize)
+            popMatrix()
+        }
+    }
+
+    private fun createArray(
+            numX: Int,
+            numY: Int,
+            paddHorizontal: Float = 0f,
+            paddVertical: Float = 0f) {
+
+        positions = Array(numX) { Array(numY) { PVector() } }
+        for (x in 0 until numX) {
+            for (y in 0 until numY) {
+                positions[x][y] = PVector(
+                        PApplet.map(x.toFloat(), 0f, numX - 1f, 0f + paddHorizontal, width.toFloat() - paddHorizontal),
+                        PApplet.map(y.toFloat(), 0f, numY - 1f, 0f + paddVertical, height.toFloat() - paddVertical),
+                        0f
+                )
+            }
+        }
+    }
+}
