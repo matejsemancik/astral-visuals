@@ -14,6 +14,7 @@ import tools.galaxy.Galaxy
 import tools.kontrol.KontrolF1
 import tools.kontrol.Pad
 
+// TODO refactor to Galaxy control
 class SpikesSketch(
         sketch: SketchLoader,
         private val audioProcessor: AudioProcessor,
