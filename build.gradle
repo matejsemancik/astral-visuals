@@ -2,9 +2,11 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.3.20'
+    ext.koin_version = '2.0.0-beta-1'
 
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -20,6 +22,8 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    
+    // Processing libs
     compile fileTree(dir: 'library', include: '*.jar')
     compile fileTree(dir: 'library/minim/library', include: '*.jar')
     compile fileTree(dir: 'library/serial/library', include: '*.jar')
@@ -27,4 +31,7 @@ dependencies {
     compile fileTree(dir: 'library/themidibus/library', include: '*.jar')
     compile fileTree(dir: 'library/videoexport/library', include: '*.jar')
     compile fileTree(dir: 'library/box2d_processing/library', include: '*.jar')
+
+    // DI
+    implementation "org.koin:koin-core:$koin_version"
 }
