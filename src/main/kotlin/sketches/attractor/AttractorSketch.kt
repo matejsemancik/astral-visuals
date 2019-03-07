@@ -8,6 +8,7 @@ import processing.core.PConstants
 import processing.core.PVector
 import tools.kontrol.KontrolF1
 
+// TODO refactor to BaseSketch, use Galaxy controls
 class AttractorSketch : PApplet() {
 
     var a = -2.24f
