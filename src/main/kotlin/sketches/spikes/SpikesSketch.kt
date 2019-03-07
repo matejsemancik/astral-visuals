@@ -33,6 +33,7 @@ class SpikesSketch(
     var rotationZEnabled = false
     var beatRecreateEnabled = false
     var forceRecreate = false
+    var baseRotationX = 0f
 
     private val kontrol = KontrolF1()
 
@@ -72,6 +73,20 @@ class SpikesSketch(
             mode = Pad.Mode.TRIGGER
             setTriggerListener { forceRecreate = true }
         }
+
+        // Base rotation
+        kontrol.pad(3, 0).apply {
+            colorOn = Triple(100, 127, 127)
+            mode = Pad.Mode.TRIGGER
+            setTriggerListener { baseRotationX = 0f }
+        }
+
+        // Base rotation
+        kontrol.pad(3, 1).apply {
+            colorOn = Triple(100, 127, 127)
+            mode = Pad.Mode.TRIGGER
+            setTriggerListener { baseRotationX = PConstants.PI / 2f }
+        }
     }
 
     override fun draw() {
@@ -90,7 +105,7 @@ class SpikesSketch(
         if (rotationXEnabled) {
             rotateX((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / kontrol.encoder.midiRange(500f)))
         } else {
-            rotateX(PConstants.PI / 2f)
+            rotateX(baseRotationX)
         }
 
         if (rotationZEnabled) {
@@ -109,7 +124,7 @@ class SpikesSketch(
                 var noiseRexY: Float = kontrol.knob2.midiRange(0.02f)
                 var noiseTravelX: Float = kontrol.knob3.midiRange(-0.01f, 0.01f)
                 var noiseTravelY: Float = kontrol.knob4.midiRange(-0.01f, 0.01f)
-                var audioGain: Float = kontrol.slider4.midiRange(10f)
+                var audioGain: Float = kontrol.slider4.midiRange(3f)
 
                 val pos = positions[x][y]
 
@@ -126,8 +141,8 @@ class SpikesSketch(
                 stroke(fgColor)
                 strokeWeight(lineWeight)
 
-                sketch.line(pos.x, pos.y, 0f, pos.x, pos.y, elevation)
-                sketch.line(pos.x, pos.y, 0f, pos.x, pos.y, -elevation)
+                sketch.line(pos.x, pos.y, noise, pos.x, pos.y, elevation)
+                sketch.line(pos.x, pos.y, -noise, pos.x, pos.y, -elevation)
 
                 // Draw dot
                 noStroke()
