@@ -83,11 +83,6 @@ class AttractorSketch : PApplet() {
         popMatrix()
     }
 
-    override fun mouseMoved() {
-//        b = PApplet.map(mouseX.toFloat(), 0f, width.toFloat(), -20f, 20f)
-//        c = PApplet.map(mouseY.toFloat(), 0f, height.toFloat(), -20f, 20f)
-    }
-
     private fun attractor() {
         var px = 0f
         var py = 0f
