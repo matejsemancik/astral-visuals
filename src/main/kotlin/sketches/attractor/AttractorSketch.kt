@@ -45,8 +45,6 @@ class AttractorSketch : PApplet() {
         a = kontrol.knob1.midiRange(-2f, 2f)
         b = kontrol.knob2.midiRange(-20f, 20f)
         c = kontrol.knob3.midiRange(-10f, 10f)
-//        b = sin(millis() / 10000f) * 20f
-//        c = sin(millis() / 12000f) * 20f
         d = kontrol.knob4.midiRange(-2f, 2f)
         e = kontrol.slider1.midiRange(0f, 10f)
         f = kontrol.slider2.midiRange(0f, 1f)
