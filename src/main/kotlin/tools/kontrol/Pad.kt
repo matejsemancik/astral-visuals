@@ -22,7 +22,7 @@ class Pad constructor(private val kontrol: KontrolF1, val cc: Int, val x: Int, v
     var colorOn = Triple(0, 127, 127)
         set(value) {
             field = value
-            colorOff = value.copy(third = 10)
+            colorOff = value.copy(third = 20)
         }
 
     var colorOff = Triple(0, 127, 0)
