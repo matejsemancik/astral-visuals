@@ -5,10 +5,6 @@ import ddf.minim.AudioSample
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import processing.core.PApplet
-import processing.core.PConstants
-import processing.core.PVector
-import processing.event.KeyEvent
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
@@ -23,17 +19,28 @@ import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.Pot
 import dev.matsem.astral.tools.galaxy.controls.PushButton
 import dev.matsem.astral.tools.galaxy.controls.ToggleButton
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import processing.core.PApplet
+import processing.core.PConstants
+import processing.core.PVector
+import processing.event.KeyEvent
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.PrintWriter
 
 
-class SketchLoader : PApplet() {
+class SketchLoader : PApplet(), KoinComponent {
 
     // region shared resources
 
-    private lateinit var audioProcessor: AudioProcessor
-    private val galaxy: Galaxy = Galaxy()
+    companion object {
+        const val IS_IN_RENDER_MODE = false
+    }
+
+    private val audioProcessor: AudioProcessor by inject()
+    private val galaxy: Galaxy by inject()
+
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
     private lateinit var resendButton: PushButton
@@ -80,7 +87,6 @@ class SketchLoader : PApplet() {
         colorMode(PConstants.HSB, 360f, 100f, 100f)
 
         galaxy.connect()
-        audioProcessor = AudioProcessor(this, isInRenderMode)
 
         gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
         debugButton = galaxy.createToggleButton(15, 65, false)
