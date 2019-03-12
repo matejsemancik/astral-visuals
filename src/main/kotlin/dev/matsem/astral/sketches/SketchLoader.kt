@@ -87,7 +87,12 @@ class SketchLoader : PApplet(), KoinComponent {
     }
 
     override fun setup() {
-        colorMode(PConstants.HSB, 360f, 100f, 100f)
+        colorMode(
+                PConstants.HSB,
+                Config.Color.HUE_MAX,
+                Config.Color.SATURATION_MAX,
+                Config.Color.BRIGHTNESS_MAX
+        )
 
         galaxy.connect()
 
@@ -102,17 +107,17 @@ class SketchLoader : PApplet(), KoinComponent {
             colorPots.forEach { it.reset() }
         }
 
-        bgHuePot = galaxy.createPot(15, 67, 0f, 360f, bgColor.x).also { colorPots.add(it) }
-        bgSatPot = galaxy.createPot(15, 68, 0f, 100f, bgColor.y).also { colorPots.add(it) }
-        bgBriPot = galaxy.createPot(15, 69, 0f, 100f, bgColor.z).also { colorPots.add(it) }
+        bgHuePot = galaxy.createPot(15, 67, 0f, Config.Color.HUE_MAX, bgColor.x).also { colorPots.add(it) }
+        bgSatPot = galaxy.createPot(15, 68, 0f, Config.Color.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }
+        bgBriPot = galaxy.createPot(15, 69, 0f, Config.Color.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }
 
-        fgHuePot = galaxy.createPot(15, 70, 0f, 360f, fgColor.x).also { colorPots.add(it) }
-        fgSatPot = galaxy.createPot(15, 71, 0f, 100f, fgColor.y).also { colorPots.add(it) }
-        fgBriPot = galaxy.createPot(15, 72, 0f, 100f, fgColor.z).also { colorPots.add(it) }
+        fgHuePot = galaxy.createPot(15, 70, 0f, Config.Color.HUE_MAX, fgColor.x).also { colorPots.add(it) }
+        fgSatPot = galaxy.createPot(15, 71, 0f, Config.Color.SATURATION_MAX, fgColor.y).also { colorPots.add(it) }
+        fgBriPot = galaxy.createPot(15, 72, 0f, Config.Color.BRIGHTNESS_MAX, fgColor.z).also { colorPots.add(it) }
 
-        accentHuePot = galaxy.createPot(15, 73, 0f, 360f, accentColor.x).also { colorPots.add(it) }
-        accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentColor.y).also { colorPots.add(it) }
-        accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentColor.z).also { colorPots.add(it) }
+        accentHuePot = galaxy.createPot(15, 73, 0f, Config.Color.HUE_MAX, accentColor.x).also { colorPots.add(it) }
+        accentSatPot = galaxy.createPot(15, 74, 0f, Config.Color.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }
+        accentBriPot = galaxy.createPot(15, 75, 0f, Config.Color.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }
 
         sketches.apply {
             put('0', blankSketch)
