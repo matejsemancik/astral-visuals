@@ -21,8 +21,6 @@ class TerrainSketch : BaseSketch() {
     private val galaxy: Galaxy by inject()
 
     companion object {
-        const val PADDING = 12f
-
         const val RENDER_MODE_TRIANGLE_STRIP = "RENDER_MODE_TRIANGLE_STRIP"
         const val RENDER_MODE_LINES_Z = "RENDER_MODE_LINES_Z"
         const val RENDER_MODE_LINES_Y = "RENDER_MODE_LINES_Y"
