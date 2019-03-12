@@ -2,22 +2,15 @@ package dev.matsem.astral.sketches.machina
 
 import dev.matsem.astral.centerX
 import dev.matsem.astral.centerY
-import processing.core.PConstants
-import processing.core.PImage
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
-import dev.matsem.astral.tools.audio.AudioProcessor
-import dev.matsem.astral.tools.galaxy.Galaxy
+import org.koin.core.inject
+import processing.core.PConstants
+import processing.core.PImage
 
-class MachinaSketch(
-        sketch: SketchLoader,
-        audioProcessor: AudioProcessor,
-        galaxy: Galaxy
-) : BaseSketch(
-        sketch,
-        audioProcessor,
-        galaxy
-) {
+class MachinaSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
 
     lateinit var semlogo: PImage
     val scale = 80

@@ -3,8 +3,6 @@ package dev.matsem.astral.sketches.polygonal
 import dev.matsem.astral.centerX
 import dev.matsem.astral.centerY
 import dev.matsem.astral.newLine
-import processing.core.PApplet.*
-import processing.core.PConstants
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.asteroid.Asteroid
@@ -13,15 +11,19 @@ import dev.matsem.astral.threshold
 import dev.matsem.astral.tools.FFTLogger
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
+import org.koin.core.inject
+import processing.core.PApplet.*
+import processing.core.PConstants
 
-class PolygonalSketch(override val sketch: SketchLoader,
-                      val audioProcessor: AudioProcessor,
-                      val galaxy: Galaxy)
-    : BaseSketch(sketch, audioProcessor, galaxy) {
+class PolygonalSketch : BaseSketch() {
 
     companion object {
         const val NUMBER_ASTEROIDS = 3
     }
+
+    override val sketch: SketchLoader by inject()
+    private val audioProcessor: AudioProcessor by inject()
+    private val galaxy: Galaxy by inject()
 
     // region params
 

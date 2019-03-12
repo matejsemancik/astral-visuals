@@ -3,27 +3,23 @@ package dev.matsem.astral.sketches.boxes
 import dev.matsem.astral.angularVelocity
 import dev.matsem.astral.centerX
 import dev.matsem.astral.centerY
+import dev.matsem.astral.shorterDimension
+import dev.matsem.astral.sketches.BaseSketch
+import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.tools.audio.AudioProcessor
 import org.jbox2d.common.Vec2
+import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PApplet.radians
 import processing.core.PApplet.sin
 import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing
-import dev.matsem.astral.shorterDimension
-import dev.matsem.astral.sketches.BaseSketch
-import dev.matsem.astral.sketches.SketchLoader
-import dev.matsem.astral.tools.audio.AudioProcessor
-import dev.matsem.astral.tools.galaxy.Galaxy
 
-class BoxesSketch(
-        override val sketch: SketchLoader,
-        val audioProcessor: AudioProcessor,
-        val galaxy: Galaxy
-) : BaseSketch(
-        sketch,
-        audioProcessor,
-        galaxy
-) {
+class BoxesSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
+    private val audioProcessor: AudioProcessor by inject()
+
     lateinit var staticSphere: StaticSphere
     private val bodies = arrayListOf<Box>()
     val box2d = Box2DProcessing(sketch)

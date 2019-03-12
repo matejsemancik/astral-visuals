@@ -2,23 +2,24 @@ package dev.matsem.astral.sketches.fibonaccisphere
 
 import dev.matsem.astral.centerX
 import dev.matsem.astral.centerY
-import processing.core.PApplet
-import processing.core.PApplet.*
-import processing.core.PConstants
 import dev.matsem.astral.shorterDimension
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
+import org.koin.core.inject
+import processing.core.PApplet
+import processing.core.PApplet.*
+import processing.core.PConstants
 
 /**
  * Based on https://www.openprocessing.org/sketch/103897
  */
-class FibSphereSketch(
-        override val sketch: SketchLoader,
-        val audioProcessor: AudioProcessor,
-        val galaxy: Galaxy)
-    : BaseSketch(sketch, audioProcessor, galaxy) {
+class FibSphereSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
+    private val audioProcessor: AudioProcessor by inject()
+    private val galaxy: Galaxy by inject()
 
     override fun onBecameActive() {
         audioProcessor.drawRanges(listOf((30f..200f)))

@@ -1,6 +1,15 @@
 package dev.matsem.astral.di
 
+import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.sketches.blank.BlankSketch
+import dev.matsem.astral.sketches.boxes.BoxesSketch
+import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
+import dev.matsem.astral.sketches.machina.MachinaSketch
+import dev.matsem.astral.sketches.patterns.PatternsSketch
+import dev.matsem.astral.sketches.polygonal.PolygonalSketch
+import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
+import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
@@ -10,7 +19,14 @@ val appModule = module {
     single { SketchLoader() }
     single { KontrolF1() }
     single { Galaxy() }
-    single { AudioProcessor(get(), SketchLoader.IS_IN_RENDER_MODE) }
+    single { AudioProcessor(get(), Config.Sketch.IS_IN_RENDER_MODE) }
 
-    factory {  }
+    factory { BlankSketch() }
+    factory { PolygonalSketch() }
+    factory { TerrainSketch() }
+    factory { FibSphereSketch() }
+    factory { StarGlitchSketch() }
+    factory { PatternsSketch() }
+    factory { MachinaSketch() }
+    factory { BoxesSketch() }
 }

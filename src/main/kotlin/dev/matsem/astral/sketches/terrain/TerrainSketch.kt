@@ -3,18 +3,22 @@ package dev.matsem.astral.sketches.terrain
 import dev.matsem.astral.centerX
 import dev.matsem.astral.centerY
 import dev.matsem.astral.newLine
-import processing.core.PApplet.map
-import processing.core.PConstants
-import processing.core.PConstants.TRIANGLE_STRIP
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.star.Starfield
 import dev.matsem.astral.tools.FFTLogger
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
+import org.koin.core.inject
+import processing.core.PApplet.map
+import processing.core.PConstants
+import processing.core.PConstants.TRIANGLE_STRIP
 
-class TerrainSketch(override val sketch: SketchLoader, val audioProcessor: AudioProcessor, val galaxy: Galaxy)
-    : BaseSketch(sketch, audioProcessor, galaxy), PConstants {
+class TerrainSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
+    private val audioProcessor: AudioProcessor by inject()
+    private val galaxy: Galaxy by inject()
 
     companion object {
         const val PADDING = 12f

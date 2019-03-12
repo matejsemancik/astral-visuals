@@ -1,18 +1,20 @@
 package dev.matsem.astral.sketches.starglitch
 
 import dev.matsem.astral.newLine
-import processing.core.PApplet
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.starglitch.star.Starfield2
 import dev.matsem.astral.threshold
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
+import org.koin.core.inject
+import processing.core.PApplet
 
-class StarGlitchSketch(override val sketch: SketchLoader,
-                       val audioProcessor: AudioProcessor,
-                       val galaxy: Galaxy)
-    : BaseSketch(sketch, audioProcessor, galaxy) {
+class StarGlitchSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
+    private val audioProcessor: AudioProcessor by inject()
+    private val galaxy: Galaxy by inject()
 
     // region params
 

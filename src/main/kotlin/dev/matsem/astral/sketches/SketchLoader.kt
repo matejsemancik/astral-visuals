@@ -5,6 +5,7 @@ import ddf.minim.AudioSample
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
+import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
@@ -34,10 +35,6 @@ class SketchLoader : PApplet(), KoinComponent {
 
     // region shared resources
 
-    companion object {
-        const val IS_IN_RENDER_MODE = false
-    }
-
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
 
@@ -62,19 +59,25 @@ class SketchLoader : PApplet(), KoinComponent {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
-    private val isInRenderMode = false
-    private val audioFilePath = "bop.wav"
-    private val sep = "|"
-    private val movieFps = 30f
-    private val frameDuration = 1f / movieFps
-
     lateinit var videoExport: VideoExport
     lateinit var reader: BufferedReader
 
     // endregion
 
-    lateinit var blankSketch: BaseSketch
-    var selector = '1'
+    // region Sketches
+
+    private val blankSketch: BlankSketch by inject()
+    private val polygonalSketch: PolygonalSketch by inject()
+    private val terrainSketch: TerrainSketch by inject()
+    private val fibSphereSketch: FibSphereSketch by inject()
+    private val starGlitchSketch: StarGlitchSketch by inject()
+    private val patternsSketch: PatternsSketch by inject()
+    private val machinaSketch: MachinaSketch by inject()
+    private val boxesSketch: BoxesSketch by inject()
+
+    // endregion
+
+    var selector = Config.Sketch.DEFAULT_SELECTOR
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -111,17 +114,15 @@ class SketchLoader : PApplet(), KoinComponent {
         accentSatPot = galaxy.createPot(15, 74, 0f, 100f, accentColor.y).also { colorPots.add(it) }
         accentBriPot = galaxy.createPot(15, 75, 0f, 100f, accentColor.z).also { colorPots.add(it) }
 
-        blankSketch = BlankSketch(this, audioProcessor, galaxy)
-
         sketches.apply {
             put('0', blankSketch)
-            put('1', PolygonalSketch(this@SketchLoader, audioProcessor, galaxy))
-            put('2', TerrainSketch(this@SketchLoader, audioProcessor, galaxy))
-            put('3', FibSphereSketch(this@SketchLoader, audioProcessor, galaxy))
-            put('4', StarGlitchSketch(this@SketchLoader, audioProcessor, galaxy))
-            put('5', PatternsSketch(this@SketchLoader, audioProcessor, galaxy))
-            put('6', MachinaSketch(this@SketchLoader, audioProcessor, galaxy))
-            put('7', BoxesSketch(this@SketchLoader, audioProcessor, galaxy))
+            put('1', polygonalSketch)
+            put('2', terrainSketch)
+            put('3', fibSphereSketch)
+            put('4', starGlitchSketch)
+            put('5', patternsSketch)
+            put('6', machinaSketch)
+            put('7', boxesSketch)
         }
 
         sketches.forEach { key, sketch ->
@@ -136,13 +137,13 @@ class SketchLoader : PApplet(), KoinComponent {
         PushButton(galaxy.midiBus, 15, 4) { switchSketch('4') }
         PushButton(galaxy.midiBus, 15, 5) { switchSketch('5') }
 
-        if (isInRenderMode) {
+        if (Config.Sketch.IS_IN_RENDER_MODE) {
             frameRate(1000f)
-            audioToTextFile(audioFilePath)
-            reader = createReader("$audioFilePath.txt")
+            audioToTextFile(Config.VideoExport.AUDIO_FILE_PATH)
+            reader = createReader("${Config.VideoExport.AUDIO_FILE_PATH}.txt")
             videoExport = VideoExport(this).apply {
-                setFrameRate(movieFps)
-                setAudioFileName(audioFilePath)
+                setFrameRate(Config.VideoExport.MOVIE_FPS)
+                setAudioFileName(Config.VideoExport.AUDIO_FILE_PATH)
                 startMovie()
             }
         }
@@ -151,7 +152,7 @@ class SketchLoader : PApplet(), KoinComponent {
     override fun draw() {
         galaxy.update()
 
-        if (!isInRenderMode) {
+        if (Config.Sketch.IS_IN_RENDER_MODE.not()) {
             audioProcessor.gain = gainPot.value
             activeSketch().isInDebugMode = debugButton.isPressed
             activeSketch().draw()
@@ -172,7 +173,7 @@ class SketchLoader : PApplet(), KoinComponent {
                 videoExport.endMovie()
                 exit()
             } else {
-                val p = split(line, sep)
+                val p = split(line, Config.VideoExport.SEP)
                 val soundTime = parseFloat(p[0])
 
                 // Our movie will have 30 frames per second.
@@ -187,7 +188,7 @@ class SketchLoader : PApplet(), KoinComponent {
                 // but I'm not sure if it's useful nor what
                 // would be the ideal value. Please experiment :)
 
-                while (videoExport.currentTime < soundTime + frameDuration * 0.5) {
+                while (videoExport.currentTime < soundTime + Config.VideoExport.FRAME_DURATION * 0.5) {
                     val channelLeft = mutableListOf<Float>()
                     val channelRight = mutableListOf<Float>()
                     val beat = parseInt(p[1])
@@ -296,13 +297,14 @@ class SketchLoader : PApplet(), KoinComponent {
                 else -> 0
             }
 
-            msg.append(sep + beat.toString())
+            msg.append(Config.VideoExport.SEP + beat.toString())
             for (i in 0 until fftSlices) {
-                msg.append(sep + nf(fftL.getAvg(i), 0, 4).replace(',', '.'))
-                msg.append(sep + nf(fftR.getAvg(i), 0, 4).replace(',', '.'))
+                msg.append(Config.VideoExport.SEP + nf(fftL.getAvg(i), 0, 4).replace(',', '.'))
+                msg.append(Config.VideoExport.SEP + nf(fftR.getAvg(i), 0, 4).replace(',', '.'))
             }
             output.println(msg.toString())
         }
+
         track.close()
         output.flush()
         output.close()

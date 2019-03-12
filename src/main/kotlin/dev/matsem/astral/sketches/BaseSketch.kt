@@ -1,10 +1,11 @@
 package dev.matsem.astral.sketches
 
+import org.koin.core.KoinComponent
 import processing.event.KeyEvent
-import dev.matsem.astral.tools.audio.AudioProcessor
-import dev.matsem.astral.tools.galaxy.Galaxy
 
-abstract class BaseSketch(open val sketch: SketchLoader, audioProcessor: AudioProcessor, galaxy: Galaxy) {
+abstract class BaseSketch : KoinComponent {
+
+    abstract val sketch: SketchLoader
 
     var isInDebugMode = false
 

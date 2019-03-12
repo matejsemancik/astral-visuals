@@ -2,13 +2,11 @@ package dev.matsem.astral.sketches.blank
 
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
-import dev.matsem.astral.tools.audio.AudioProcessor
-import dev.matsem.astral.tools.galaxy.Galaxy
+import org.koin.core.inject
 
-class BlankSketch(override val sketch: SketchLoader,
-                  audioProcessor: AudioProcessor,
-                  galaxy: Galaxy)
-    : BaseSketch(sketch, audioProcessor, galaxy) {
+class BlankSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
 
     override fun setup() {
         // nothing
