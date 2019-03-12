@@ -11,7 +11,7 @@ abstract class BaseSketch : KoinComponent {
 
     abstract fun setup()
 
-    abstract fun onBecameActive()
+    open fun onBecameActive() = Unit
 
     abstract fun draw()
 

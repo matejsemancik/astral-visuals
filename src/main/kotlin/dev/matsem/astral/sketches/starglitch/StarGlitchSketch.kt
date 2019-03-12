@@ -57,10 +57,6 @@ class StarGlitchSketch : BaseSketch() {
         // TouchOSC
     }
 
-    override fun onBecameActive() {
-
-    }
-
     fun onTimerTick() {
         if (starModeTimerButtton.isPressed) {
             starModeButtons.switchToRandom()

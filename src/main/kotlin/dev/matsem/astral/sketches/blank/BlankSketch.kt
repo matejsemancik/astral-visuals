@@ -12,10 +12,6 @@ class BlankSketch : BaseSketch() {
         // nothing
     }
 
-    override fun onBecameActive() {
-
-    }
-
     override fun draw() {
         sketch.background(0)
     }

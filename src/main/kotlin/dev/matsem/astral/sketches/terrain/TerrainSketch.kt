@@ -103,10 +103,6 @@ class TerrainSketch : BaseSketch() {
         starfield2 = Starfield(sketch, 1200)
     }
 
-    override fun onBecameActive() {
-
-    }
-
     override fun draw() {
         renderMode = renderModeButtons.activeButtonsIndices().first()
         terrainMode = terrainModeButtons.activeButtonsIndices().first()
