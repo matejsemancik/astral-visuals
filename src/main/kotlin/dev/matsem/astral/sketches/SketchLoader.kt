@@ -37,6 +37,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
+    private val videoExport: VideoExport by inject()
 
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
@@ -59,7 +60,6 @@ class SketchLoader : PApplet(), KoinComponent {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
-    lateinit var videoExport: VideoExport
     lateinit var reader: BufferedReader
 
     // endregion
@@ -141,11 +141,7 @@ class SketchLoader : PApplet(), KoinComponent {
             frameRate(1000f)
             audioToTextFile(Config.VideoExport.AUDIO_FILE_PATH)
             reader = createReader("${Config.VideoExport.AUDIO_FILE_PATH}.txt")
-            videoExport = VideoExport(this).apply {
-                setFrameRate(Config.VideoExport.MOVIE_FPS)
-                setAudioFileName(Config.VideoExport.AUDIO_FILE_PATH)
-                startMovie()
-            }
+            videoExport.startMovie()
         }
     }
 

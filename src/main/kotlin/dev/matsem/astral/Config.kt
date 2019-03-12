@@ -8,7 +8,7 @@ interface Config {
     }
 
     object VideoExport {
-        const val AUDIO_FILE_PATH = "bop.wav"
+        const val AUDIO_FILE_PATH = "yoga.mp3"
         const val SEP = "|"
         const val MOVIE_FPS = 30f
         const val FRAME_DURATION = 1f / MOVIE_FPS

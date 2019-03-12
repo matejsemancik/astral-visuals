@@ -1,5 +1,6 @@
 package dev.matsem.astral.di
 
+import com.hamoid.VideoExport
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.blank.BlankSketch
@@ -13,13 +14,21 @@ import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import processing.core.PApplet
 
 val appModule = module {
-    single { SketchLoader() }
+    single { SketchLoader() } bind PApplet::class
     single { KontrolF1() }
     single { Galaxy() }
     single { AudioProcessor(get(), Config.Sketch.IS_IN_RENDER_MODE) }
+    single {
+        VideoExport(get()).apply {
+            setFrameRate(Config.VideoExport.MOVIE_FPS)
+            setAudioFileName(Config.VideoExport.AUDIO_FILE_PATH)
+        }
+    }
 
     factory { BlankSketch() }
     factory { PolygonalSketch() }
