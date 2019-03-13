@@ -48,7 +48,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var colorResetButton: PushButton
 
     private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(97f, 100f, 60f)
+    private val fgColor = PVector(200f, 0f, 100f)
     private val accentColor = PVector(97f, 100f, 100f)
 
     lateinit var bgHuePot: Pot

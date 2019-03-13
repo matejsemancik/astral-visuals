@@ -1,11 +1,10 @@
 package dev.matsem.astral.sketches.attractor
 
+import controlP5.ControlP5
 import dev.matsem.astral.centerX
 import dev.matsem.astral.centerY
-import dev.matsem.astral.midiRange
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
-import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.koin.core.inject
 import processing.core.PVector
 
@@ -13,82 +12,65 @@ import processing.core.PVector
 class AttractorSketch : BaseSketch() {
 
     override val sketch: SketchLoader by inject()
-    val kontrol: KontrolF1 by inject()
+    val cp5: ControlP5 by inject()
 
-    var a = -2.24f
-    var b = 0.43f
-    var c = -0.65f
-    var d = -2.43f
-    var e = 0f
-    var f = 0f
+    private var iterations = 40000
+    private val deJongPoints = Array(iterations) { PVector() }
 
-    var color = 0
-    var color2 = 0
-    var iterations = 15000
+    private val iterationCountSlider = cp5.addSlider("iterations", 1000f, iterations.toFloat())
+            .linebreak()
+            .apply { value = iterations.toFloat() }
 
-    val points = Array(iterations) { PVector() }
+    private val sliderA = cp5.addSlider("a", -10f, 10f)
+            .linebreak()
+            .apply { value = -2.24f }
 
-    override fun setup() {
-        attractor()
-    }
+    private val sliderB = cp5.addSlider("b", 0f, 2f)
+            .linebreak()
+            .apply { value = 2.0f }
+
+    private val sliderC = cp5.addSlider("c", -0.5f, 0.5f)
+            .linebreak()
+            .apply { value = -0.66f }
+
+    private val sliderD = cp5.addSlider("d", -10f, 10f)
+            .linebreak()
+            .apply { value = -2.43f }
+
+    override fun setup() = Unit
 
     override fun draw() {
-        a = kontrol.knob1.midiRange(-2f, 2f)
-        b = kontrol.knob2.midiRange(-20f, 20f)
-        c = kontrol.knob3.midiRange(-10f, 10f)
-        d = kontrol.knob4.midiRange(-2f, 2f)
-        e = kontrol.slider1.midiRange(0f, 10f)
-        f = kontrol.slider2.midiRange(0f, 1f)
+        iterations = iterationCountSlider.value.toInt()
+        sliderA.value = millis() / 3000f % 20f - 10f
+        sliderD.value = millis() / 6000f % 20f - 10f
 
-        attractor()
+        deJongAttractor(sliderA.value, sliderB.value, sliderC.value, sliderD.value)
 
-        background(0)
+        background(bgColor)
+        cp5.draw()
+
         translate(centerX(), centerY())
-
-        pushMatrix()
-        stroke(color)
-        fill(color)
-        rotateY(millis() / 1000f)
-
-        points.forEach {
-            pushMatrix()
-            translate(it.x * 200f, it.y * 200f, it.z * 200f)
-            point(0f, 0f, 0f)
-            popMatrix()
-        }
-        popMatrix()
-
-        pushMatrix()
-        stroke(color2)
-        fill(color2)
-        rotateY(-millis() / 1000f)
-
-        points.forEach {
-            pushMatrix()
-            translate(it.x * 200f, it.y * 200f, it.z * 200f)
-            point(0f, 0f, 0f)
-            popMatrix()
-        }
-        popMatrix()
-    }
-
-    private fun attractor() {
-        var px = 0f
-        var py = 0f
-        var pz = 0f
+        stroke(fgColor)
+        fill(fgColor)
 
         for (i in 0 until iterations) {
-            val bSin = b + sin(millis() / 10f) * 0.01f
-            val cSin = c + sin(millis() / 12f) * 0.03f
-            val x = sin(a * py) - cos(bSin * px)
-            val y = sin(cSin * px) - cos(d * py)
-            val z = sin(e * px) - cos(f * pz)
+            val pt = deJongPoints[i]
+            point(pt.x * 200f, pt.y * 200f)
+        }
+    }
+
+    private fun deJongAttractor(a: Float, b: Float, c: Float, d: Float) {
+        var px = 0f
+        var py = 0f
+
+        for (i in 0 until iterations) {
+            val x = sin(a * py) - cos(b * px)
+            val y = sin(c * px) - cos(d * py)
 
             px = x
             py = y
-            pz = z
 
-            points[i] = PVector(x, y, z)
+            deJongPoints[i] = PVector(x, y)
         }
     }
 }

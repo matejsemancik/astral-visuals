@@ -1,6 +1,7 @@
 package dev.matsem.astral.di
 
 import com.hamoid.VideoExport
+import controlP5.ControlP5
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.attractor.AttractorSketch
@@ -28,6 +29,11 @@ val appModule = module {
         VideoExport(get()).apply {
             setFrameRate(Config.VideoExport.MOVIE_FPS)
             setAudioFileName(Config.VideoExport.AUDIO_FILE_PATH)
+        }
+    }
+    single {
+        ControlP5(get()).apply {
+            isAutoDraw = false
         }
     }
 
