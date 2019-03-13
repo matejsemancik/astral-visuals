@@ -3,6 +3,7 @@ package dev.matsem.astral.di
 import com.hamoid.VideoExport
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.sketches.attractor.AttractorSketch
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
@@ -38,4 +39,5 @@ val appModule = module {
     factory { PatternsSketch() }
     factory { MachinaSketch() }
     factory { BoxesSketch() }
+    factory { AttractorSketch() }
 }

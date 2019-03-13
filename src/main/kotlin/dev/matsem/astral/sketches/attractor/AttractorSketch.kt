@@ -1,15 +1,19 @@
-package sketches.attractor
+package dev.matsem.astral.sketches.attractor
 
-import centerX
-import centerY
-import midiRange
-import processing.core.PApplet
-import processing.core.PConstants
+import dev.matsem.astral.centerX
+import dev.matsem.astral.centerY
+import dev.matsem.astral.midiRange
+import dev.matsem.astral.sketches.BaseSketch
+import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.tools.kontrol.KontrolF1
+import org.koin.core.inject
 import processing.core.PVector
-import tools.kontrol.KontrolF1
 
-// TODO refactor to BaseSketch, use Galaxy controls
-class AttractorSketch : PApplet() {
+// TODO use Galaxy controls
+class AttractorSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
+    val kontrol: KontrolF1 by inject()
 
     var a = -2.24f
     var b = 0.43f
@@ -24,21 +28,7 @@ class AttractorSketch : PApplet() {
 
     val points = Array(iterations) { PVector() }
 
-    lateinit var kontrol: KontrolF1
-
-    override fun settings() {
-        size(1280, 720, PConstants.P3D)
-    }
-
     override fun setup() {
-        colorMode(PConstants.HSB, 360f, 100f, 100f, 100f)
-        color = color(190f, 100f, 100f)
-        color2 = color(160f, 100f, 100f)
-
-        kontrol = KontrolF1().apply {
-            connect()
-        }
-
         attractor()
     }
 
@@ -52,7 +42,7 @@ class AttractorSketch : PApplet() {
 
         attractor()
 
-        background(color(0f, 0f, 0f, 0.01f))
+        background(0)
         translate(centerX(), centerY())
 
         pushMatrix()

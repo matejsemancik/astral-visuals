@@ -4,7 +4,7 @@ interface Config {
 
     object Sketch {
         const val IS_IN_RENDER_MODE = false
-        const val DEFAULT_SELECTOR = '1'
+        const val DEFAULT_SELECTOR = '8'
     }
 
     object Color {
