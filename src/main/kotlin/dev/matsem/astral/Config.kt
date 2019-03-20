@@ -13,7 +13,7 @@ interface Config {
     }
 
     object VideoExport {
-        const val IS_IN_RENDER_MODE = true
+        const val IS_IN_RENDER_MODE = false
         const val AUDIO_FILE_PATH = "drama.wav"
         const val SEP = "|"
         const val MOVIE_FPS = 20f

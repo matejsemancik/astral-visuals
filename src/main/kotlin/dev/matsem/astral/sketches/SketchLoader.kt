@@ -85,8 +85,7 @@ class SketchLoader : PApplet(), KoinComponent {
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
-//        size(1280, 720, PConstants.P3D)
-        size(1280, 1280, PConstants.P3D)
+        size(1280, 720, PConstants.P3D)
         // fullScreen(P3D, 2) - use in live environment (projector extends desktop)
         noSmooth()
     }

@@ -42,47 +42,28 @@ class AttractorSketch : BaseSketch() {
                 addItems(arrayOf("de jong", "aizawa"))
             }
 
-    private val iterationCountSlider = cp5.addSlider("iterations", 1000f, iterations.toFloat())
-            .linebreak()
-            .apply { value = iterations.toFloat() }
-
-    private val deJongScaleSlider = cp5.addSlider("scale", 1f, 400f)
-            .linebreak()
-            .apply { value = 316f }
-
-    private val sliderA = cp5.addSlider("DE JONG A", -10f, 10f)
-            .linebreak()
-            .apply { value = 4f }
-
-    private val sliderB = cp5.addSlider("DE JONG B", 0f, 2f)
-            .linebreak()
-            .apply { value = 0.54f }
-
-    private val sliderC = cp5.addSlider("DE JONG C", -0.5f, 0.5f)
-            .linebreak()
-            .apply { value = 0.40f }
-
-    private val sliderD = cp5.addSlider("DE JONG D", -10f, 10f)
-            .linebreak()
-            .apply { value = -2.43f }
+    private val iterationCountSlider = cp5.addSlider("iterations", 1000f, iterations.toFloat()).linebreak().apply { value = iterations.toFloat() }
+    private val deJongScaleSlider = cp5.addSlider("scale", 1f, 600f).linebreak().apply { value = 250f }
+    private val sliderA = cp5.addSlider("De Jong A", -10f, 10f).linebreak().apply { value = 4f }
+    private val sliderB = cp5.addSlider("De Jong B", 0f, 1f).linebreak().apply { value = 0.54f }
+    private val sliderC = cp5.addSlider("De Jong C", -0.5f, 0.5f).linebreak().apply { value = 0.40f }
+    private val sliderD = cp5.addSlider("De Jong D", -10f, 10f).linebreak().apply { value = -2.43f }
 
     override fun setup() = Unit
 
     override fun draw() {
         background(bgColor)
-        cp5.draw()
+//        cp5.draw()
 
         iterations = iterationCountSlider.value.toInt()
 
         when (Attractor.VALUES[buttonBar.value.toInt()]) {
             Attractor.DE_JONG -> {
                 sliderA.value = millis() / 1500f % 20f - 10f + audioProcessor.getRange(0f..100f) / 100f
-                if (audioProcessor.beatDetect.isKick) {
-                    sliderC.value = sketch.random(-0.2f, 0.2f)
-                }
-                sliderB.value = sin(angularVelocity(15f)) fromRange (-1f..1f) toRange (sliderB.min..sliderB.max)
+                if (audioProcessor.beatDetect.isKick) { sliderC.value = sketch.random(-0.2f, 0.2f) }
+                sliderB.value = sin(angularVelocity(6f)) fromRange (-1f..1f) toRange (sliderB.min..sliderB.max)
                 sliderC.value = 0.40f + audioProcessor.getRange(200f..600f) / 1000f
-                sliderD.value = millis() / 1000f % 20f - 10f // + audioProcessor.getRange(800f..1200f) / 100f
+                sliderD.value = millis() / 1000f % 20f - 10f + audioProcessor.getRange(800f..1200f) / 100f
 
                 deJongAttractor(sliderA.value, sliderB.value, sliderC.value, sliderD.value)
 
