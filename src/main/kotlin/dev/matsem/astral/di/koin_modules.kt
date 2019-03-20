@@ -24,7 +24,7 @@ val appModule = module {
     single { SketchLoader() } bind PApplet::class
     single { KontrolF1() }
     single { Galaxy() }
-    single { AudioProcessor(get(), Config.Sketch.IS_IN_RENDER_MODE) }
+    single { AudioProcessor(get(), Config.VideoExport.IS_IN_RENDER_MODE) }
     single {
         VideoExport(get()).apply {
             setFrameRate(Config.VideoExport.MOVIE_FPS)

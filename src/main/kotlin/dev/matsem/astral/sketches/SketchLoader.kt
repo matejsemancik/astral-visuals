@@ -149,7 +149,7 @@ class SketchLoader : PApplet(), KoinComponent {
         PushButton(galaxy.midiBus, 15, 4) { switchSketch('4') }
         PushButton(galaxy.midiBus, 15, 5) { switchSketch('5') }
 
-        if (Config.Sketch.IS_IN_RENDER_MODE) {
+        if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)
             audioToTextFile(Config.VideoExport.AUDIO_FILE_PATH)
             reader = createReader("${Config.VideoExport.AUDIO_FILE_PATH}.txt")
@@ -160,7 +160,7 @@ class SketchLoader : PApplet(), KoinComponent {
     override fun draw() {
         galaxy.update()
 
-        if (Config.Sketch.IS_IN_RENDER_MODE.not()) {
+        if (Config.VideoExport.IS_IN_RENDER_MODE.not()) {
             audioProcessor.gain = gainPot.value
             activeSketch().isInDebugMode = debugButton.isPressed
             activeSketch().draw()
