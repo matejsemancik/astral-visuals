@@ -88,6 +88,8 @@ abstract class BaseSketch : KoinComponent {
 
     fun noise(x: Float, y: Float, z: Float) = sketch.noise(x, y, z)
 
+    fun beginShape() = sketch.beginShape()
+
     fun beginShape(kind: Int) = sketch.beginShape(kind)
 
     fun endShape() = sketch.endShape()
