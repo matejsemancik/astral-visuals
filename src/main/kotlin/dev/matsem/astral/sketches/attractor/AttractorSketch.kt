@@ -48,20 +48,23 @@ class AttractorSketch : BaseSketch() {
     private val sliderB = cp5.addSlider("De Jong B", 0f, 1f).linebreak().apply { value = 0.54f }
     private val sliderC = cp5.addSlider("De Jong C", -0.5f, 0.5f).linebreak().apply { value = 0.40f }
     private val sliderD = cp5.addSlider("De Jong D", -10f, 10f).linebreak().apply { value = -2.43f }
+    private val stretchXSlider = cp5.addSlider("stretch x", 0.5f, 2f).linebreak().apply { value = 1f }
 
     override fun setup() = Unit
 
     override fun draw() {
         background(bgColor)
-//        cp5.draw()
+        cp5.draw()
 
         iterations = iterationCountSlider.value.toInt()
 
         when (Attractor.VALUES[buttonBar.value.toInt()]) {
             Attractor.DE_JONG -> {
                 sliderA.value = millis() / 1500f % 20f - 10f + audioProcessor.getRange(0f..100f) / 100f
-                if (audioProcessor.beatDetect.isKick) { sliderC.value = sketch.random(-0.2f, 0.2f) }
-                sliderB.value = sin(angularVelocity(6f)) fromRange (-1f..1f) toRange (sliderB.min..sliderB.max)
+                if (audioProcessor.beatDetect.isKick) {
+                    sliderC.value = sketch.random(-0.2f, 0.2f)
+                }
+                sliderB.value = sin(angularVelocity(6f)) mapFrom (-1f..1f) to (sliderB.min..sliderB.max)
                 sliderC.value = 0.40f + audioProcessor.getRange(200f..600f) / 1000f
                 sliderD.value = millis() / 1000f % 20f - 10f + audioProcessor.getRange(800f..1200f) / 100f
 
@@ -79,7 +82,6 @@ class AttractorSketch : BaseSketch() {
                 val deJongWidth = deJongRight - deJongLeft
                 val deJongHeight = deJongBottom - deJongTop
 
-//                translate(centerX() + PApplet.map(sin(angularVelocity(30f) + PConstants.PI / 2f), -1f, 1f, -centerX() / 2f, centerX() / 2f), centerY())
                 translate(centerX(), centerY())
                 stroke(fgColor)
                 fill(fgColor)
@@ -96,8 +98,12 @@ class AttractorSketch : BaseSketch() {
                     val pt = deJongPoints[i]
                     if (deJongStabilize) {
                         point(
-                                PApplet.map(pt.x * deJongScaleSlider.value, deJongLeft, deJongRight, -deJongWidth / 2f, deJongWidth / 2f),
-                                PApplet.map(pt.y * deJongScaleSlider.value, deJongTop, deJongBottom, -deJongHeight / 2f, deJongHeight / 2f)
+                                pt.x * deJongScaleSlider.value
+                                        mapFrom (deJongLeft..deJongRight)
+                                        to (-deJongWidth / 2f * stretchXSlider.value..deJongWidth / 2f * stretchXSlider.value),
+                                pt.y * deJongScaleSlider.value
+                                        mapFrom (deJongTop..deJongBottom)
+                                        to (-deJongHeight / 2f..deJongHeight / 2f)
                         )
                     } else {
                         point(pt.x * deJongScaleSlider.value, pt.y * deJongScaleSlider.value)

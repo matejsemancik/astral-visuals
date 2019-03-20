@@ -7,10 +7,10 @@ data class FromRange(
         val inRange: ClosedFloatingPointRange<Float>
 )
 
-infix fun Float.fromRange(range: ClosedFloatingPointRange<Float>): FromRange {
+infix fun Float.mapFrom(range: ClosedFloatingPointRange<Float>): FromRange {
     return FromRange(this, range)
 }
 
-infix fun FromRange.toRange(outRange: ClosedFloatingPointRange<Float>): Float {
+infix fun FromRange.to(outRange: ClosedFloatingPointRange<Float>): Float {
     return PApplet.map(input, inRange.start, inRange.endInclusive, outRange.start, outRange.endInclusive)
 }
