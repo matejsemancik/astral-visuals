@@ -46,7 +46,7 @@ class AttractorSketch : BaseSketch() {
             .linebreak()
             .apply { value = iterations.toFloat() }
 
-    private val deJongMultiplierSlider = cp5.addSlider("de jong point multiplier", 1f, 400f)
+    private val deJongScaleSlider = cp5.addSlider("scale", 1f, 400f)
             .linebreak()
             .apply { value = 316f }
 
@@ -87,7 +87,7 @@ class AttractorSketch : BaseSketch() {
                 deJongAttractor(sliderA.value, sliderB.value, sliderC.value, sliderD.value)
 
                 deJongPoints
-                        .map { PVector(it.x * deJongMultiplierSlider.value, it.y * deJongMultiplierSlider.value) }
+                        .map { PVector(it.x * deJongScaleSlider.value, it.y * deJongScaleSlider.value) }
                         .forEach {
                             if (it.x > deJongRight) deJongRight = it.x
                             if (it.x < deJongLeft) deJongLeft = it.x
@@ -115,11 +115,11 @@ class AttractorSketch : BaseSketch() {
                     val pt = deJongPoints[i]
                     if (deJongStabilize) {
                         point(
-                                PApplet.map(pt.x * deJongMultiplierSlider.value, deJongLeft, deJongRight, -deJongWidth / 2f, deJongWidth / 2f),
-                                PApplet.map(pt.y * deJongMultiplierSlider.value, deJongTop, deJongBottom, -deJongHeight / 2f, deJongHeight / 2f)
+                                PApplet.map(pt.x * deJongScaleSlider.value, deJongLeft, deJongRight, -deJongWidth / 2f, deJongWidth / 2f),
+                                PApplet.map(pt.y * deJongScaleSlider.value, deJongTop, deJongBottom, -deJongHeight / 2f, deJongHeight / 2f)
                         )
                     } else {
-                        point(pt.x * deJongMultiplierSlider.value, pt.y * deJongMultiplierSlider.value)
+                        point(pt.x * deJongScaleSlider.value, pt.y * deJongScaleSlider.value)
                     }
                 }
 

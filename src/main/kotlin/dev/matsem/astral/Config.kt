@@ -14,9 +14,9 @@ interface Config {
     }
 
     object VideoExport {
-        const val AUDIO_FILE_PATH = "yoga.mp3"
+        const val AUDIO_FILE_PATH = "drama.wav"
         const val SEP = "|"
-        const val MOVIE_FPS = 30f
+        const val MOVIE_FPS = 20f
         const val FRAME_DURATION = 1f / MOVIE_FPS
     }
 }
