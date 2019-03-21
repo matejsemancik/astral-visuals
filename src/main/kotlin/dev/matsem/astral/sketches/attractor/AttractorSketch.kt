@@ -5,6 +5,7 @@ import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
+import dev.matsem.astral.tools.galaxy.controls.Pot
 import org.koin.core.inject
 import processing.core.PVector
 
@@ -26,20 +27,42 @@ class AttractorSketch : BaseSketch() {
 
     private val iterationCountSlider = galaxy.createPot(5, 0, 100f, ITERATIONS_MAX.toFloat(), 25000f)
     private val scaleSlider = galaxy.createPot(5, 1, 1f, 600f, 250f)
-    private val sliderA = galaxy.createPot(5, 2, -10f, 10f, 4f)
-    private val sliderB = galaxy.createPot(5, 3, 0f, 1f, 0.54f)
-    private val sliderC = galaxy.createPot(5, 4, -0.5f, 0.5f, 0.40f)
-    private val sliderD = galaxy.createPot(5, 5, -10f, 10f, -2.43f)
     private val stretchSlider = galaxy.createPot(5, 6, 0.5f, 2f, 1f)
     private val stabilizeBtn = galaxy.createToggleButton(5, 7, true)
-    private val automateBtn = galaxy.createToggleButton(5, 8, false)
+    private val audioBtn = galaxy.createToggleButton(5, 8, false)
+    private val randomizeButton = galaxy.createPushButton(5, 21) {
+        randomPots.forEach { it.random() }
+    }
+
+    private val randomPots = mutableListOf<Pot>()
+
+    private val sliderA = galaxy.createPot(5, 2, -20f, 20f, 4f).also { randomPots.add(it) }
+    private val sliderB = galaxy.createPot(5, 3, 0f, 1f, 0.54f).also { randomPots.add(it) }
+    private val sliderC = galaxy.createPot(5, 4, -0.5f, 0.5f, 0.40f).also { randomPots.add(it) }
+    private val sliderD = galaxy.createPot(5, 5, -20f, 20f, -2.43f).also { randomPots.add(it) }
+
+    private val potA0 = galaxy.createPot(5, 9, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
+    private val potA1 = galaxy.createPot(5, 10, -20f, 20f, 0f).also { randomPots.add(it) }
+    private val potA2 = galaxy.createPot(5, 11, 0f, 1f, 1f).also { randomPots.add(it) }
+
+    private val potB0 = galaxy.createPot(5, 12, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
+    private val potB1 = galaxy.createPot(5, 13, 0f, 1f, 0f).also { randomPots.add(it) }
+    private val potB2 = galaxy.createPot(5, 14, 0f, 1f, 1f).also { randomPots.add(it) }
+
+    private val potC0 = galaxy.createPot(5, 15, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
+    private val potC1 = galaxy.createPot(5, 16, -0.5f, 0.5f, 0f).also { randomPots.add(it) }
+    private val potC2 = galaxy.createPot(5, 17, 0f, 1f, 1f).also { randomPots.add(it) }
+
+    private val potD0 = galaxy.createPot(5, 18, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
+    private val potD1 = galaxy.createPot(5, 19, -20f, 20f, 0f).also { randomPots.add(it) }
+    private val potD2 = galaxy.createPot(5, 20, 0f, 1f, 1f).also { randomPots.add(it) }
 
     override fun setup() = Unit
 
     override fun draw() {
         background(bgColor)
 
-        if (automateBtn.isPressed) {
+        if (audioBtn.isPressed) {
             sliderA.sendValue(millis() / 1500f % 20f - 10f + audioProcessor.getRange(0f..100f) / 100f)
             if (audioProcessor.beatDetect.isKick) {
                 sliderC.random()
@@ -52,7 +75,9 @@ class AttractorSketch : BaseSketch() {
         deJongAttractor(sliderA.value, sliderB.value, sliderC.value, sliderD.value)
 
         deJongPoints
-                .map { PVector(it.x * scaleSlider.value, it.y * scaleSlider.value) }
+                .withIndex()
+                .filter { it.index < iterationCountSlider.value.toInt() }
+                .map { pt -> PVector(pt.value.x * scaleSlider.value, pt.value.y * scaleSlider.value) }
                 .forEach {
                     if (it.x > deJongRight) deJongRight = it.x
                     if (it.x < deJongLeft) deJongLeft = it.x
