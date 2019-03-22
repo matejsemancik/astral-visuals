@@ -110,6 +110,8 @@ abstract class BaseSketch : KoinComponent {
 
     fun cos(t: Float) = PApplet.cos(t)
 
+    fun saw(fHz: Float): Float = (millis() % (1000f * 1 / fHz)) / (1000f * 1 / fHz)
+
     val bgHue: Float get() = sketch.bgHuePot.value
     val bgSat: Float get() = sketch.bgSatPot.value
     val bgBrightness: Float get() = sketch.bgBriPot.value

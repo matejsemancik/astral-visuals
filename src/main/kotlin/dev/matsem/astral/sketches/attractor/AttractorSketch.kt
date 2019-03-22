@@ -29,50 +29,71 @@ class AttractorSketch : BaseSketch() {
     private val scaleSlider = galaxy.createPot(5, 1, 1f, 600f, 250f)
     private val stretchSlider = galaxy.createPot(5, 6, 0.5f, 2f, 1f)
     private val stabilizeBtn = galaxy.createToggleButton(5, 7, true)
-    private val audioBtn = galaxy.createToggleButton(5, 8, false)
+    private val beatBtn = galaxy.createToggleButton(5, 8, false)
     private val randomizeButton = galaxy.createPushButton(5, 21) {
         randomPots.forEach { it.random() }
     }
 
     private val randomPots = mutableListOf<Pot>()
 
-    private val sliderA = galaxy.createPot(5, 2, -20f, 20f, 4f).also { randomPots.add(it) }
-    private val sliderB = galaxy.createPot(5, 3, 0f, 1f, 0.54f).also { randomPots.add(it) }
-    private val sliderC = galaxy.createPot(5, 4, -0.5f, 0.5f, 0.40f).also { randomPots.add(it) }
-    private val sliderD = galaxy.createPot(5, 5, -20f, 20f, -2.43f).also { randomPots.add(it) }
+    private val sliderA = galaxy.createPot(5, 2, -10f, 10f, 4f).also { randomPots.add(it) }
+    private val sliderB = galaxy.createPot(5, 3, -2f, 2f, 0.54f)
+    private val sliderC = galaxy.createPot(5, 4, -2f, 2f, 0.40f)
+    private val sliderD = galaxy.createPot(5, 5, -10f, 10f, -2.43f).also { randomPots.add(it) }
 
-    private val potA0 = galaxy.createPot(5, 9, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
-    private val potA1 = galaxy.createPot(5, 10, -20f, 20f, 0f).also { randomPots.add(it) }
-    private val potA2 = galaxy.createPot(5, 11, 0f, 1f, 1f).also { randomPots.add(it) }
+    private val potA0 = galaxy.createPot(5, 9).also { randomPots.add(it) }
+    private val potA1 = galaxy.createPot(5, 10).also { randomPots.add(it) }
+    private val potA2 = galaxy.createPot(5, 11).also { randomPots.add(it) }
 
-    private val potB0 = galaxy.createPot(5, 12, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
-    private val potB1 = galaxy.createPot(5, 13, 0f, 1f, 0f).also { randomPots.add(it) }
-    private val potB2 = galaxy.createPot(5, 14, 0f, 1f, 1f).also { randomPots.add(it) }
+    private val potB0 = galaxy.createPot(5, 12).also { randomPots.add(it) }
+    private val potB1 = galaxy.createPot(5, 13).also { randomPots.add(it) }
+    private val potB2 = galaxy.createPot(5, 14).also { randomPots.add(it) }
 
-    private val potC0 = galaxy.createPot(5, 15, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
-    private val potC1 = galaxy.createPot(5, 16, -0.5f, 0.5f, 0f).also { randomPots.add(it) }
-    private val potC2 = galaxy.createPot(5, 17, 0f, 1f, 1f).also { randomPots.add(it) }
+    private val potC0 = galaxy.createPot(5, 15).also { randomPots.add(it) }
+    private val potC1 = galaxy.createPot(5, 16).also { randomPots.add(it) }
+    private val potC2 = galaxy.createPot(5, 17).also { randomPots.add(it) }
 
-    private val potD0 = galaxy.createPot(5, 18, 1 / 10f, 30f, 30f).also { randomPots.add(it) }
-    private val potD1 = galaxy.createPot(5, 19, -20f, 20f, 0f).also { randomPots.add(it) }
-    private val potD2 = galaxy.createPot(5, 20, 0f, 1f, 1f).also { randomPots.add(it) }
+    private val potD0 = galaxy.createPot(5, 18).also { randomPots.add(it) }
+    private val potD1 = galaxy.createPot(5, 19).also { randomPots.add(it) }
+    private val potD2 = galaxy.createPot(5, 20).also { randomPots.add(it) }
 
     override fun setup() = Unit
 
     override fun draw() {
         background(bgColor)
 
-        if (audioBtn.isPressed) {
-            sliderA.sendValue(millis() / 1500f % 20f - 10f + audioProcessor.getRange(0f..100f) / 100f)
-            if (audioProcessor.beatDetect.isKick) {
-                sliderC.random()
-            }
-            sliderB.sendValue(sin(angularVelocity(6f)) mapFrom (-1f..1f) to (sliderB.min..sliderB.max))
-            sliderC.sendValue(0.40f + audioProcessor.getRange(200f..600f) / 1000f)
-            sliderD.sendValue(millis() / 1000f % 20f - 10f + audioProcessor.getRange(800f..1200f) / 100f)
+//        if (beatBtn.isPressed) {
+//            sliderA.sendValue(millis() / 1000f % 40f - 20f/* + audioProcessor.getRange(0f..100f) / 100f*/)
+//            if (audioProcessor.beatDetect.isKick) {
+//                sliderC.random()
+//            }
+//            sliderB.sendValue(sin(angularVelocity(6f)) mapFrom (-1f..1f) to (sliderB.min..sliderB.max))
+//            sliderC.sendValue(0.40f + audioProcessor.getRange(200f..600f) / 1000f)
+//            sliderD.sendValue(millis() / 1000f % 20f - 10f + audioProcessor.getRange(800f..1200f) / 100f)
+//        }
+
+        if (beatBtn.isPressed && audioProcessor.beatDetect.isKick) {
+            sliderA.random()
+            sliderD.random()
         }
 
-        deJongAttractor(sliderA.value, sliderB.value, sliderC.value, sliderD.value)
+        val a = sliderA.value +
+                saw(potA0.value.mapp(1 / 100f, 1 / 10f)).mapp(sliderA.min, sliderA.max) * potA1.value +
+                (audioProcessor.getRange(20f..100f) / 100f) * potA2.value.mapp(0f, 2f)
+
+        val b = sliderB.value +
+                sin(angularVelocity(potB0.value.mapp(100f, 10f))).mapSin(sliderB.min, sliderB.max) * potB1.value +
+                (audioProcessor.getRange(600f..800f) / 1000f) * potB2.value.mapp(0f, 2f)
+
+        val c = sliderC.value +
+                sin(angularVelocity(potC0.value.mapp(100f, 10f))).mapSin(sliderC.min, sliderC.max) * potC1.value +
+                (audioProcessor.getRange(200f..600f) / 1000f) * potC2.value.mapp(0f, 2f)
+
+        val d = sliderD.value +
+                saw(potD0.value.mapp(1 / 100f, 1 / 10f)).mapp(sliderD.min, sliderD.max) * potD1.value +
+                (audioProcessor.getRange(800f..1200f) / 100f) * potD2.value.mapp(0f, 2f)
+
+        deJongAttractor(a, b, c, d)
 
         deJongPoints
                 .withIndex()
