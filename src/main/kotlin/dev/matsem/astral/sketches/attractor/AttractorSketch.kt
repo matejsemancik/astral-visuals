@@ -57,24 +57,25 @@ class AttractorSketch : BaseSketch() {
     private val potD1 = galaxy.createPot(5, 19).also { randomPots.add(it) }
     private val potD2 = galaxy.createPot(5, 20).also { randomPots.add(it) }
 
+    val beatBtns = galaxy.createButtonGroup(5, (22..37).toList(), listOf())
+    val beatControls = listOf(
+            sliderA, sliderB, sliderC, sliderD,
+            potA0, potB0, potC0, potD0,
+            potA1, potB1, potC1, potD1,
+            potA2, potB2, potC2, potD2
+    )
+
     override fun setup() = Unit
 
     override fun draw() {
         background(bgColor)
 
-//        if (beatBtn.isPressed) {
-//            sliderA.sendValue(millis() / 1000f % 40f - 20f/* + audioProcessor.getRange(0f..100f) / 100f*/)
-//            if (audioProcessor.beatDetect.isKick) {
-//                sliderC.random()
-//            }
-//            sliderB.sendValue(sin(angularVelocity(6f)) mapFrom (-1f..1f) to (sliderB.min..sliderB.max))
-//            sliderC.sendValue(0.40f + audioProcessor.getRange(200f..600f) / 1000f)
-//            sliderD.sendValue(millis() / 1000f % 20f - 10f + audioProcessor.getRange(800f..1200f) / 100f)
-//        }
-
-        if (beatBtn.isPressed && audioProcessor.beatDetect.isKick) {
-            sliderA.random()
-            sliderD.random()
+        if (audioProcessor.beatDetect.isKick) {
+            beatControls.withIndex().forEach { controlWithIndex ->
+                if (beatBtns.activeButtonsIndices(exclusive = false).contains(controlWithIndex.index)) {
+                    controlWithIndex.value.random()
+                }
+            }
         }
 
         val a = sliderA.value +
