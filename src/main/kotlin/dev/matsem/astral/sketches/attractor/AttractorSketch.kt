@@ -20,10 +20,10 @@ class AttractorSketch : BaseSketch() {
     val audioProcessor: AudioProcessor by inject()
     val galaxy: Galaxy by inject()
 
-    private var deJongRight = Float.MIN_VALUE
-    private var deJongLeft = Float.MAX_VALUE
-    private var deJongTop = Float.MAX_VALUE
-    private var deJongBottom = Float.MIN_VALUE
+    private var rightmost = Float.MIN_VALUE
+    private var leftmost = Float.MAX_VALUE
+    private var topmost = Float.MAX_VALUE
+    private var bottommost = Float.MIN_VALUE
     private val deJongPoints = Array(ITERATIONS_MAX) { PVector() }
 
     private val iterationCountSlider = galaxy.createPot(5, 0, 100f, ITERATIONS_MAX.toFloat(), 25000f)
@@ -108,14 +108,14 @@ class AttractorSketch : BaseSketch() {
                 .filter { it.index < iterationCountSlider.value.toInt() }
                 .map { pt -> PVector(pt.value.x * scaleSlider.value, pt.value.y * scaleSlider.value) }
                 .forEach {
-                    if (it.x > deJongRight) deJongRight = it.x
-                    if (it.x < deJongLeft) deJongLeft = it.x
-                    if (it.y < deJongTop) deJongTop = it.y
-                    if (it.y > deJongBottom) deJongBottom = it.y
+                    if (it.x > rightmost) rightmost = it.x
+                    if (it.x < leftmost) leftmost = it.x
+                    if (it.y < topmost) topmost = it.y
+                    if (it.y > bottommost) bottommost = it.y
                 }
 
-        val deJongWidth = deJongRight - deJongLeft
-        val deJongHeight = deJongBottom - deJongTop
+        val deJongWidth = rightmost - leftmost
+        val deJongHeight = bottommost - topmost
 
         translate(centerX(), centerY())
         stroke(fgColor)
@@ -123,10 +123,10 @@ class AttractorSketch : BaseSketch() {
 
         // DEBUG
         if (isInDebugMode) {
-            sketch.line(deJongRight, -height / 8f, deJongRight, height / 8f)
-            sketch.line(deJongLeft, -height / 8f, deJongLeft, height / 8f)
-            sketch.line(-width / 8f, deJongTop, width / 8f, deJongTop)
-            sketch.line(-width / 8f, deJongBottom, width / 8f, deJongBottom)
+            sketch.line(rightmost, -height / 8f, rightmost, height / 8f)
+            sketch.line(leftmost, -height / 8f, leftmost, height / 8f)
+            sketch.line(-width / 8f, topmost, width / 8f, topmost)
+            sketch.line(-width / 8f, bottommost, width / 8f, bottommost)
         }
 
         for (i in 0 until iterationCountSlider.value.toInt()) {
@@ -134,10 +134,10 @@ class AttractorSketch : BaseSketch() {
             if (stabilizeBtn.isPressed) {
                 point(
                         pt.x * scaleSlider.value
-                                mapFrom (deJongLeft..deJongRight)
+                                mapFrom (leftmost..rightmost)
                                 to (-deJongWidth / 2f * stretchSlider.value..deJongWidth / 2f * stretchSlider.value),
                         pt.y * scaleSlider.value
-                                mapFrom (deJongTop..deJongBottom)
+                                mapFrom (topmost..bottommost)
                                 to (-deJongHeight / 2f..deJongHeight / 2f)
                 )
             } else {
@@ -145,10 +145,10 @@ class AttractorSketch : BaseSketch() {
             }
         }
 
-        deJongRight = Float.MIN_VALUE
-        deJongLeft = Float.MAX_VALUE
-        deJongTop = Float.MAX_VALUE
-        deJongBottom = Float.MIN_VALUE
+        rightmost = Float.MIN_VALUE
+        leftmost = Float.MAX_VALUE
+        topmost = Float.MAX_VALUE
+        bottommost = Float.MIN_VALUE
     }
 
     private fun deJongAttractor(a: Float, b: Float, c: Float, d: Float) {
