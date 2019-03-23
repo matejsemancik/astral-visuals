@@ -7,6 +7,7 @@ import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.Pot
 import org.koin.core.inject
+import processing.core.PApplet.pow
 import processing.core.PVector
 
 class AttractorSketch : BaseSketch() {
@@ -57,8 +58,10 @@ class AttractorSketch : BaseSketch() {
     private val potD1 = galaxy.createPot(5, 19).also { randomPots.add(it) }
     private val potD2 = galaxy.createPot(5, 20).also { randomPots.add(it) }
 
-    val beatBtns = galaxy.createButtonGroup(5, (22..37).toList(), listOf())
-    val beatControls = listOf(
+    private var numBeats = 0
+    private val beatDividerBtns = galaxy.createButtonGroup(5, (38..43).toList(), listOf(38))
+    private val beatBtns = galaxy.createButtonGroup(5, (22..37).toList(), listOf())
+    private val beatControls = listOf(
             sliderA, sliderB, sliderC, sliderD,
             potA0, potB0, potC0, potD0,
             potA1, potB1, potC1, potD1,
@@ -71,9 +74,13 @@ class AttractorSketch : BaseSketch() {
         background(bgColor)
 
         if (audioProcessor.beatDetect.isKick) {
-            beatControls.withIndex().forEach { controlWithIndex ->
-                if (beatBtns.activeButtonsIndices(exclusive = false).contains(controlWithIndex.index)) {
-                    controlWithIndex.value.random()
+            numBeats++
+
+            if (numBeats % pow(2f, beatDividerBtns.activeButtonsIndices().first().toFloat()).toInt() == 0) {
+                beatControls.withIndex().forEach { controlWithIndex ->
+                    if (beatBtns.activeButtonsIndices(exclusive = false).contains(controlWithIndex.index)) {
+                        controlWithIndex.value.random()
+                    }
                 }
             }
         }
