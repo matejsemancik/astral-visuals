@@ -51,6 +51,10 @@ fun Float.mapp(start: Float, end: Float): Float {
     return PApplet.map(this, 0f, 1f, start, end)
 }
 
+fun Float.mapSin(start: Float, end: Float): Float {
+    return PApplet.map(this, -1f, 1f, start, end)
+}
+
 fun Int.midiRange(start: Float, end: Float): Float {
     return PApplet.map(this.toFloat(), 0f, 127f, start, end)
 }

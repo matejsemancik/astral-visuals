@@ -1,6 +1,7 @@
 package dev.matsem.astral.sketches
 
 import org.koin.core.KoinComponent
+import processing.core.PApplet
 import processing.event.KeyEvent
 
 abstract class BaseSketch : KoinComponent {
@@ -87,6 +88,8 @@ abstract class BaseSketch : KoinComponent {
 
     fun noise(x: Float, y: Float, z: Float) = sketch.noise(x, y, z)
 
+    fun beginShape() = sketch.beginShape()
+
     fun beginShape(kind: Int) = sketch.beginShape(kind)
 
     fun endShape() = sketch.endShape()
@@ -98,6 +101,16 @@ abstract class BaseSketch : KoinComponent {
     fun sphere(radius: Float) = sketch.sphere(radius)
 
     fun color(v1: Int, v2: Int, v3: Int) = sketch.color(v1, v2, v3)
+
+    fun point(x: Float, y: Float, z: Float) = sketch.point(x, y, z)
+
+    fun point(x: Float, y: Float) = sketch.point(x, y)
+
+    fun sin(t: Float) = PApplet.sin(t)
+
+    fun cos(t: Float) = PApplet.cos(t)
+
+    fun saw(fHz: Float): Float = (millis() % (1000f * 1 / fHz)) / (1000f * 1 / fHz)
 
     val bgHue: Float get() = sketch.bgHuePot.value
     val bgSat: Float get() = sketch.bgSatPot.value

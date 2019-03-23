@@ -1,22 +1,23 @@
 package dev.matsem.astral.tools.galaxy.controls
 
-import processing.core.PApplet
 import dev.matsem.astral.random
-import themidibus.MidiBus
 import dev.matsem.astral.tools.galaxy.SimpleMidiListenerAdapter
+import processing.core.PApplet
+import themidibus.MidiBus
 
 open class Pot internal constructor(
         private val midiBus: MidiBus,
         private val ch: Int,
         private val cc: Int,
-        private val min: Float = 0f,
-        private val max: Float = 1f,
+        val min: Float = 0f,
+        val max: Float = 1f,
         private val initialValue: Float = 0f
 ) : MidiControl() {
 
     var value = 0f
     var rawValue = 0
     private var lerp = 1f
+    var lastUpdated = System.currentTimeMillis()
 
     init {
         if (min > max) {
@@ -36,6 +37,15 @@ open class Pot internal constructor(
                 }
             }
         })
+    }
+
+    fun sendValue(value: Float) {
+        rawValue = PApplet.map(value, min, max, 0f, 127f).toInt()
+        val now = System.currentTimeMillis()
+        if (now > lastUpdated + 1000) {
+            lastUpdated = now
+            sendClientUpdate()
+        }
     }
 
     override fun onUpdate() {

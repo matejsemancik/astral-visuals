@@ -1,7 +1,7 @@
 package dev.matsem.astral.tools.galaxy.controls
 
-import themidibus.MidiBus
 import dev.matsem.astral.tools.galaxy.SimpleMidiListenerAdapter
+import themidibus.MidiBus
 
 class ButtonGroup(
         private val midiBus: MidiBus,
@@ -10,7 +10,7 @@ class ButtonGroup(
         private val activeCCs: List<Int>
 ) : MidiControl() {
 
-    val btns = mutableListOf<Boolean>()
+    private val btns = mutableListOf<Boolean>()
 
     init {
         ccs.forEach { btns.add(activeCCs.contains(it)) }
@@ -38,10 +38,10 @@ class ButtonGroup(
         sendClientUpdate()
     }
 
-    fun activeButtonsIndices(): List<Int> {
+    fun activeButtonsIndices(exclusive: Boolean = true): List<Int> {
         val activeButtons = mutableListOf<Int>()
         btns.withIndex().forEach { if (it.value) activeButtons.add(it.index) }
-        if (activeButtons.isEmpty()) {
+        if (activeButtons.isEmpty() && exclusive) {
             activeButtons.add(0)
         }
 

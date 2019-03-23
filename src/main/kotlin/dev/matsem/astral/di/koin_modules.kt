@@ -1,8 +1,10 @@
 package dev.matsem.astral.di
 
 import com.hamoid.VideoExport
+import controlP5.ControlP5
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.sketches.attractor.AttractorSketch
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
@@ -22,11 +24,16 @@ val appModule = module {
     single { SketchLoader() } bind PApplet::class
     single { KontrolF1() }
     single { Galaxy() }
-    single { AudioProcessor(get(), Config.Sketch.IS_IN_RENDER_MODE) }
+    single { AudioProcessor(get(), Config.VideoExport.IS_IN_RENDER_MODE) }
     single {
         VideoExport(get()).apply {
             setFrameRate(Config.VideoExport.MOVIE_FPS)
             setAudioFileName(Config.VideoExport.AUDIO_FILE_PATH)
+        }
+    }
+    single {
+        ControlP5(get()).apply {
+            isAutoDraw = false
         }
     }
 
@@ -38,4 +45,5 @@ val appModule = module {
     factory { PatternsSketch() }
     factory { MachinaSketch() }
     factory { BoxesSketch() }
+    factory { AttractorSketch() }
 }

@@ -6,6 +6,7 @@ import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
 import dev.matsem.astral.Config
+import dev.matsem.astral.sketches.attractor.AttractorSketch
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
@@ -20,6 +21,7 @@ import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.Pot
 import dev.matsem.astral.tools.galaxy.controls.PushButton
 import dev.matsem.astral.tools.galaxy.controls.ToggleButton
+import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -37,6 +39,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
+    private val kontrolF1: KontrolF1 by inject()
     private val videoExport: VideoExport by inject()
 
     private lateinit var debugButton: ToggleButton
@@ -45,7 +48,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var colorResetButton: PushButton
 
     private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(97f, 100f, 60f)
+    private val fgColor = PVector(0f, 0f, 100f)
     private val accentColor = PVector(97f, 100f, 100f)
 
     lateinit var bgHuePot: Pot
@@ -74,6 +77,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val patternsSketch: PatternsSketch by inject()
     private val machinaSketch: MachinaSketch by inject()
     private val boxesSketch: BoxesSketch by inject()
+    private val attractorSketch: AttractorSketch by inject()
 
     // endregion
 
@@ -95,6 +99,7 @@ class SketchLoader : PApplet(), KoinComponent {
         )
 
         galaxy.connect()
+        kontrolF1.connect()
 
         gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
         debugButton = galaxy.createToggleButton(15, 65, false)
@@ -128,6 +133,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('5', patternsSketch)
             put('6', machinaSketch)
             put('7', boxesSketch)
+            put('8', attractorSketch)
         }
 
         sketches.forEach { key, sketch ->
@@ -141,8 +147,9 @@ class SketchLoader : PApplet(), KoinComponent {
         PushButton(galaxy.midiBus, 15, 3) { switchSketch('3') }
         PushButton(galaxy.midiBus, 15, 4) { switchSketch('4') }
         PushButton(galaxy.midiBus, 15, 5) { switchSketch('5') }
+        PushButton(galaxy.midiBus, 15, 6) { switchSketch('8') }
 
-        if (Config.Sketch.IS_IN_RENDER_MODE) {
+        if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)
             audioToTextFile(Config.VideoExport.AUDIO_FILE_PATH)
             reader = createReader("${Config.VideoExport.AUDIO_FILE_PATH}.txt")
@@ -153,7 +160,7 @@ class SketchLoader : PApplet(), KoinComponent {
     override fun draw() {
         galaxy.update()
 
-        if (Config.Sketch.IS_IN_RENDER_MODE.not()) {
+        if (Config.VideoExport.IS_IN_RENDER_MODE.not()) {
             audioProcessor.gain = gainPot.value
             activeSketch().isInDebugMode = debugButton.isPressed
             activeSketch().draw()
