@@ -1,5 +1,7 @@
 package dev.matsem.astral.sketches.boxes
 
+import dev.matsem.astral.toPVector
+import dev.matsem.astral.toVec2
 import org.jbox2d.collision.shapes.PolygonShape
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.*
@@ -7,8 +9,6 @@ import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PConstants.TWO_PI
 import shiffman.box2d.Box2DProcessing
-import dev.matsem.astral.toPVector
-import dev.matsem.astral.toVec2
 
 class Box(
         private val sketch: PApplet,
@@ -112,5 +112,9 @@ class Box(
                 popMatrix()
             }
         }
+    }
+
+    fun destroy() {
+        box2d.destroyBody(body)
     }
 }

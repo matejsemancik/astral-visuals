@@ -34,6 +34,9 @@ class BoxesSketch : BaseSketch() {
     val motionTranslateBWDBtn = galaxy.createPushButton(6, 5) { starMotion = Starfield.Motion.TRANSLATING_BACKWARD }
     val motionTranslateFWDBtn = galaxy.createPushButton(6, 6) { starMotion = Starfield.Motion.TRANSLATING_FORWARD }
 
+    val addBoxBtn = galaxy.createToggleButton(6, 11)
+    val removeBoxBtn = galaxy.createToggleButton(6, 10)
+
     val starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
     val starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
 
@@ -74,7 +77,29 @@ class BoxesSketch : BaseSketch() {
                             }
                     )
                 }
+
+                'd' -> {
+                    if (bodies.isNotEmpty()) {
+                        val randomBox = bodies.random()
+                        randomBox.destroy()
+                        bodies.remove(randomBox)
+                    }
+                }
             }
+        }
+
+        if (addBoxBtn.isPressed) {
+            bodies.add(
+                    Box(sketch, box2d, random(-centerX(), centerX()), random(-centerY(), centerY())).apply {
+                        accentColor = this@BoxesSketch.accentColor
+                        fgColor = this@BoxesSketch.fgColor
+                        size = sketch.random(15f, 30f)
+                    }
+            )
+        } else if (removeBoxBtn.isPressed && bodies.isNotEmpty()) {
+            val randomBox = bodies.random()
+            randomBox.destroy()
+            bodies.remove(randomBox)
         }
 
         amp += audioProcessor.getRange((200f..300f)) * 1f

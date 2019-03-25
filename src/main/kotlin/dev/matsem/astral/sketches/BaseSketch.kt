@@ -112,6 +112,10 @@ abstract class BaseSketch : KoinComponent {
 
     fun saw(fHz: Float): Float = (millis() % (1000f * 1 / fHz)) / (1000f * 1 / fHz)
 
+    fun random(high: Float) = sketch.random(high)
+
+    fun random(low: Float, high: Float) = sketch.random(low, high)
+
     val bgHue: Float get() = sketch.bgHuePot.value
     val bgSat: Float get() = sketch.bgSatPot.value
     val bgBrightness: Float get() = sketch.bgBriPot.value
