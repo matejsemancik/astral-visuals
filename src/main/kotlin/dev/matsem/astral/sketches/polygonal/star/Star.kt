@@ -2,7 +2,6 @@ package dev.matsem.astral.sketches.polygonal.star
 
 import processing.core.PApplet
 import processing.core.PApplet.map
-import processing.core.PVector
 
 class Star(private val sketch: PApplet) {
 
@@ -18,7 +17,7 @@ class Star(private val sketch: PApplet) {
     private var px: Float = 0f
     private var py: Float = 0f
     private var pz: Float = 0f
-    private var color = PVector(255f, 255f, 255f)
+    var color = 0
 
     init {
         newLocation()
@@ -77,12 +76,8 @@ class Star(private val sketch: PApplet) {
         pz = z
     }
 
-    fun setColor(a: Float, b: Float, c: Float) {
-        color = PVector(a, b, c)
-    }
-
     fun draw() {
-        sketch.fill(color.x, color.y, color.z)
+        sketch.fill(color)
         sketch.noStroke()
 
         val sx = map(x / z, 0f, 1f, 0f, sketch.width.toFloat())
@@ -103,7 +98,7 @@ class Star(private val sketch: PApplet) {
             Starfield.Motion.TRANSLATING_BACKWARD -> map(y / pz, 0f, 1f, 0f, sketch.height.toFloat())
         }
 
-        sketch.stroke(color.x, color.y, color.z)
+        sketch.stroke(color)
         sketch.strokeWeight(2f)
         sketch.line(sx, sy, px, py)
         this.pz = z

@@ -6,12 +6,12 @@ import dev.matsem.astral.centerY
 import dev.matsem.astral.shorterDimension
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.sketches.polygonal.star.Starfield
 import dev.matsem.astral.tools.audio.AudioProcessor
 import org.jbox2d.common.Vec2
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PApplet.radians
-import processing.core.PApplet.sin
 import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing
 
@@ -23,6 +23,7 @@ class BoxesSketch : BaseSketch() {
     lateinit var staticSphere: StaticSphere
     private val bodies = arrayListOf<Box>()
     val box2d = Box2DProcessing(sketch)
+    val starfield = Starfield(sketch, 1000)
 
     override fun onBecameActive() {
         rectMode(PConstants.CENTER)
@@ -66,6 +67,12 @@ class BoxesSketch : BaseSketch() {
         }
 
         background(bgColor)
+
+        starfield.apply {
+            color = fgColor
+            update(4)
+            draw()
+        }
 
         pushMatrix()
         translate(centerX(), centerY())

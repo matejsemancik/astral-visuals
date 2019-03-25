@@ -3,7 +3,6 @@ package dev.matsem.astral.sketches.polygonal.star
 import dev.matsem.astral.centerX
 import dev.matsem.astral.centerY
 import processing.core.PApplet
-import processing.core.PVector
 
 class Starfield(private val sketch: PApplet, initialCount: Int) {
 
@@ -17,7 +16,7 @@ class Starfield(private val sketch: PApplet, initialCount: Int) {
     private val stars = mutableListOf<Star>()
     private var rotation = 0f
     private var desiredCount = initialCount
-    private var color = PVector(255f, 255f, 255f)
+    var color = 0
 
     init {
         repeat(initialCount, { addStar() })
@@ -43,8 +42,9 @@ class Starfield(private val sketch: PApplet, initialCount: Int) {
         this.rotation = rotation
     }
 
+    @Deprecated(message = "use color property access")
     fun setColor(a: Float, b: Float, c: Float) {
-        color = PVector(a, b, c)
+        color = sketch.color(a, b, c)
     }
 
     fun draw() {
@@ -53,7 +53,7 @@ class Starfield(private val sketch: PApplet, initialCount: Int) {
         sketch.rotateZ(rotation)
 
         for (star in stars) {
-            star.setColor(color.x, color.y, color.z)
+            star.color = color
             star.motion = this.motion
             star.draw()
         }
