@@ -68,10 +68,13 @@ class AttractorSketch : BaseSketch() {
             potA2, potB2, potC2, potD2
     )
 
+    private val dotSizePot = galaxy.createPot(5, 44, 1f, 5f, 1f)
+
     override fun setup() = Unit
 
     override fun draw() {
         background(bgColor)
+        strokeWeight(dotSizePot.value)
 
         if (audioProcessor.beatDetect.isKick) {
             numBeats++
