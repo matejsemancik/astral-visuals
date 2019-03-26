@@ -16,9 +16,11 @@ import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import org.jbox2d.common.Vec2
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import processing.core.PApplet
+import shiffman.box2d.Box2DProcessing
 
 val appModule = module {
     single { SketchLoader() } bind PApplet::class
@@ -34,6 +36,13 @@ val appModule = module {
     single {
         ControlP5(get()).apply {
             isAutoDraw = false
+        }
+    }
+
+    factory {
+        Box2DProcessing(get()).apply {
+            createWorld(Vec2(0f, 0f))
+            setContinuousPhysics(true)
         }
     }
 
