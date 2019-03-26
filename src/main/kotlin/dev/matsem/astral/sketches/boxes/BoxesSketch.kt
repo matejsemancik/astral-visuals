@@ -43,6 +43,9 @@ class BoxesSketch : BaseSketch() {
     private val sphereDetailPot = galaxy.createPot(6, 16, 4f, 32f, 8f)
     private val sphereGravityPot = galaxy.createPot(6, 17, 0f, 2000f, 1000f)
 
+    private val joystick = galaxy.createJoystick(6, 18, 19, 20, 21, 22, 23).flipped()
+    private val rotationAutoBtn = galaxy.createToggleButton(6, 24, true)
+
     private val starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
     private val starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
 
@@ -54,6 +57,15 @@ class BoxesSketch : BaseSketch() {
 
     private val bodies = arrayListOf<Box>()
 
+    var amp = 0f
+    var bassSum = 0f
+    var starVz = 0f
+    var starRotationZ = 0f
+
+    var rotX = 0f
+    var rotY = 0f
+    var rotZ = 0f
+
     override fun onBecameActive() {
         rectMode(PConstants.CENTER)
         sketch.ellipseMode(PConstants.RADIUS)
@@ -62,46 +74,39 @@ class BoxesSketch : BaseSketch() {
 
     override fun setup() = Unit
 
-    var amp = 0f
-    var bassSum = 0f
-    var starVz = 0f
-    var starRotationZ = 0f
+    private fun addBox() {
+        bodies.add(
+                Box(sketch, box2d, random(-centerX(), centerX()), random(-centerY(), centerY())).apply {
+                    accentColor = this@BoxesSketch.accentColor
+                    fgColor = this@BoxesSketch.fgColor
+                    size = sketch.random(15f, 30f)
+                }
+        )
+    }
+
+    private fun destroyBox() {
+        val randomBox = bodies.random()
+        randomBox.destroy()
+        bodies.remove(randomBox)
+    }
 
     override fun draw() {
         if (sketch.keyPressed) {
             when (sketch.key) {
                 'b' -> {
-                    bodies.add(
-                            Box(sketch, box2d, mouseX.toFloat() - width / 2f, mouseY.toFloat() - height / 2f).apply {
-                                accentColor = this@BoxesSketch.accentColor
-                                fgColor = this@BoxesSketch.fgColor
-                                size = sketch.random(15f, 30f)
-                            }
-                    )
+                    addBox()
                 }
 
                 'd' -> {
-                    if (bodies.isNotEmpty()) {
-                        val randomBox = bodies.random()
-                        randomBox.destroy()
-                        bodies.remove(randomBox)
-                    }
+                    destroyBox()
                 }
             }
         }
 
         if (addBoxBtn.isPressed) {
-            bodies.add(
-                    Box(sketch, box2d, random(-centerX(), centerX()), random(-centerY(), centerY())).apply {
-                        accentColor = this@BoxesSketch.accentColor
-                        fgColor = this@BoxesSketch.fgColor
-                        size = sketch.random(15f, 30f)
-                    }
-            )
+            addBox()
         } else if (removeBoxBtn.isPressed && bodies.isNotEmpty()) {
-            val randomBox = bodies.random()
-            randomBox.destroy()
-            bodies.remove(randomBox)
+            destroyBox()
         }
 
         amp += audioProcessor.getRange((200f..300f)) * 1f
@@ -131,14 +136,30 @@ class BoxesSketch : BaseSketch() {
         starfield1.draw()
         starfield2.draw()
 
-        pushMatrix()
-        translate(centerX(), centerY())
-        rotateY(angularVelocity(16f))
-        pushMatrix()
-        rotateX(PApplet.map(sin(angularVelocity(30f)), -1f, 1f, radians(-180f), radians(180f)))
+        rotX += joystick.y * .04f
+        rotY += joystick.x * .04f
+        rotZ += joystick.z * .04f
+
+        if (rotationAutoBtn.isPressed) {
+            pushMatrix()
+            translate(centerX() + centerX() / 2f, centerY())
+            rotateY(angularVelocity(16f))
+            pushMatrix()
+            rotateX(PApplet.map(sin(angularVelocity(30f)), -1f, 1f, radians(-180f), radians(180f)))
+            pushMatrix()
+            rotateZ(0f)
+        } else {
+            pushMatrix()
+            translate(centerX(), centerY())
+            rotateY(rotY)
+            pushMatrix()
+            rotateX(rotX)
+            pushMatrix()
+            rotateZ(rotZ)
+        }
 
         staticSphere.apply {
-            radius = 100f + amp
+            radius = 150f + amp
             accentColor = this@BoxesSketch.accentColor
             fgColor = this@BoxesSketch.fgColor
         }
@@ -160,6 +181,7 @@ class BoxesSketch : BaseSketch() {
             it.value.draw()
         }
 
+        popMatrix()
         popMatrix()
         popMatrix()
 
