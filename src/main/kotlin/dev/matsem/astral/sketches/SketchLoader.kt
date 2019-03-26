@@ -166,7 +166,7 @@ class SketchLoader : PApplet(), KoinComponent {
             activeSketch().isInDebugMode = debugButton.isPressed
             activeSketch().draw()
         } else {
-            audioProcessor.gain = 1.5f
+            audioProcessor.gain = 1.0f
             activeSketch().isInDebugMode = false
 
             val line: String?

@@ -14,9 +14,9 @@ interface Config {
 
     object VideoExport {
         const val IS_IN_RENDER_MODE = false
-        const val AUDIO_FILE_PATH = "drama.wav"
+        const val AUDIO_FILE_PATH = "drama_switch.wav"
         const val SEP = "|"
-        const val MOVIE_FPS = 20f
+        const val MOVIE_FPS = 60f
         const val FRAME_DURATION = 1f / MOVIE_FPS
     }
 }
