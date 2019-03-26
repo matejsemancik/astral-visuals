@@ -46,6 +46,8 @@ class BoxesSketch : BaseSketch() {
     private val joystick = galaxy.createJoystick(6, 18, 19, 20, 21, 22, 23).flipped()
     private val rotationAutoBtn = galaxy.createToggleButton(6, 24, true)
 
+    private val wireframesBtn = galaxy.createToggleButton(6, 25)
+
     private val starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
     private val starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
 
@@ -142,7 +144,7 @@ class BoxesSketch : BaseSketch() {
 
         if (rotationAutoBtn.isPressed) {
             pushMatrix()
-            translate(centerX() + centerX() / 2f, centerY())
+            translate(centerX(), centerY())
             rotateY(angularVelocity(16f))
             pushMatrix()
             rotateX(PApplet.map(sin(angularVelocity(30f)), -1f, 1f, radians(-180f), radians(180f)))
@@ -166,6 +168,11 @@ class BoxesSketch : BaseSketch() {
 
         sphereDetail(sphereDetailPot.value.toInt())
         staticSphere.draw()
+
+        if (audioProcessor.beatDetect.isSnare && wireframesBtn.isPressed) {
+            bodies.forEach { it.hasFill = !it.hasFill }
+            staticSphere.hasFill = !staticSphere.hasFill
+        }
 
         bodies.withIndex().forEach {
             when {

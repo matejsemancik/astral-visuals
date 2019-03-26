@@ -26,6 +26,7 @@ class Box(
 
     var size = 25f
     var strokeWeight = 3f
+    var hasFill = true
     var rotationConstant = sketch.random(6f, 10f)
 
     val body: Body
@@ -80,8 +81,8 @@ class Box(
 
     fun draw() {
         with(sketch) {
-            fill(fgColor)
-            stroke(accentColor)
+            if (hasFill) fill(fgColor) else noFill()
+            if (hasFill) stroke(accentColor) else stroke(fgColor)
             strokeWeight(strokeWeight)
 
             // Box itself
