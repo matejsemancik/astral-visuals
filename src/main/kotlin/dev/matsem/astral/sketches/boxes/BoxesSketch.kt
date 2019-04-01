@@ -48,6 +48,10 @@ class BoxesSketch : BaseSketch() {
 
     private val wireframesBtn = galaxy.createToggleButton(6, 25)
 
+    private val baseDiameterPot = galaxy.createPot(6, 26, 50f, 200f, 100f)
+    private val ampGainPot = galaxy.createPot(6, 27, 0.2f, 8f, 1f)
+    private val startFreqPot = galaxy.createPot(6, 28, 100f, 1000f, 200f)
+
     private val starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
     private val starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
 
@@ -111,7 +115,8 @@ class BoxesSketch : BaseSketch() {
             destroyBox()
         }
 
-        amp += audioProcessor.getRange((200f..300f)) * 1f
+        val range = startFreqPot.value..startFreqPot.value + 100f
+        amp += audioProcessor.getRange(range) * ampGainPot.value
         amp *= 0.80f
 
         bassSum += audioProcessor.getRange(0f..50f)
@@ -161,7 +166,7 @@ class BoxesSketch : BaseSketch() {
         }
 
         staticSphere.apply {
-            radius = 150f + amp
+            radius = baseDiameterPot.value + amp
             accentColor = this@BoxesSketch.accentColor
             fgColor = this@BoxesSketch.fgColor
         }
