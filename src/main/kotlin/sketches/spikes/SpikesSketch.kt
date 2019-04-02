@@ -11,6 +11,7 @@ import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
+import kotlin.random.Random
 
 class SpikesSketch : BaseSketch() {
 
@@ -23,14 +24,21 @@ class SpikesSketch : BaseSketch() {
 
     var numX = 45
     var numY = 25
+    var paddX = 100f
+    var paddY = 100f
+
     var rotationXEnabled = galaxy.createToggleButton(7, 0, false)
     var rotationZEnabled = galaxy.createToggleButton(7, 1, false)
-    var rotationQuantize = galaxy.createEncoder(7, 2, 0, 500, 20)
+    var rotationQuantize = galaxy.createEncoder(7, 2, 0, 500, 128)
 
     var beatRegenEnabled = galaxy.createToggleButton(7, 3, false)
     var forceRegen = galaxy.createPushButton(7, 4) { shouldRegen = true }
     var shouldRegen = false
     var beatRegenCounter = 0
+
+    var beatRandomize = galaxy.createToggleButton(7, 15, false)
+    var beatRandomizeCounter = 0
+    var beatRandomizeModulo = 8
 
     var baseRotationBtns = galaxy.createButtonGroup(7, listOf(5, 6), listOf(5))
     var baseRotations = floatArrayOf(
@@ -53,12 +61,30 @@ class SpikesSketch : BaseSketch() {
         createArray(
                 numX = numX,
                 numY = numY,
-                paddHorizontal = 100f,
-                paddVertical = 100f
+                paddHorizontal = paddX,
+                paddVertical = paddY
         )
     }
 
     override fun draw() {
+        if (beatRandomize.isPressed && audioProcessor.beatDetect.isKick) {
+            beatRandomizeCounter++
+
+            if (beatRandomizeCounter % beatRandomizeModulo == 0) {
+                beatRandomizeCounter = 0
+                beatRandomizeModulo = listOf(1, 2, 4, 8, 16, 32).shuffled().first()
+
+                noiseGain.random()
+                noiseResX.random()
+                noiseResY.random()
+                noiseTravelX.random()
+                noiseTravelY.random()
+                shouldRegen = Random.nextBoolean()
+                dotSize.random()
+                lineWeight.random()
+            }
+        }
+
         if (beatRegenEnabled.isPressed && audioProcessor.beatDetect.isKick) {
             beatRegenCounter++
             if (beatRegenCounter % 2 == 0) {
@@ -70,7 +96,7 @@ class SpikesSketch : BaseSketch() {
         if (shouldRegen) {
             numX = sketch.random(20f, 50f).toInt()
             numY = sketch.random(10f, 25f).toInt()
-            createArray(numX, numY, 100f, 100f)
+            createArray(numX, numY, paddX, paddY)
 
             shouldRegen = false
         }
