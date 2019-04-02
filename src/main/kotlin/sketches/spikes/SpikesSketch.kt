@@ -72,7 +72,7 @@ class SpikesSketch : BaseSketch() {
 
             if (beatRandomizeCounter % beatRandomizeModulo == 0) {
                 beatRandomizeCounter = 0
-                beatRandomizeModulo = listOf(1, 2, 4, 8, 16, 32).shuffled().first()
+                beatRandomizeModulo = listOf(1, 2, 4, 8, 16).shuffled().first()
 
                 noiseGain.random()
                 noiseResX.random()
