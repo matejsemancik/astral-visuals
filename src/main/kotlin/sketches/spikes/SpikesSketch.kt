@@ -23,13 +23,19 @@ class SpikesSketch : BaseSketch() {
 
     var numX = 45
     var numY = 25
-    var rotationXEnabled = false
-    var rotationZEnabled = false
-    var beatRecreateEnabled = true
-    var forceRecreate = false
-    var baseRotationX = 0f
-    //    var baseRotationX = PConstants.PI / 2f
-    var rotationQuantize = 100f // 0f - 500f
+    var rotationXEnabled = galaxy.createToggleButton(7, 0, false)
+    var rotationZEnabled = galaxy.createToggleButton(7, 1, false)
+    var rotationQuantize = galaxy.createEncoder(7, 2, 0, 500, 20)
+
+    var beatRegenEnabled = galaxy.createToggleButton(7, 3, false)
+    var forceRegenBtn = galaxy.createPushButton(7, 4) { forceRegen = true }
+    var forceRegen = false
+
+    var baseRotationBtns = galaxy.createButtonGroup(7, listOf(5, 6), listOf(5))
+    var baseRotations = floatArrayOf(
+            0f,
+            PConstants.PI / 2f
+    )
 
 //    var dotSize = kontrol.slider2.midiRange(0f, 10f)
 //    var lineWeight = kontrol.slider3.midiRange(0f, 10f)
@@ -41,7 +47,7 @@ class SpikesSketch : BaseSketch() {
 //    var noiseTravelY: Float = kontrol.knob4.midiRange(-0.01f, 0.01f)
 //    var audioGain: Float = kontrol.slider4.midiRange(3f)
 
-    var dotSize = 5f
+    var dotSize = 4f
     var lineWeight = 2f
 
     var noiseGain: Float = 100f
@@ -61,26 +67,26 @@ class SpikesSketch : BaseSketch() {
     }
 
     override fun draw() {
-        if ((beatRecreateEnabled && audioProcessor.beatDetect.isKick) || forceRecreate) {
+        if ((beatRegenEnabled.isPressed && audioProcessor.beatDetect.isKick) || forceRegen) {
             numX = sketch.random(20f, 50f).toInt()
             numY = sketch.random(10f, 25f).toInt()
             createArray(numX, numY, 100f, 100f)
 
-            if (forceRecreate) {
-                forceRecreate = false
+            if (forceRegen) {
+                forceRegen = false
             }
         }
 
         background(bgColor)
         translate(centerX(), centerY())
-        if (rotationXEnabled) {
-            rotateX((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize))
+        if (rotationXEnabled.isPressed) {
+            rotateX((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize.value.toFloat()))
         } else {
-            rotateX(baseRotationX)
+            rotateX(baseRotations[baseRotationBtns.activeButtonsIndices().first()])
         }
 
-        if (rotationZEnabled) {
-            rotateZ((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize))
+        if (rotationZEnabled.isPressed) {
+            rotateZ((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize.value.toFloat()))
         } else {
             rotateZ(0f)
         }
