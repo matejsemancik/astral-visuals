@@ -28,8 +28,9 @@ class SpikesSketch : BaseSketch() {
     var rotationQuantize = galaxy.createEncoder(7, 2, 0, 500, 20)
 
     var beatRegenEnabled = galaxy.createToggleButton(7, 3, false)
-    var forceRegenBtn = galaxy.createPushButton(7, 4) { forceRegen = true }
-    var forceRegen = false
+    var forceRegen = galaxy.createPushButton(7, 4) { shouldRegen = true }
+    var shouldRegen = false
+    var beatRegenCounter = 0
 
     var baseRotationBtns = galaxy.createButtonGroup(7, listOf(5, 6), listOf(5))
     var baseRotations = floatArrayOf(
@@ -37,25 +38,16 @@ class SpikesSketch : BaseSketch() {
             PConstants.PI / 2f
     )
 
-//    var dotSize = kontrol.slider2.midiRange(0f, 10f)
-//    var lineWeight = kontrol.slider3.midiRange(0f, 10f)
-//
-//    var noiseGain: Float = kontrol.slider1.midiRange(200f)
-//    var noiseResX: Float = kontrol.knob1.midiRange(0.02f)
-//    var noiseRexY: Float = kontrol.knob2.midiRange(0.02f)
-//    var noiseTravelX: Float = kontrol.knob3.midiRange(-0.01f, 0.01f)
-//    var noiseTravelY: Float = kontrol.knob4.midiRange(-0.01f, 0.01f)
-//    var audioGain: Float = kontrol.slider4.midiRange(3f)
+    var dotSize = galaxy.createPot(7, 7, 0f, 10f, 2f)
+    var lineWeight = galaxy.createPot(7, 8, 0f, 10f, 4f)
 
-    var dotSize = 4f
-    var lineWeight = 2f
+    var noiseGain = galaxy.createPot(7, 9, 0f, 200f, 50f)
+    var audioGain = galaxy.createPot(7, 10, 0f, 3f, 0.8f)
 
-    var noiseGain: Float = 100f
-    var noiseResX: Float = 0.02f
-    var noiseRexY: Float = 0.02f
-    var noiseTravelX: Float = 0f
-    var noiseTravelY: Float = 0f
-    var audioGain: Float = 1f
+    var noiseResX = galaxy.createPot(7, 11, 0f, 0.02f, 0f)
+    var noiseTravelX = galaxy.createPot(7, 12, -0.01f, 0.01f, 0f)
+    var noiseResY = galaxy.createPot(7, 13, 0f, 0.02f, 0f)
+    var noiseTravelY = galaxy.createPot(7, 14, -0.01f, 0.01f, 0f)
 
     override fun setup() {
         createArray(
@@ -67,14 +59,20 @@ class SpikesSketch : BaseSketch() {
     }
 
     override fun draw() {
-        if ((beatRegenEnabled.isPressed && audioProcessor.beatDetect.isKick) || forceRegen) {
+        if (beatRegenEnabled.isPressed && audioProcessor.beatDetect.isKick) {
+            beatRegenCounter++
+            if (beatRegenCounter % 2 == 0) {
+                beatRegenCounter = 0
+                shouldRegen = true
+            }
+        }
+
+        if (shouldRegen) {
             numX = sketch.random(20f, 50f).toInt()
             numY = sketch.random(10f, 25f).toInt()
             createArray(numX, numY, 100f, 100f)
 
-            if (forceRegen) {
-                forceRegen = false
-            }
+            shouldRegen = false
         }
 
         background(bgColor)
@@ -95,18 +93,18 @@ class SpikesSketch : BaseSketch() {
             for (y in 0 until numY) {
                 val pos = positions[x][y]
 
-                val audio = audioProcessor.getFftAvg(fftMapping[x][y]) * audioGain
+                val audio = audioProcessor.getFftAvg(fftMapping[x][y]) * audioGain.value
                 val noise = noise(
-                        pos.x * noiseResX + millis() * noiseTravelX,
-                        pos.y * noiseRexY + millis() * noiseTravelY
-                ) * noiseGain
+                        pos.x * noiseResX.value + millis() * noiseTravelX.value,
+                        pos.y * noiseResY.value + millis() * noiseTravelY.value
+                ) * noiseGain.value
 
                 val elevation = noise + audio
 
                 // Draw line
                 noFill()
                 stroke(fgColor)
-                strokeWeight(lineWeight)
+                strokeWeight(lineWeight.value)
 
                 sketch.line(pos.x, pos.y, noise, pos.x, pos.y, elevation)
                 sketch.line(pos.x, pos.y, -noise, pos.x, pos.y, -elevation)
@@ -117,12 +115,12 @@ class SpikesSketch : BaseSketch() {
 
                 pushMatrix()
                 translate(pos.x, pos.y, elevation)
-                sphere(dotSize)
+                sphere(dotSize.value)
                 popMatrix()
 
                 pushMatrix()
                 translate(pos.x, pos.y, -elevation)
-                sphere(dotSize)
+                sphere(dotSize.value)
                 popMatrix()
             }
         }
