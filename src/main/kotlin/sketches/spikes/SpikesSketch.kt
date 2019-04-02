@@ -1,29 +1,22 @@
 package sketches.spikes
 
-import centerX
-import centerY
-import midiRange
+import dev.matsem.astral.centerX
+import dev.matsem.astral.centerY
+import dev.matsem.astral.quantize
+import dev.matsem.astral.sketches.BaseSketch
+import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.galaxy.Galaxy
+import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
-import quantize
-import sketches.BaseSketch
-import sketches.SketchLoader
-import tools.audio.AudioProcessor
-import tools.galaxy.Galaxy
-import tools.kontrol.KontrolF1
-import tools.kontrol.Pad
 
-// TODO refactor to Galaxy control
-class SpikesSketch(
-        sketch: SketchLoader,
-        private val audioProcessor: AudioProcessor,
-        galaxy: Galaxy
-) : BaseSketch(
-        sketch,
-        audioProcessor,
-        galaxy
-) {
+class SpikesSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
+    val galaxy: Galaxy by inject()
+    val audioProcessor: AudioProcessor by inject()
 
     lateinit var positions: Array<Array<PVector>>
     lateinit var fftMapping: Array<IntArray>
@@ -32,11 +25,31 @@ class SpikesSketch(
     var numY = 25
     var rotationXEnabled = false
     var rotationZEnabled = false
-    var beatRecreateEnabled = false
+    var beatRecreateEnabled = true
     var forceRecreate = false
     var baseRotationX = 0f
+    //    var baseRotationX = PConstants.PI / 2f
+    var rotationQuantize = 100f // 0f - 500f
 
-    private val kontrol = KontrolF1()
+//    var dotSize = kontrol.slider2.midiRange(0f, 10f)
+//    var lineWeight = kontrol.slider3.midiRange(0f, 10f)
+//
+//    var noiseGain: Float = kontrol.slider1.midiRange(200f)
+//    var noiseResX: Float = kontrol.knob1.midiRange(0.02f)
+//    var noiseRexY: Float = kontrol.knob2.midiRange(0.02f)
+//    var noiseTravelX: Float = kontrol.knob3.midiRange(-0.01f, 0.01f)
+//    var noiseTravelY: Float = kontrol.knob4.midiRange(-0.01f, 0.01f)
+//    var audioGain: Float = kontrol.slider4.midiRange(3f)
+
+    var dotSize = 5f
+    var lineWeight = 2f
+
+    var noiseGain: Float = 100f
+    var noiseResX: Float = 0.02f
+    var noiseRexY: Float = 0.02f
+    var noiseTravelX: Float = 0f
+    var noiseTravelY: Float = 0f
+    var audioGain: Float = 1f
 
     override fun setup() {
         createArray(
@@ -45,49 +58,6 @@ class SpikesSketch(
                 paddHorizontal = 100f,
                 paddVertical = 100f
         )
-
-        kontrol.connect()
-    }
-
-    override fun onBecameActive() {
-        // X rotation
-        kontrol.pad(0, 0).apply {
-            colorOn = Triple(0, 127, 127)
-            setStateListener { rotationXEnabled = it }
-        }
-
-        // Z rotation
-        kontrol.pad(0, 1).apply {
-            colorOn = Triple(0, 127, 127)
-            setStateListener { rotationZEnabled = it }
-        }
-
-        // Beat recreate
-        kontrol.pad(0, 2).apply {
-            colorOn = Triple(8, 127, 127)
-            setStateListener { beatRecreateEnabled = it }
-        }
-
-        // Force recreate
-        kontrol.pad(0, 3).apply {
-            colorOn = Triple(16, 127, 127)
-            mode = Pad.Mode.TRIGGER
-            setTriggerListener { forceRecreate = true }
-        }
-
-        // Base rotation
-        kontrol.pad(3, 0).apply {
-            colorOn = Triple(100, 127, 127)
-            mode = Pad.Mode.TRIGGER
-            setTriggerListener { baseRotationX = 0f }
-        }
-
-        // Base rotation
-        kontrol.pad(3, 1).apply {
-            colorOn = Triple(100, 127, 127)
-            mode = Pad.Mode.TRIGGER
-            setTriggerListener { baseRotationX = PConstants.PI / 2f }
-        }
     }
 
     override fun draw() {
@@ -104,29 +74,19 @@ class SpikesSketch(
         background(bgColor)
         translate(centerX(), centerY())
         if (rotationXEnabled) {
-            rotateX((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / kontrol.encoder.midiRange(500f)))
+            rotateX((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize))
         } else {
             rotateX(baseRotationX)
         }
 
         if (rotationZEnabled) {
-            rotateZ((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / kontrol.encoder.midiRange(500f)))
+            rotateZ((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize))
         } else {
             rotateZ(0f)
         }
 
         for (x in 0 until numX) {
             for (y in 0 until numY) {
-                var dotSize = kontrol.slider2.midiRange(0f, 10f)
-                var lineWeight = kontrol.slider3.midiRange(0f, 10f)
-
-                var noiseGain: Float = kontrol.slider1.midiRange(200f)
-                var noiseResX: Float = kontrol.knob1.midiRange(0.02f)
-                var noiseRexY: Float = kontrol.knob2.midiRange(0.02f)
-                var noiseTravelX: Float = kontrol.knob3.midiRange(-0.01f, 0.01f)
-                var noiseTravelY: Float = kontrol.knob4.midiRange(-0.01f, 0.01f)
-                var audioGain: Float = kontrol.slider4.midiRange(3f)
-
                 val pos = positions[x][y]
 
                 val audio = audioProcessor.getFftAvg(fftMapping[x][y]) * audioGain

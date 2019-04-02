@@ -28,6 +28,7 @@ import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
 import processing.event.KeyEvent
+import sketches.spikes.SpikesSketch
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.PrintWriter
@@ -78,6 +79,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val machinaSketch: MachinaSketch by inject()
     private val boxesSketch: BoxesSketch by inject()
     private val attractorSketch: AttractorSketch by inject()
+    private val spikesSketch: SpikesSketch by inject()
 
     // endregion
 
@@ -134,6 +136,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('6', machinaSketch)
             put('7', boxesSketch)
             put('8', attractorSketch)
+            put('9', spikesSketch)
         }
 
         sketches.forEach { key, sketch ->
@@ -149,6 +152,7 @@ class SketchLoader : PApplet(), KoinComponent {
         PushButton(galaxy.midiBus, 15, 5) { switchSketch('5') }
         PushButton(galaxy.midiBus, 15, 6) { switchSketch('8') }
         PushButton(galaxy.midiBus, 15, 7) { switchSketch('7') }
+        PushButton(galaxy.midiBus, 15, 8) { switchSketch('9') }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)

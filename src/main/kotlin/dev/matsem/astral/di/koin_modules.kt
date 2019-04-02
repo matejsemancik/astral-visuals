@@ -21,6 +21,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import processing.core.PApplet
 import shiffman.box2d.Box2DProcessing
+import sketches.spikes.SpikesSketch
 
 val appModule = module {
     single { SketchLoader() } bind PApplet::class
@@ -55,4 +56,5 @@ val appModule = module {
     factory { MachinaSketch() }
     factory { BoxesSketch() }
     factory { AttractorSketch() }
+    factory { SpikesSketch() }
 }
