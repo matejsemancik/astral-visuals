@@ -30,9 +30,9 @@ class CubesSketch : BaseSketch() {
 
     var rotationOffset = galaxy.createPot(8, 0, 16f, 64f, 64f).lerp(0.2f)
 
-    var rotationXSpeed = galaxy.createPot(8, 1, -0.0015f, 0.0015f, 0f).lerp(0.6f)
-    var rotationYSpeed = galaxy.createPot(8, 2, -0.0015f, 0.0015f, 0f).lerp(0.6f)
-    var rotationZSpeed = galaxy.createPot(8, 3, -0.0015f, 0.0015f, 0f).lerp(0.6f)
+    var rotationXSpeed = galaxy.createPot(8, 1, -0.0015f, 0.0015f, 0f).lerp(0.3f)
+    var rotationYSpeed = galaxy.createPot(8, 2, -0.0015f, 0.0015f, 0f).lerp(0.3f)
+    var rotationZSpeed = galaxy.createPot(8, 3, -0.0015f, 0.0015f, 0f).lerp(0.3f)
 
     var bassGain = galaxy.createPot(8, 4, 0f, 1f, 1f)
     var midGain = galaxy.createPot(8, 5, 0f, 1f, 1f)
@@ -77,7 +77,7 @@ class CubesSketch : BaseSketch() {
         bass += audioProcessor.getRange(20f..60f)
         bass *= 0.5f
 
-        mid += audioProcessor.getRange(400f..1000f)
+        mid += audioProcessor.getRange(200f..400f) * 4f
         mid *= 0.2f
 
         snare = audioProcessor.getRange(900f..1100f) * 10f
@@ -100,7 +100,7 @@ class CubesSketch : BaseSketch() {
                     PApplet.map(i.toFloat(), 0f, num.toFloat(), fgBrightness, bgBrightness)
             )
 
-            if (i == 0) {
+            if (i == 0 && pillEnabled.isPressed) {
                 fill(fgColor)
             } else {
                 noFill()
