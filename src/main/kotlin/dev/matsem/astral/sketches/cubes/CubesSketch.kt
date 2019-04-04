@@ -23,13 +23,11 @@ class CubesSketch : BaseSketch() {
     var bass = 0f
     var mid = 0f
     var snare = 0f
-    var num = 12
 
     var sweep = 0
     var sweepModulo = 1
 
     var rotationOffset = galaxy.createPot(8, 0, 16f, 64f, 64f).lerp(0.2f)
-
     var rotationXSpeed = galaxy.createPot(8, 1, -0.0015f, 0.0015f, 0f).lerp(0.3f)
     var rotationYSpeed = galaxy.createPot(8, 2, -0.0015f, 0.0015f, 0f).lerp(0.3f)
     var rotationZSpeed = galaxy.createPot(8, 3, -0.0015f, 0.0015f, 0f).lerp(0.3f)
@@ -40,13 +38,26 @@ class CubesSketch : BaseSketch() {
     var sweepEnabled = galaxy.createToggleButton(8, 7, true)
     var pillEnabled = galaxy.createToggleButton(8, 8, false)
 
+    var num = galaxy.createPot(8, 9, 6f, 32f, 6f)
+
+    var rotationOffsetRandom = galaxy.createToggleButton(8, 10, false)
+    var rotationXSpeedRandom = galaxy.createToggleButton(8, 11, false)
+    var rotationYSpeedRandom = galaxy.createToggleButton(8, 12, false)
+    var rotationZSpeedRandom = galaxy.createToggleButton(8, 13, false)
+    var bassGainRandom = galaxy.createToggleButton(8, 14, false)
+    var midGainRandom = galaxy.createToggleButton(8, 15, false)
+    var snareGainRandom = galaxy.createToggleButton(8, 16, false)
+    var numRandom = galaxy.createToggleButton(8, 17, false)
+
     override fun setup() {
         beatCounter.addListener(OnKick, 4) {
-            num = random(6f, 12f).toInt()
+            if (numRandom.isPressed) {
+                num.random(maxRaw = 40)
+            }
         }
 
         beatCounter.addListener(OnSnare, 1) {
-            rotationOffset.random()
+            if (rotationOffsetRandom.isPressed) rotationOffset.random()
         }
 
         beatCounter.addListener(OnSnare, 4) {
@@ -58,15 +69,15 @@ class CubesSketch : BaseSketch() {
         }
 
         beatCounter.addListener(OnKick, 16) {
-            rotationXSpeed.random()
-            rotationYSpeed.random()
-            rotationZSpeed.random()
+            if (rotationXSpeedRandom.isPressed) rotationXSpeed.random()
+            if (rotationYSpeedRandom.isPressed) rotationYSpeed.random()
+            if (rotationZSpeedRandom.isPressed) rotationZSpeed.random()
         }
 
         beatCounter.addListener(OnSnare, 32) {
-            bassGain.random()
-            midGain.random()
-            snareGain.random()
+            if (bassGainRandom.isPressed) bassGain.random()
+            if (midGainRandom.isPressed) midGain.random()
+            if (snareGainRandom.isPressed) snareGain.random()
         }
     }
 
@@ -86,7 +97,7 @@ class CubesSketch : BaseSketch() {
         background(bgColor)
 
         translate(centerX(), centerY())
-        for (i in 0 until num) {
+        for (i in 0 until num.value.toInt()) {
 
             pushMatrix()
 
@@ -96,8 +107,8 @@ class CubesSketch : BaseSketch() {
 
             stroke(
                     fgHue,
-                    PApplet.map(i.toFloat(), 0f, num.toFloat(), fgSat, bgSat),
-                    PApplet.map(i.toFloat(), 0f, num.toFloat(), fgBrightness, bgBrightness)
+                    PApplet.map(i.toFloat(), 0f, num.value, fgSat, bgSat),
+                    PApplet.map(i.toFloat(), 0f, num.value, fgBrightness, bgBrightness)
             )
 
             if (i == 0 && pillEnabled.isPressed) {

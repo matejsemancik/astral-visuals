@@ -56,8 +56,8 @@ open class Pot internal constructor(
         midiBus.sendControllerChange(ch, cc, rawValue)
     }
 
-    fun random() {
-        rawValue = (0..127).random()
+    fun random(maxRaw: Int = 127) {
+        rawValue = (0..maxRaw).random()
         sendClientUpdate()
     }
 
