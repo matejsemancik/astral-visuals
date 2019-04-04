@@ -7,6 +7,7 @@ import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.attractor.AttractorSketch
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
+import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.sketches.machina.MachinaSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
@@ -14,6 +15,7 @@ import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.jbox2d.common.Vec2
@@ -47,6 +49,8 @@ val appModule = module {
         }
     }
 
+    factory { BeatCounter(get()) }
+
     factory { BlankSketch() }
     factory { PolygonalSketch() }
     factory { TerrainSketch() }
@@ -57,4 +61,5 @@ val appModule = module {
     factory { BoxesSketch() }
     factory { AttractorSketch() }
     factory { SpikesSketch() }
+    factory { CubesSketch()  }
 }

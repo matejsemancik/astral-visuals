@@ -38,6 +38,8 @@ abstract class BaseSketch : KoinComponent {
 
     val mousePressed: Boolean get() = sketch.mousePressed
 
+    val frameCount: Int get() = sketch.frameCount
+
     fun millis() = sketch.millis()
 
     fun pushMatrix() = sketch.pushMatrix()

@@ -9,6 +9,7 @@ import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.attractor.AttractorSketch
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
+import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.sketches.machina.MachinaSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
@@ -48,8 +49,8 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(0f, 0f, 100f)
+    private val bgColor = PVector(0f, 100f, 0f)
+    private val fgColor = PVector(128f, 100f, 100f)
     private val accentColor = PVector(0f, 0f, 10f)
 
     lateinit var bgHuePot: Pot
@@ -80,6 +81,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val boxesSketch: BoxesSketch by inject()
     private val attractorSketch: AttractorSketch by inject()
     private val spikesSketch: SpikesSketch by inject()
+    private val cubesSketch: CubesSketch by inject()
 
     // endregion
 
@@ -137,6 +139,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('7', boxesSketch)
             put('8', attractorSketch)
             put('9', spikesSketch)
+            put('p', cubesSketch)
         }
 
         sketches.forEach { key, sketch ->
