@@ -28,7 +28,7 @@ class CubesSketch : BaseSketch() {
     var sweep = 0
     var sweepModulo = 1
 
-    var rotationOffset = galaxy.createPot(8, 0, 32f, 64f, 64f).lerp(0.2f)
+    var rotationOffset = galaxy.createPot(8, 0, 16f, 64f, 64f).lerp(0.2f)
 
     var rotationXSpeed = galaxy.createPot(8, 1, -0.0015f, 0.0015f, 0f).lerp(0.6f)
     var rotationYSpeed = galaxy.createPot(8, 2, -0.0015f, 0.0015f, 0f).lerp(0.6f)
