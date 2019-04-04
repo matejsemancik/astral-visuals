@@ -156,6 +156,7 @@ class SketchLoader : PApplet(), KoinComponent {
         PushButton(galaxy.midiBus, 15, 6) { switchSketch('8') }
         PushButton(galaxy.midiBus, 15, 7) { switchSketch('7') }
         PushButton(galaxy.midiBus, 15, 8) { switchSketch('9') }
+        PushButton(galaxy.midiBus, 15, 9) { switchSketch('p') }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)
