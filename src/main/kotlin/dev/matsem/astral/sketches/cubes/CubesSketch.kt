@@ -40,8 +40,6 @@ class CubesSketch : BaseSketch() {
     var sweepEnabled = galaxy.createToggleButton(8, 7, true)
     var pillEnabled = galaxy.createToggleButton(8, 8, false)
 
-    var randomizeEnabled = galaxy.createToggleButton(8, 9, true)
-
     override fun setup() {
         beatCounter.addListener(OnKick, 4) {
             num = random(6f, 12f).toInt()
@@ -74,10 +72,7 @@ class CubesSketch : BaseSketch() {
 
     override fun draw() {
         if (frameCount % sweepModulo == 0) sweep++
-
-        if (randomizeEnabled.isPressed) {
-            beatCounter.update()
-        }
+        beatCounter.update()
 
         bass += audioProcessor.getRange(20f..60f)
         bass *= 0.5f
