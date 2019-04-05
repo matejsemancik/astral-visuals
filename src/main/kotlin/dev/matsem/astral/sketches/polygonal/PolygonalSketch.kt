@@ -12,7 +12,8 @@ import dev.matsem.astral.tools.FFTLogger
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
-import processing.core.PApplet.*
+import processing.core.PApplet.map
+import processing.core.PApplet.radians
 import processing.core.PConstants
 
 class PolygonalSketch : BaseSketch() {
@@ -116,7 +117,7 @@ class PolygonalSketch : BaseSketch() {
             shouldRegenerate = true
         }
 
-        background(bgHue, bgSat, bgBrightness)
+        background(bgColor)
 
         if (isInDebugMode) {
             debugWindow()
@@ -136,8 +137,8 @@ class PolygonalSketch : BaseSketch() {
         starfield2.setCount(starCountPot.value.toInt())
         starfield1.update(speed = (2 * starSpeedPot.value).toInt() + (bassSum * starAccelPot.value).toInt())
         starfield2.update(speed = (4 * starSpeedPot.value).toInt())
-        starfield1.setColor(fgHue, fgSat, fgBrightness)
-        starfield2.setColor(fgHue, fgSat, fgBrightness)
+        starfield1.color = fgColor
+        starfield2.color = fgColor
         starfield1.motion = starMotion
         starfield2.motion = starMotion
         starfield1.draw()
@@ -156,8 +157,8 @@ class PolygonalSketch : BaseSketch() {
             translate(width / 2f, height / 2f)
             scale(asteroidSizePot.value + (rmsSum * asteroidSizeMultPot.value))
 
-            triangloid.setStrokeColor(accentHue, accentSat, accentBrightness)
-            triangloid.setFillColor(bgHue, bgSat, bgBrightness)
+            triangloid.strokeColor = accentColor
+            triangloid.fillColor = bgColor
             triangloid.draw()
 
             popMatrix()
@@ -170,8 +171,8 @@ class PolygonalSketch : BaseSketch() {
 
     fun hud() {
         pushMatrix()
-        fill(accentHue, accentSat, accentBrightness)
-        stroke(accentHue, accentSat, accentBrightness)
+        fill(fgColor)
+        stroke(fgColor)
         translate(centerX(), centerY())
         rotateX(sin(millis() * 0.0005f) * PConstants.PI / 100f)
         rotateZ(sin(millis() * 0.0005f) * PConstants.PI / 100f)

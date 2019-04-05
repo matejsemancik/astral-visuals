@@ -109,7 +109,7 @@ class TerrainSketch : BaseSketch() {
         rotY += joystick.x * .02f
         rotZ += joystick.z * .02f
 
-        background(bgHue, bgSat, bgBrightness)
+        background(bgColor)
 
         starfield.update(3 + (audioProcessor.getRange(6000f..12000f) * 5f).toInt())
         starfield.setColor(fgHue, fgSat, fgBrightness)
@@ -118,9 +118,9 @@ class TerrainSketch : BaseSketch() {
         starfield2.setColor(fgHue + 2, fgSat, fgBrightness)
         starfield2.draw()
 
-        stroke(accentHue, accentSat, accentBrightness)
+        stroke(fgColor)
         strokeWeight(1.4f)
-        fill(bgHue, bgSat, bgBrightness)
+        fill(accentColor)
 
         regenerate()
         flying += flyingPot.value

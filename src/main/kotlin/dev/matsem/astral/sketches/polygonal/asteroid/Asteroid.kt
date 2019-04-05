@@ -1,18 +1,18 @@
 package dev.matsem.astral.sketches.polygonal.asteroid
 
+import dev.matsem.astral.tools.audio.AudioProcessor
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PShape
 import processing.core.PVector
-import dev.matsem.astral.tools.audio.AudioProcessor
 
 class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, private val audioProcessor: AudioProcessor) {
 
     private val skeletonVectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
     private val fftAverages = mutableListOf<Float>(0f, 0f, 0f, 0f)
-    private var strokeColor = PVector(255f, 255f, 255f)
-    private var fillColor = PVector(0f, 0f, 0f)
+    var strokeColor: Int = 0
+    var fillColor: Int = 0
 
     companion object {
         const val NUMBER_VECTORS = 4
@@ -69,14 +69,6 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
         }
     }
 
-    fun setStrokeColor(a: Float, b: Float, c: Float) {
-        strokeColor = PVector(a, b, c)
-    }
-
-    fun setFillColor(a: Float, b: Float, c: Float) {
-        fillColor = PVector(a, b, c)
-    }
-
     fun draw() {
         // modify vectors
         val shapeVectors = skeletonVectors
@@ -102,8 +94,8 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
             val polygon = sketch.createShape()
             polygon.beginShape()
 
-            polygon.fill(fillColor.x, fillColor.y, fillColor.z)
-            polygon.stroke(strokeColor.x, strokeColor.y, strokeColor.z)
+            polygon.fill(fillColor)
+            polygon.stroke(strokeColor)
             polygon.strokeWeight(5f)
 
             val currentVector = shapeVectors[i]
