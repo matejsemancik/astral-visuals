@@ -9,7 +9,6 @@ import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PApplet.radians
-import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing
 
 class BoxesSketch : BaseSketch() {
@@ -73,8 +72,6 @@ class BoxesSketch : BaseSketch() {
     var rotZ = 0f
 
     override fun onBecameActive() {
-        rectMode(PConstants.CENTER)
-        sketch.ellipseMode(PConstants.RADIUS)
         sphereDetail(sphereDetailPot.value.toInt())
     }
 
