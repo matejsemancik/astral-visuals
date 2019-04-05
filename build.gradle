@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    
+
     // Processing libs
     compile fileTree(dir: 'library', include: '*.jar')
     compile fileTree(dir: 'library/minim/library', include: '*.jar')
@@ -32,6 +32,7 @@ dependencies {
     compile fileTree(dir: 'library/themidibus/library', include: '*.jar')
     compile fileTree(dir: 'library/videoexport/library', include: '*.jar')
     compile fileTree(dir: 'library/box2d_processing/library', include: '*.jar')
+    compile fileTree(dir: 'library/video/library', include: '*.jar')
 
     // DI
     implementation "org.koin:koin-core:$koin_version"

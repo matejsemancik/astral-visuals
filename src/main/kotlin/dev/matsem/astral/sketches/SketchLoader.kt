@@ -16,6 +16,7 @@ import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
+import dev.matsem.astral.sketches.video.VideoSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.BeatDetectData
 import dev.matsem.astral.tools.galaxy.Galaxy
@@ -82,6 +83,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val attractorSketch: AttractorSketch by inject()
     private val spikesSketch: SpikesSketch by inject()
     private val cubesSketch: CubesSketch by inject()
+    private val videoSketch: VideoSketch by inject()
 
     // endregion
 
@@ -140,6 +142,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('8', attractorSketch)
             put('9', spikesSketch)
             put('p', cubesSketch)
+            put('m', videoSketch)
         }
 
         sketches.forEach { key, sketch ->

@@ -14,6 +14,7 @@ import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
+import dev.matsem.astral.sketches.video.VideoSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.galaxy.Galaxy
@@ -61,5 +62,6 @@ val appModule = module {
     factory { BoxesSketch() }
     factory { AttractorSketch() }
     factory { SpikesSketch() }
-    factory { CubesSketch()  }
+    factory { CubesSketch() }
+    factory { VideoSketch() }
 }
