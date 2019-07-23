@@ -25,7 +25,7 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     private var nextRound = 0
 
     lateinit var universe: Universe
-    lateinit var stamp: PGraphics
+    lateinit var overlay: PGraphics
     lateinit var pixelFont: PFont
 
     private var stampCount: Int = 0
@@ -63,16 +63,16 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
 
         pixelFont = createFont("fonts/fff-forward.ttf", 24f, false)
         val text = "astral"
-        stamp = createGraphics(universe.width, universe.height, PConstants.P2D)
-        stamp.beginDraw()
-        stamp.noStroke()
-        stamp.background(0f)
-        stamp.fill(255f)
-        stamp.textFont(pixelFont)
-        stamp.textAlign(CENTER, CENTER)
-        stamp.textSize(24f)
-        stamp.text(text, stamp.width / 2f, stamp.height / 2 - 24 / 2f)
-        stamp.endDraw()
+        overlay = createGraphics(universe.width, universe.height, PConstants.P2D)
+        overlay.beginDraw()
+        overlay.noStroke()
+        overlay.background(0f)
+        overlay.fill(255f)
+        overlay.textFont(pixelFont)
+        overlay.textAlign(CENTER, CENTER)
+        overlay.textSize(24f)
+        overlay.text(text, overlay.width / 2f, overlay.height / 2 - 24 / 2f)
+        overlay.endDraw()
     }
 
     override fun draw() {
@@ -89,10 +89,10 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         }
 
         if (stampCount < 20) {
-            stamp.loadPixels()
-            for (y in 0 until stamp.pixelHeight) {
-                for (x in 0 until stamp.width) {
-                    if (brightness(stamp.pixels[x + (y * stamp.pixelWidth)]) > 0) {
+            overlay.loadPixels()
+            for (y in 0 until overlay.pixelHeight) {
+                for (x in 0 until overlay.width) {
+                    if (brightness(overlay.pixels[x + (y * overlay.pixelWidth)]) > 0) {
                         universe.cells[y][x] = AliveCell
                     }
                 }
