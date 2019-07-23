@@ -1,9 +1,12 @@
 package dev.matsem.astral.sketches.gameoflife
 
+import dev.matsem.astral.midiRange
 import dev.matsem.astral.remap
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import dev.matsem.astral.tools.kontrol.Pad
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -25,6 +28,12 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     lateinit var stamp: PGraphics
     lateinit var pixelFont: PFont
 
+    private var stampCount: Int = 0
+
+    private var hueStart: Float = 160f
+    private var hueEnd: Float = 220f
+    private var heatMapEnabled: Boolean = false
+
     override fun settings() {
         size(1280, 720, PConstants.P3D)
     }
@@ -32,38 +41,54 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     override fun setup() {
         kontrol.connect()
 
+        kontrol.pad(0, 0).apply {
+            colorOn = Triple(64, 127, 127)
+            colorOff = Triple(64, 127, 0)
+            mode = Pad.Mode.TOGGLE
+            setStateListener { heatMapEnabled = it }
+        }
+
         colorMode(PConstants.HSB, 360f, 100f, 100f)
         rectMode(PConstants.CORNER)
 
         universe = Universe(Array(height / cellSize) { Array<Cell>(width / cellSize) { DeadCell } })
 
-        beatCounter.addListener(OnKick, 2) {
-            randomize(0.999f)
+        beatCounter.addListener(OnKick, 16) {
+            stampCount = 0
+        }
+
+        beatCounter.addListener(OnSnare, 8) {
+            randomize(0.990f)
         }
 
         pixelFont = createFont("fonts/fff-forward.ttf", 24f, false)
+        val text = "astral"
         stamp = createGraphics(universe.width, universe.height, PConstants.P2D)
         stamp.beginDraw()
         stamp.noStroke()
         stamp.background(0f)
         stamp.fill(255f)
         stamp.textFont(pixelFont)
+        stamp.textAlign(CENTER, CENTER)
         stamp.textSize(24f)
-        val w = stamp.textWidth("astral")
-        stamp.text("astral", stamp.width / 2 - w / 2, stamp.height / 2 - 24 / 2f)
+        stamp.text(text, stamp.width / 2f, stamp.height / 2 - 24 / 2f)
         stamp.endDraw()
     }
 
     override fun draw() {
+        hueStart = kontrol.knob1.midiRange(0f, 360f)
+        hueEnd = kontrol.knob2.midiRange(0f, 360f)
+
         beatCounter.update()
         background(0f, 0f, 10f)
 
         if (millis() > nextRound) {
             nextRound = millis() + delayMillis
             universe.nextGeneration()
+            stampCount++
         }
 
-        if (mousePressed) {
+        if (stampCount < 20) {
             stamp.loadPixels()
             for (y in 0 until stamp.pixelHeight) {
                 for (x in 0 until stamp.width) {
@@ -76,10 +101,17 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
 
         for (y in 0 until universe.height) {
             for (x in 0 until universe.width) {
+
+                val brightness = if (heatMapEnabled) {
+                    universe.heatMap[y][x].remap(0f, 1f, 10f, 100f)
+                } else {
+                    if (universe.cells[y][x] is AliveCell) 100f else 0f
+                }
+
                 val color = color(
-                        universe.heatMap[y][x].remap(0f, 1f, 128f, 0f),
+                        universe.heatMap[y][x].remap(1f, 0f, hueStart, hueEnd),
                         if (universe.cells[y][x] is AliveCell) 10f else 100f,
-                        universe.heatMap[y][x].remap(0f, 1f, 10f, 100f)
+                        brightness
                 )
 
                 noStroke()
