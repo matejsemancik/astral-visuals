@@ -3,10 +3,10 @@ package dev.matsem.astral.sketches.gameoflife
 import dev.matsem.astral.midiRange
 import dev.matsem.astral.remap
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
-import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.kontrol.KontrolF1
-import dev.matsem.astral.tools.kontrol.Pad
+import dev.matsem.astral.tools.kontrol.onTogglePad
+import dev.matsem.astral.tools.kontrol.onTriggerPad
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -21,18 +21,18 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
 
     private var cellSize = 5
 
-    private var delayMillis = 60
+    private var speedMillis = 60
     private var nextRound = 0
 
     lateinit var universe: Universe
     lateinit var overlay: PGraphics
     lateinit var pixelFont: PFont
 
-    private var stampCount: Int = 0
-
+    private var overlayText: String? = null
     private var hueStart: Float = 160f
     private var hueEnd: Float = 220f
     private var heatMapEnabled: Boolean = false
+    private var randomizeThresh: Float = 1f
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
@@ -41,60 +41,59 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     override fun setup() {
         kontrol.connect()
 
-        kontrol.pad(0, 0).apply {
-            colorOn = Triple(64, 127, 127)
-            colorOff = Triple(64, 127, 0)
-            mode = Pad.Mode.TOGGLE
-            setStateListener { heatMapEnabled = it }
-        }
+        kontrol.onTogglePad(0, 0, midiHue = 64) { heatMapEnabled = it }
+        kontrol.onTriggerPad(3, 0, midiHue = 100) { overlayText = if (it) "astral" else null }
+        kontrol.onTriggerPad(3, 1, midiHue = 100) { overlayText = if (it) "soul ex\nmachina" else null }
+        kontrol.onTriggerPad(3, 2, midiHue = 100) { overlayText = if (it) "16/11" else null }
+        kontrol.onTriggerPad(3, 3, midiHue = 80) { if (it) randomize(randomizeThresh) }
 
         colorMode(PConstants.HSB, 360f, 100f, 100f)
         rectMode(PConstants.CORNER)
 
         universe = Universe(Array(height / cellSize) { Array<Cell>(width / cellSize) { DeadCell } })
-
-        beatCounter.addListener(OnKick, 16) {
-            stampCount = 0
-        }
-
-        beatCounter.addListener(OnSnare, 8) {
-            randomize(0.990f)
-        }
-
         pixelFont = createFont("fonts/fff-forward.ttf", 24f, false)
-        val text = "astral"
         overlay = createGraphics(universe.width, universe.height, PConstants.P2D)
-        overlay.beginDraw()
-        overlay.noStroke()
-        overlay.background(0f)
-        overlay.fill(255f)
-        overlay.textFont(pixelFont)
-        overlay.textAlign(CENTER, CENTER)
-        overlay.textSize(24f)
-        overlay.text(text, overlay.width / 2f, overlay.height / 2 - 24 / 2f)
-        overlay.endDraw()
+
+        beatCounter.addListener(OnSnare, 2) {
+            randomize(0.996f)
+        }
+    }
+
+    fun drawOverlay() = with(overlay) {
+        beginDraw()
+        noStroke()
+        background(0f)
+
+        overlayText?.let { text ->
+            fill(255f)
+            textFont(pixelFont)
+            textAlign(CENTER, CENTER)
+            textSize(24f)
+            text(text, width / 2f, height / 2 - 24 / 2f)
+        }
+
+        endDraw()
     }
 
     override fun draw() {
         hueStart = kontrol.knob1.midiRange(0f, 360f)
         hueEnd = kontrol.knob2.midiRange(0f, 360f)
+        randomizeThresh = kontrol.slider1.midiRange(1f, 0f)
 
         beatCounter.update()
+        drawOverlay()
         background(0f, 0f, 10f)
 
         if (millis() > nextRound) {
-            nextRound = millis() + delayMillis
+            nextRound = millis() + speedMillis
             universe.nextGeneration()
-            stampCount++
         }
 
-        if (stampCount < 20) {
-            overlay.loadPixels()
-            for (y in 0 until overlay.pixelHeight) {
-                for (x in 0 until overlay.width) {
-                    if (brightness(overlay.pixels[x + (y * overlay.pixelWidth)]) > 0) {
-                        universe.cells[y][x] = AliveCell
-                    }
+        overlay.loadPixels()
+        for (y in 0 until overlay.pixelHeight) {
+            for (x in 0 until overlay.width) {
+                if (brightness(overlay.pixels[x + (y * overlay.pixelWidth)]) > 0) {
+                    universe.cells[y][x] = AliveCell
                 }
             }
         }
@@ -125,7 +124,6 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         val x = mouseX / cellSize
         val y = mouseY / cellSize
         universe.cells[y][x] = AliveCell
-        randomize(0.990f)
     }
 
     private fun randomize(threshold: Float) {

@@ -44,6 +44,7 @@ class Pad constructor(private val kontrol: KontrolF1, val cc: Int, val x: Int, v
 
             Mode.TRIGGER -> {
                 state = rawState == 127
+                onStateChanged?.invoke(state)
                 if (state) {
                     onTrigger?.invoke()
                 }
