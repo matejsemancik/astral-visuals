@@ -14,6 +14,7 @@ import processing.core.PConstants
 import processing.core.PFont
 import processing.core.PGraphics
 
+// TODO convert to BaseSketch
 class GameOfLifeSketch : PApplet(), KoinComponent {
 
     private val kontrol: KontrolF1 by inject()
