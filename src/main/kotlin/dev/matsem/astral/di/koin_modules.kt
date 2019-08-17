@@ -24,7 +24,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import processing.core.PApplet
 import shiffman.box2d.Box2DProcessing
-import sketches.spikes.SpikesSketch
+import dev.matsem.astral.sketches.spikes.SpikesSketch
 
 val appModule = module {
     single { SketchLoader() } bind PApplet::class

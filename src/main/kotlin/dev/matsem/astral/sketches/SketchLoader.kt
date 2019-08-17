@@ -14,6 +14,7 @@ import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.sketches.machina.MachinaSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
+import dev.matsem.astral.sketches.spikes.SpikesSketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
@@ -30,7 +31,6 @@ import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
 import processing.event.KeyEvent
-import sketches.spikes.SpikesSketch
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.PrintWriter

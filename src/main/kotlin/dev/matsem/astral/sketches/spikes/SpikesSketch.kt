@@ -1,4 +1,4 @@
-package sketches.spikes
+package dev.matsem.astral.sketches.spikes
 
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
