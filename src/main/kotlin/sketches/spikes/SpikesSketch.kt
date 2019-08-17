@@ -1,11 +1,11 @@
 package sketches.spikes
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
-import dev.matsem.astral.quantize
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
+import dev.matsem.astral.tools.extensions.quantize
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet

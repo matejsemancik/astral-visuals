@@ -1,15 +1,15 @@
 package dev.matsem.astral.sketches.polygonal
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
-import dev.matsem.astral.newLine
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.asteroid.Asteroid
 import dev.matsem.astral.sketches.polygonal.star.Starfield
-import dev.matsem.astral.threshold
 import dev.matsem.astral.tools.FFTLogger
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
+import dev.matsem.astral.tools.extensions.newLine
+import dev.matsem.astral.tools.extensions.threshold
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet.map

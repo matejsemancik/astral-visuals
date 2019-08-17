@@ -1,9 +1,9 @@
 package dev.matsem.astral.sketches.waves
 
-import dev.matsem.astral.centerY
-import dev.matsem.astral.midiRange
-import dev.matsem.astral.saw
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.centerY
+import dev.matsem.astral.tools.extensions.midiRange
+import dev.matsem.astral.tools.extensions.saw
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import org.koin.core.KoinComponent

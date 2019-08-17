@@ -1,10 +1,10 @@
 package dev.matsem.astral.tools.galaxy.controls
 
-import dev.matsem.astral.midiRange
-import dev.matsem.astral.midiValue
-import themidibus.MidiBus
-import dev.matsem.astral.toMidi
+import dev.matsem.astral.tools.extensions.midiRange
+import dev.matsem.astral.tools.extensions.midiValue
+import dev.matsem.astral.tools.extensions.toMidi
 import dev.matsem.astral.tools.galaxy.SimpleMidiListenerAdapter
+import themidibus.MidiBus
 
 class Joystick internal constructor(
         private val midiBus: MidiBus,

@@ -1,9 +1,9 @@
 package dev.matsem.astral.sketches.machina
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
 import org.koin.core.inject
 import processing.core.PConstants
 import processing.core.PImage

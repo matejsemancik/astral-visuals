@@ -1,8 +1,7 @@
 package dev.matsem.astral.tools.galaxy.controls
 
-import dev.matsem.astral.random
-import themidibus.MidiBus
 import dev.matsem.astral.tools.galaxy.SimpleMidiListenerAdapter
+import themidibus.MidiBus
 
 class Encoder(
         private val midiBus: MidiBus,

@@ -1,7 +1,7 @@
 package dev.matsem.astral.sketches.boxes
 
-import dev.matsem.astral.toPVector
-import dev.matsem.astral.toVec2
+import dev.matsem.astral.tools.extensions.toPVector
+import dev.matsem.astral.tools.extensions.toVec2
 import org.jbox2d.collision.shapes.PolygonShape
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.*

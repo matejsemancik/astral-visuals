@@ -1,11 +1,11 @@
 package dev.matsem.astral.sketches.starglitch
 
-import dev.matsem.astral.newLine
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.starglitch.star.Starfield2
-import dev.matsem.astral.threshold
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.newLine
+import dev.matsem.astral.tools.extensions.threshold
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet

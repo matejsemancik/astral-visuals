@@ -1,10 +1,10 @@
 package dev.matsem.astral.sketches.boxes
 
-import dev.matsem.astral.*
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.star.Starfield
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet

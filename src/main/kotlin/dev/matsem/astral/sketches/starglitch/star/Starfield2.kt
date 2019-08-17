@@ -1,10 +1,10 @@
 package dev.matsem.astral.sketches.starglitch.star
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
 import processing.core.PApplet
 import processing.core.PVector
 import dev.matsem.astral.sketches.polygonal.star.Star
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
 
 class Starfield2(private val sketch: PApplet, initialCount: Int) {
 

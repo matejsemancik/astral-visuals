@@ -1,9 +1,9 @@
 package dev.matsem.astral.sketches.attractor
 
-import dev.matsem.astral.*
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.Pot
 import org.koin.core.inject
@@ -136,12 +136,18 @@ class AttractorSketch : BaseSketch() {
             val pt = deJongPoints[i]
             if (stabilizeBtn.isPressed) {
                 point(
-                        pt.x * scaleSlider.value
-                                mapFrom (leftmost..rightmost)
-                                to (-deJongWidth / 2f * stretchSlider.value..deJongWidth / 2f * stretchSlider.value),
-                        pt.y * scaleSlider.value
-                                mapFrom (topmost..bottommost)
-                                to (-deJongHeight / 2f..deJongHeight / 2f)
+                        (pt.x * scaleSlider.value).remap(
+                                leftmost,
+                                rightmost,
+                                -deJongWidth / 2f * stretchSlider.value,
+                                deJongWidth / 2f * stretchSlider.value
+                        ),
+                        (pt.y * scaleSlider.value).remap(
+                                topmost,
+                                bottommost,
+                                -deJongHeight / 2f,
+                                deJongHeight / 2f
+                        )
                 )
             } else {
                 point(pt.x * scaleSlider.value, pt.y * scaleSlider.value)

@@ -1,9 +1,9 @@
 package dev.matsem.astral.sketches.gameoflife
 
-import dev.matsem.astral.midiRange
-import dev.matsem.astral.remap
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnSnare
+import dev.matsem.astral.tools.extensions.midiRange
+import dev.matsem.astral.tools.extensions.remap
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad

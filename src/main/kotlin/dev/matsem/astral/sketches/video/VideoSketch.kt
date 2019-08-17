@@ -1,10 +1,10 @@
 package dev.matsem.astral.sketches.video
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
 import org.koin.core.inject
 import processing.video.Movie
 

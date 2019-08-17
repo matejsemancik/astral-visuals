@@ -1,8 +1,8 @@
 package dev.matsem.astral.sketches.playground
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
-import dev.matsem.astral.midiRange
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
+import dev.matsem.astral.tools.extensions.midiRange
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.Pad
 import org.koin.core.KoinComponent

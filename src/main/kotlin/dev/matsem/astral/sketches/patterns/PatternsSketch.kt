@@ -1,12 +1,12 @@
 package dev.matsem.astral.sketches.patterns
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
-import dev.matsem.astral.longerDimension
-import dev.matsem.astral.shorterDimension
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
+import dev.matsem.astral.tools.extensions.longerDimension
+import dev.matsem.astral.tools.extensions.shorterDimension
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet

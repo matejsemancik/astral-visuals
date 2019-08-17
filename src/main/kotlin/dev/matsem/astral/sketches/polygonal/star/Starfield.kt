@@ -1,7 +1,7 @@
 package dev.matsem.astral.sketches.polygonal.star
 
-import dev.matsem.astral.centerX
-import dev.matsem.astral.centerY
+import dev.matsem.astral.tools.extensions.centerX
+import dev.matsem.astral.tools.extensions.centerY
 import processing.core.PApplet
 
 class Starfield(private val sketch: PApplet, initialCount: Int) {

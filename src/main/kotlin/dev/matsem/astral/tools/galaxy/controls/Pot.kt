@@ -1,6 +1,5 @@
 package dev.matsem.astral.tools.galaxy.controls
 
-import dev.matsem.astral.random
 import dev.matsem.astral.tools.galaxy.SimpleMidiListenerAdapter
 import processing.core.PApplet
 import themidibus.MidiBus
