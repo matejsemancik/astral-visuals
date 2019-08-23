@@ -11,6 +11,7 @@ import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PConstants
 
+// TODO to BaseSketch
 class WavesSketch : PApplet(), KoinComponent {
 
     val kontrol: KontrolF1 by inject()
