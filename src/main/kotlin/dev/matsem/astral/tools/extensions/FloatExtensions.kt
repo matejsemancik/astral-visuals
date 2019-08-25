@@ -25,3 +25,5 @@ fun Float.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
         PApplet.map(this, start1, end1, start2, end2)
 
 fun Float.quantize(step: Float): Float = (this / step).toInt() * step
+
+fun Float.constrain(low: Float = Float.MIN_VALUE, high: Float = Float.MAX_VALUE): Float = PApplet.constrain(this, low, high)
