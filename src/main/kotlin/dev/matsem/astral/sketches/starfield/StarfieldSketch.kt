@@ -100,5 +100,16 @@ class StarfieldSketch : PApplet(), KoinComponent {
             point(it.vec.x, it.vec.y, it.vec.z)
             popMatrix()
         }
+
+        // Black hole
+        pushMatrix()
+        translateCenter()
+        noStroke()
+        fill(0)
+        ellipseMode(PConstants.CENTER)
+        beginShape()
+        sphere(25f)
+        endShape()
+        popMatrix()
     }
 }
