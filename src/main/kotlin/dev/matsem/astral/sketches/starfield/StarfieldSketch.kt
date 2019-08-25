@@ -1,6 +1,7 @@
 package dev.matsem.astral.sketches.starfield
 
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.extensions.midiRange
 import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
@@ -21,24 +22,24 @@ class StarfieldSketch : PApplet(), KoinComponent {
     )
 
     private val audioProcessor: AudioProcessor by inject()
+    private val beatCounter: BeatCounter by inject()
     private val kontrol: KontrolF1 by inject()
 
     private val starField = mutableListOf<Star>()
     private val galaxy = mutableListOf<Star>()
-
-    private lateinit var galaxyImage: PImage
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
     }
 
     override fun setup() {
-        hint(PConstants.ENABLE_DEPTH_SORT) // Displays loaded PImage with alpha channel
+        kontrol.connect()
         colorMode(PConstants.HSB, 360f, 100f, 100f)
-        galaxyImage = loadImage("images/galaxy-transparent-bw.png").apply { resize(640, 640) }
-        galaxyImage.loadPixels()
 
-        var pixelBrightness = 0f
+        // Create galaxy from image
+        val galaxyImage: PImage = loadImage("images/galaxy-transparent-bw.png").apply { resize(640, 640) }
+        galaxyImage.loadPixels()
+        var pixelBrightness: Float
         for (x in 0 until galaxyImage.width step 2) {
             for (y in 0 until galaxyImage.height step 2) {
                 pixelBrightness = brightness(galaxyImage[x, y])
@@ -49,17 +50,14 @@ class StarfieldSketch : PApplet(), KoinComponent {
                                     random(-4f, 4f),
                                     y.toFloat() - galaxyImage.height / 2f
                             ),
-                            diameter = random(1f, 3f),
+                            diameter = random(1f, 4f),
                             ySpeed = random(0.00002f, 0.000025f)
                     )
                 }
             }
         }
 
-        kontrol.apply {
-            connect()
-        }
-
+        // Create starfield
         repeat(4000) {
             starField += Star(
                     vec = PVector.random3D().mult(random(0f, 2500f)),
@@ -71,6 +69,7 @@ class StarfieldSketch : PApplet(), KoinComponent {
     }
 
     override fun draw() {
+        beatCounter.update()
         background(0)
 
         noFill()
@@ -80,7 +79,7 @@ class StarfieldSketch : PApplet(), KoinComponent {
         galaxy.forEach {
             pushMatrix()
             translateCenter()
-            rotateX(kontrol.knob1.midiRange(0f, -PConstants.PI))
+            rotateX(kontrol.knob1.midiRange(PConstants.PI / 4f, -PConstants.PI / 4f))
             rotateY(millis() * it.ySpeed)
             rotateZ(millis() * it.zSpeed)
 
