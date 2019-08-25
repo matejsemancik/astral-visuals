@@ -3,7 +3,7 @@ package dev.matsem.astral.sketches.terrain
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.star.Starfield
-import dev.matsem.astral.tools.FFTLogger
+import dev.matsem.astral.tools.logging.FFTLogger
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY

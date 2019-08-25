@@ -1,4 +1,4 @@
-package dev.matsem.astral.tools
+package dev.matsem.astral.tools.logging
 
 import dev.matsem.astral.tools.audio.AudioProcessor
 import processing.core.PApplet
