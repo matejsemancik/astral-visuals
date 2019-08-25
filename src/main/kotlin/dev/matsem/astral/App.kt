@@ -1,7 +1,7 @@
 package dev.matsem.astral
 
 import dev.matsem.astral.sketches.SketchLoader
-import dev.matsem.astral.sketches.waves.WavesSketch
+import dev.matsem.astral.sketches.starfield.StarfieldSketch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -13,6 +13,6 @@ class App : KoinComponent {
     fun run() {
         val processingArgs = arrayOf("Sketch")
 //        PApplet.runSketch(processingArgs, sketchLoader)
-        PApplet.runSketch(processingArgs, WavesSketch())
+        PApplet.runSketch(processingArgs, StarfieldSketch())
     }
 }
