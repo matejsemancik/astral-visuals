@@ -4,10 +4,10 @@ import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import dev.matsem.astral.sketches.SketchLoader
+import processing.core.PApplet
 
 class AudioProcessor constructor(
-        private val sketch: SketchLoader,
+        private val sketch: PApplet,
         private val isInRenderMode: Boolean
 ) : AudioListener {
 
