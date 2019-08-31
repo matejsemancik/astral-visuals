@@ -10,7 +10,6 @@ import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
@@ -40,8 +39,8 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         val galaxyImage: PImage = loadImage("images/galaxy-transparent-bw.png").apply { resize(720, 720) }
         galaxyImage.loadPixels()
         var pixelBrightness: Float
-        for (x in 0 until galaxyImage.width step 2) {
-            for (y in 0 until galaxyImage.height step 2) {
+        for (x in 0 until galaxyImage.width step 3) {
+            for (y in 0 until galaxyImage.height step 3) {
                 pixelBrightness = brightness(galaxyImage[x, y])
                 if (pixelBrightness > 60f) {
                     galaxy += Star(
@@ -59,7 +58,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         }
 
         // Create starfield
-        repeat(2500) {
+        repeat(2000) {
             starField += Star(
                     vec = PVector.random3D().mult(random(0f, 2500f)),
                     diameter = if (random(1f) > 0.99f) random(6f, 10f) else random(1f, 4f),
@@ -81,6 +80,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         galaxy.forEach {
             pushMatrix()
             translateCenter()
+
             it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
 //            rotateX(kontrol.knob1.midiRange(PConstants.PI / 4f, -PConstants.PI / 4f))
             rotateX(-0.34f)
@@ -88,9 +88,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
             rotateZ(millis() * it.zSpeed)
 
             strokeWeight(it.diameter)
-            val wave = PApplet.sin(millis() / 1000f + it.vec.x / 40f)
-            val waveAmplitude = 2f
-            point(it.vec.x, it.vec.y + wave * waveAmplitude, it.vec.z)
+            point(it.vec.x, it.vec.y, it.vec.z)
             popMatrix()
         }
 
