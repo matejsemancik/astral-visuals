@@ -63,7 +63,7 @@ class StarGlitchSketch : BaseSketch() {
         }
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         if (millis() > timerLastTick + timerIntervalPot.value) {
             timerLastTick = millis()
             onTimerTick()
@@ -108,7 +108,7 @@ class StarGlitchSketch : BaseSketch() {
         starfield2.draw()
     }
 
-    fun debugWindow() {
+    fun debugWindow() = with(sketch) {
         pushMatrix()
         // debug values
         val basicInfoStr = StringBuilder()

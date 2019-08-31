@@ -7,7 +7,7 @@ import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.Pot
 import org.koin.core.inject
-import processing.core.PApplet.pow
+import processing.core.PApplet.*
 import processing.core.PVector
 
 class AttractorSketch : BaseSketch() {
@@ -72,7 +72,7 @@ class AttractorSketch : BaseSketch() {
 
     override fun setup() = Unit
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         background(bgColor)
         strokeWeight(dotSizePot.value)
 
@@ -93,11 +93,11 @@ class AttractorSketch : BaseSketch() {
                 (audioProcessor.getRange(20f..100f) / 100f) * potA2.value.mapp(0f, 2f)
 
         val b = sliderB.value +
-                sin(angularVelocity(potB0.value.mapp(100f, 10f))).mapSin(sliderB.min, sliderB.max) * potB1.value +
+                sin(angularTimeS(potB0.value.mapp(100f, 10f))).mapSin(sliderB.min, sliderB.max) * potB1.value +
                 (audioProcessor.getRange(600f..800f) / 1000f) * potB2.value.mapp(0f, 2f)
 
         val c = sliderC.value +
-                sin(angularVelocity(potC0.value.mapp(100f, 10f))).mapSin(sliderC.min, sliderC.max) * potC1.value +
+                sin(angularTimeS(potC0.value.mapp(100f, 10f))).mapSin(sliderC.min, sliderC.max) * potC1.value +
                 (audioProcessor.getRange(200f..600f) / 1000f) * potC2.value.mapp(0f, 2f)
 
         val d = sliderD.value +
@@ -120,16 +120,16 @@ class AttractorSketch : BaseSketch() {
         val deJongWidth = rightmost - leftmost
         val deJongHeight = bottommost - topmost
 
-        translate(centerX(), centerY())
+        translateCenter()
         stroke(fgColor)
         fill(fgColor)
 
         // DEBUG
         if (isInDebugMode) {
-            sketch.line(rightmost, -height / 8f, rightmost, height / 8f)
-            sketch.line(leftmost, -height / 8f, leftmost, height / 8f)
-            sketch.line(-width / 8f, topmost, width / 8f, topmost)
-            sketch.line(-width / 8f, bottommost, width / 8f, bottommost)
+            line(rightmost, -height / 8f, rightmost, height / 8f)
+            line(leftmost, -height / 8f, leftmost, height / 8f)
+            line(-width / 8f, topmost, width / 8f, topmost)
+            line(-width / 8f, bottommost, width / 8f, bottommost)
         }
 
         for (i in 0 until iterationCountSlider.value.toInt()) {

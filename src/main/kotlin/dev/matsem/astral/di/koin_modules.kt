@@ -9,7 +9,6 @@ import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
-import dev.matsem.astral.sketches.machina.MachinaSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
@@ -62,7 +61,6 @@ val appModule = module {
     factory { FibSphereSketch() }
     factory { StarGlitchSketch() }
     factory { PatternsSketch() }
-    factory { MachinaSketch() }
     factory { BoxesSketch() }
     factory { AttractorSketch() }
     factory { SpikesSketch() }

@@ -3,12 +3,12 @@ package dev.matsem.astral.sketches.terrain
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.star.Starfield
-import dev.matsem.astral.tools.logging.FFTLogger
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.newLine
 import dev.matsem.astral.tools.galaxy.Galaxy
+import dev.matsem.astral.tools.logging.FFTLogger
 import org.koin.core.inject
 import processing.core.PApplet.map
 import processing.core.PConstants
@@ -61,7 +61,7 @@ class TerrainSketch : BaseSketch() {
         rotZ = 0f
     }
     val perlinResPot = galaxy.createPot(1, 9, 0f, 0.5f, 0.4f)
-    val distancePot = galaxy.createPot(1, 10, -width / 1.5f, width / 1.5f, 0f).lerp(0.05f)
+    val distancePot = galaxy.createPot(1, 10, -sketch.width / 1.5f, sketch.width / 1.5f, 0f).lerp(0.05f)
     val flyingPot = galaxy.createPot(1, 11, -0.1f, 0.1f, 0f).lerp(0.05f)
     val perlinBoostPot = galaxy.createPot(1, 12, 0f, 5f, 0f)
     val secondTerrainButton = galaxy.createToggleButton(1, 13, true)
@@ -101,7 +101,7 @@ class TerrainSketch : BaseSketch() {
         starfield2 = Starfield(sketch, 1200)
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         renderMode = renderModeButtons.activeButtonsIndices().first()
         terrainMode = terrainModeButtons.activeButtonsIndices().first()
 
@@ -156,7 +156,7 @@ class TerrainSketch : BaseSketch() {
         }
     }
 
-    fun drawTerrain(multiplier: Float) {
+    fun drawTerrain(multiplier: Float) = with(sketch) {
         for (y in 0 until rows - 1) {
             beginShape(TRIANGLE_STRIP)
 
@@ -181,7 +181,7 @@ class TerrainSketch : BaseSketch() {
         }
     }
 
-    private fun regenerate() {
+    private fun regenerate() = with(sketch) {
         val buff = musicTerrain.toMutableList()
         buff.removeAt(buff.size - 1)
         buff.add(0, FloatArray(cols))
@@ -241,7 +241,7 @@ class TerrainSketch : BaseSketch() {
         }
     }
 
-    private fun debugWindow() {
+    private fun debugWindow() = with(sketch) {
         // debug values
         val basicInfoStr = StringBuilder()
                 .append("resolution: ${width}x$height").newLine()

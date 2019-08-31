@@ -22,7 +22,7 @@ class VideoSketch : BaseSketch() {
         movie.loop()
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         background(0)
         if (movie.available()) {
             movie.read()

@@ -81,7 +81,7 @@ class CubesSketch : BaseSketch() {
         }
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         if (frameCount % sweepModulo == 0) sweep++
         beatCounter.update()
 
@@ -124,7 +124,7 @@ class CubesSketch : BaseSketch() {
                 strokeWeight(4f)
             }
 
-            sketch.box(
+            box(
                     50f + i * 100f + bass * bassGain.value,
                     50f + i * 100f + mid * midGain.value,
                     50f + i * 100f + snare * snareGain.value

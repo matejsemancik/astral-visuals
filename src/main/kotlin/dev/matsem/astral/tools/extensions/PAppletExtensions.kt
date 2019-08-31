@@ -2,17 +2,23 @@ package dev.matsem.astral.tools.extensions
 
 import processing.core.PApplet
 import processing.core.PConstants
+import kotlin.math.max
+import kotlin.math.min
 
 fun PApplet.centerX() = this.width / 2f
 
 fun PApplet.centerY() = this.height / 2f
 
+fun PApplet.translateCenter() = translate(centerX(), centerY())
+
+fun PApplet.shorterDimension(): Int = min(width, height)
+
+fun PApplet.longerDimension(): Int = max(width, height)
+
 /**
  * Generates saw signal with given frequency in range from 0f to 1f
  */
 fun PApplet.saw(fHz: Float): Float = (millis() % (1000f * 1 / fHz)) / (1000f * 1 / fHz)
-
-fun PApplet.translateCenter() = translate(centerX(), centerY())
 
 fun PApplet.angularTimeS(periodSeconds: Float) = millis() / 1000f * PConstants.TWO_PI / periodSeconds
 

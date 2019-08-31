@@ -11,6 +11,7 @@ import processing.core.PApplet
 import processing.core.PConstants
 import kotlin.random.Random
 
+// TODO to BaseSketch?
 class PlaygroundSketch : PApplet(), KoinComponent {
 
     private var t: Float = 0f

@@ -66,7 +66,7 @@ class SpikesSketch : BaseSketch() {
         )
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         if (beatRandomize.isPressed && audioProcessor.beatDetect.isKick) {
             beatRandomizeCounter++
 
@@ -156,7 +156,7 @@ class SpikesSketch : BaseSketch() {
             numX: Int,
             numY: Int,
             paddHorizontal: Float = 0f,
-            paddVertical: Float = 0f) {
+            paddVertical: Float = 0f) = with(sketch) {
 
         positions = Array(numX) { Array(numY) { PVector() } }
         for (x in 0 until numX) {
