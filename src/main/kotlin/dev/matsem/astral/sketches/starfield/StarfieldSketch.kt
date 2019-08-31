@@ -58,7 +58,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         }
 
         // Create starfield
-        repeat(4000) {
+        repeat(2500) {
             starField += Star(
                     vec = PVector.random3D().mult(random(0f, 2500f)),
                     diameter = if (random(1f) > 0.99f) random(6f, 10f) else random(1f, 4f),
