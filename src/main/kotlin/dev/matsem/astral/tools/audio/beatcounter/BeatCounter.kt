@@ -4,9 +4,9 @@ import dev.matsem.astral.tools.audio.AudioProcessor
 
 class BeatCounter(private val audioProcessor: AudioProcessor) {
 
-    var kicksCount = 0
-    var snaresCount = 0
-    var hatsCount = 0
+    private var kicksCount = 0
+    private var snaresCount = 0
+    private var hatsCount = 0
 
     private var listeners = mutableMapOf<BeatListener, () -> Unit>()
 
@@ -37,6 +37,12 @@ class BeatCounter(private val audioProcessor: AudioProcessor) {
                 }
             }
         }
+    }
+
+    fun sync() {
+        kicksCount = 0
+        snaresCount = 0
+        hatsCount = 0
     }
 
     fun addListener(type: Type, modulo: Int, onBeat: () -> Unit): BeatListener {

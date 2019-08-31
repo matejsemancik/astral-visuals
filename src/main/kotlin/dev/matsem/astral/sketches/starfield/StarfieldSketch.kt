@@ -10,6 +10,7 @@ import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
@@ -50,7 +51,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                                     y.toFloat() - galaxyImage.height / 2f
                             ),
                             diameter = random(1f, 4f),
-                            ySpeed = random(0.00006f, 0.0001f),
+                            ySpeed = random(PConstants.TWO_PI * 6e-6f, PConstants.TWO_PI * 8e-6f),
                             randomFactor = random(0.01f, 0.1f)
                     )
                 }
@@ -87,7 +88,9 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
             rotateZ(millis() * it.zSpeed)
 
             strokeWeight(it.diameter)
-            point(it.vec.x, it.vec.y, it.vec.z)
+            val wave = PApplet.sin(millis() / 1000f + it.vec.x / 40f)
+            val waveAmplitude = 2f
+            point(it.vec.x, it.vec.y + wave * waveAmplitude, it.vec.z)
             popMatrix()
         }
 
