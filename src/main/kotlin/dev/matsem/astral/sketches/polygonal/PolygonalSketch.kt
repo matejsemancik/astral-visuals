@@ -4,16 +4,15 @@ import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.asteroid.Asteroid
 import dev.matsem.astral.sketches.polygonal.star.Starfield
-import dev.matsem.astral.tools.logging.FFTLogger
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.newLine
 import dev.matsem.astral.tools.extensions.threshold
 import dev.matsem.astral.tools.galaxy.Galaxy
+import dev.matsem.astral.tools.logging.FFTLogger
 import org.koin.core.inject
-import processing.core.PApplet.map
-import processing.core.PApplet.radians
+import processing.core.PApplet.*
 import processing.core.PConstants
 
 class PolygonalSketch : BaseSketch() {
@@ -79,18 +78,18 @@ class PolygonalSketch : BaseSketch() {
         triangloids.add(Asteroid(sketch, centerWeightButton.isPressed, audioProcessor))
     }
 
-    override fun setup() {
+    override fun setup() = with(sketch) {
         starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
         starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightButton.isPressed, audioProcessor)) })
         fftLogger = FFTLogger(sketch, audioProcessor)
     }
 
-    override fun onBecameActive() {
+    override fun onBecameActive() = with(sketch) {
         rectMode(PConstants.CORNER)
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         if (shouldRegenerate) {
             regenerate()
             shouldRegenerate = false
@@ -169,7 +168,7 @@ class PolygonalSketch : BaseSketch() {
         }
     }
 
-    fun hud() {
+    fun hud() = with(sketch) {
         pushMatrix()
         fill(fgColor)
         stroke(fgColor)
@@ -197,7 +196,7 @@ class PolygonalSketch : BaseSketch() {
         popMatrix()
     }
 
-    fun debugWindow() {
+    fun debugWindow() = with(sketch) {
         // debug values
         val basicInfoStr = StringBuilder()
                 .append("resolution: ${width}x${height}").newLine()
@@ -220,7 +219,7 @@ class PolygonalSketch : BaseSketch() {
         textSize(14f)
         text(menuStr, 12f, height - menuStr.lines().size * 20f)
 
-        var rectHeight = 8
+        val rectHeight = 8
 
         pushMatrix()
         translate(12f, 100f)

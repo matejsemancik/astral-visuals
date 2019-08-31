@@ -11,7 +11,6 @@ import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
-import dev.matsem.astral.sketches.machina.MachinaSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
@@ -79,7 +78,6 @@ class SketchLoader : PApplet(), KoinComponent {
     private val fibSphereSketch: FibSphereSketch by inject()
     private val starGlitchSketch: StarGlitchSketch by inject()
     private val patternsSketch: PatternsSketch by inject()
-    private val machinaSketch: MachinaSketch by inject()
     private val boxesSketch: BoxesSketch by inject()
     private val attractorSketch: AttractorSketch by inject()
     private val spikesSketch: SpikesSketch by inject()
@@ -139,7 +137,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('3', fibSphereSketch)
             put('4', starGlitchSketch)
             put('5', patternsSketch)
-            put('6', machinaSketch)
+            put('6', blankSketch) // TODO free slot
             put('7', boxesSketch)
             put('8', attractorSketch)
             put('9', spikesSketch)

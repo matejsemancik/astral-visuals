@@ -9,6 +9,7 @@ import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PApplet.radians
+import processing.core.PApplet.sin
 import shiffman.box2d.Box2DProcessing
 
 class BoxesSketch : BaseSketch() {
@@ -54,10 +55,12 @@ class BoxesSketch : BaseSketch() {
     private val starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
     private val starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
 
-    private val staticSphere = StaticSphere(sketch, box2d, 0f, 0f).apply {
-        fgColor = this@BoxesSketch.fgColor
-        accentColor = this@BoxesSketch.accentColor
-        radius = shorterDimension() / 4f
+    private val staticSphere = with(sketch) {
+        StaticSphere(sketch, box2d, 0f, 0f).apply {
+            fgColor = this@BoxesSketch.fgColor
+            accentColor = this@BoxesSketch.accentColor
+            radius = shorterDimension() / 4f
+        }
     }
 
     private val bodies = arrayListOf<Box>()
@@ -71,18 +74,18 @@ class BoxesSketch : BaseSketch() {
     var rotY = 0f
     var rotZ = 0f
 
-    override fun onBecameActive() {
+    override fun onBecameActive() = with(sketch) {
         sphereDetail(sphereDetailPot.value.toInt())
     }
 
     override fun setup() = Unit
 
-    private fun addBox() {
+    private fun addBox() = with(sketch) {
         bodies.add(
                 Box(sketch, box2d, random(-centerX(), centerX()), random(-centerY(), centerY())).apply {
                     accentColor = this@BoxesSketch.accentColor
                     fgColor = this@BoxesSketch.fgColor
-                    size = sketch.random(15f, 30f)
+                    size = random(15f, 30f)
                 }
         )
     }
@@ -93,9 +96,9 @@ class BoxesSketch : BaseSketch() {
         bodies.remove(randomBox)
     }
 
-    override fun draw() {
-        if (sketch.keyPressed) {
-            when (sketch.key) {
+    override fun draw() = with(sketch) {
+        if (keyPressed) {
+            when (key) {
                 'b' -> {
                     addBox()
                 }
@@ -147,9 +150,9 @@ class BoxesSketch : BaseSketch() {
         if (rotationAutoBtn.isPressed) {
             pushMatrix()
             translate(centerX(), centerY())
-            rotateY(angularVelocity(16f))
+            rotateY(angularTimeS(16f))
             pushMatrix()
-            rotateX(PApplet.map(sin(angularVelocity(30f)), -1f, 1f, radians(-180f), radians(180f)))
+            rotateX(PApplet.map(sin(angularTimeS(30f)), -1f, 1f, radians(-180f), radians(180f)))
             pushMatrix()
             rotateZ(0f)
         } else {

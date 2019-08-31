@@ -8,11 +8,9 @@ class BlankSketch : BaseSketch() {
 
     override val sketch: SketchLoader by inject()
 
-    override fun setup() {
-        // nothing
-    }
+    override fun setup() = Unit
 
-    override fun draw() {
-        sketch.background(0)
+    override fun draw() = with(sketch) {
+        background(0)
     }
 }

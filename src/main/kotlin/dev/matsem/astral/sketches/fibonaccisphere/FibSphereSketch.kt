@@ -42,40 +42,39 @@ class FibSphereSketch : BaseSketch() {
         MODE_10
     }
 
-    val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6, 7, 8, 9), listOf(9))
+    private val drawModeButtons = galaxy.createButtonGroup(2, listOf(1, 2, 3, 4, 5, 6, 7, 8, 9), listOf(9))
 
-    var numPoints = 500
-    val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
+    private var numPoints = 500
+    private val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
 
-    var radius = shorterDimension() / 2f
+    private var radius = sketch.shorterDimension() / 2f
 
-    val joystick = galaxy.createJoystick(2, 11, 12, 13, 14, 15, 16)
+    private val joystick = galaxy.createJoystick(2, 11, 12, 13, 14, 15, 16)
 
-    var rotationX = 0f
-    var rotationY = 0f
-    var rotationZ = 0f
-    var velocityX = 0f
-    var velocityY = 0f
-    var velocityZ = 0f
-    var pushBack = 0f
+    private var rotationX = 0f
+    private var rotationY = 0f
+    private var rotationZ = 0f
+    private var velocityX = 0f
+    private var velocityY = 0f
+    private var velocityZ = 0f
+    private var pushBack = 0f
 
-    val sphereSizePot = galaxy.createPot(2, 17, 0f, 10f, 5f)
-    val spikeSizePot = galaxy.createPot(2, 18, 0f, 8f, 4f)
-    val oscSpeedPot = galaxy.createPot(2, 19, 0f, 1f, 0.1f)
-    val oscLowPot = galaxy.createPot(2, 20, 0f, radius * 2f, radius)
-    val oscHiPot = galaxy.createPot(2, 21, 0f, radius * 2f, radius)
+    private val sphereSizePot = galaxy.createPot(2, 17, 0f, 10f, 5f)
+    private val spikeSizePot = galaxy.createPot(2, 18, 0f, 8f, 4f)
+    private val oscSpeedPot = galaxy.createPot(2, 19, 0f, 1f, 0.1f)
+    private val oscLowPot = galaxy.createPot(2, 20, 0f, radius * 2f, radius)
+    private val oscHiPot = galaxy.createPot(2, 21, 0f, radius * 2f, radius)
 
-    val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
-    var bass = 0f
+    private val encoder = galaxy.createEncoder(2, 0, 50, MAX_POINTS, numPoints)
+    private var bass = 0f
 
-    val drawModeTimerButtton = galaxy.createToggleButton(2, 22, false)
-    val timerIntervalPot = galaxy.createPot(2, 23, 500f, 60000f, 1000f)
-    var timerLastTick = 0
+    private val drawModeTimerButtton = galaxy.createToggleButton(2, 22, false)
+    private val timerIntervalPot = galaxy.createPot(2, 23, 500f, 60000f, 1000f)
+    private var timerLastTick = 0
 
-    fun osc(
-            timeStretch: Float = 1f,
-            timeOffset: Float = 0f
-    ) = sin(millis() / 1000f * PConstants.PI * 2 * timeStretch + timeOffset)
+    fun osc(timeStretch: Float = 1f, timeOffset: Float = 0f) = with(sketch) {
+        sin(millis() / 1000f * PConstants.PI * 2 * timeStretch + timeOffset)
+    }
 
     fun initSphere(num: Int) {
         drawModeButtons.activeButtonsIndices()
@@ -95,12 +94,12 @@ class FibSphereSketch : BaseSketch() {
         }
     }
 
-    override fun setup() {
+    override fun setup() = with(sketch) {
         sphereDetail(8)
         initSphere(numPoints)
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         if (millis() > timerLastTick + timerIntervalPot.value) {
             timerLastTick = millis()
             onTimerTick()
@@ -134,7 +133,7 @@ class FibSphereSketch : BaseSketch() {
         }
     }
 
-    fun renderGlobe(mode: DrawMode) {
+    fun renderGlobe(mode: DrawMode) = with(sketch) {
         pushMatrix()
         translate(centerX(), centerY(), pushBack)
 
