@@ -1,5 +1,6 @@
 package dev.matsem.astral.tools.audio
 
+import ddf.minim.AudioInput
 import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
@@ -25,10 +26,11 @@ class AudioProcessor constructor(
         beatDetect.detect(p0)
     }
 
-    val minim = Minim(sketch)
-    val audioInput = minim.lineIn.apply {
+    private val minim = Minim(sketch)
+    val audioInput: AudioInput = minim.lineIn.apply {
         if (!isInRenderMode) addListener(this@AudioProcessor)
     }
+    var gain = 1f
 
     val fft = FFT(audioInput.bufferSize(), audioInput.sampleRate()).apply {
         logAverages(22, 3)
@@ -48,14 +50,6 @@ class AudioProcessor constructor(
                     beatDetect.isHat
             )
         }
-
-    var gain = 1f
-    private val ranges = mutableListOf<ClosedFloatingPointRange<Float>>()
-
-    fun drawRanges(newRanges: List<ClosedFloatingPointRange<Float>>) {
-        ranges.clear()
-        ranges.addAll(newRanges)
-    }
 
     fun getRange(range: ClosedFloatingPointRange<Float>): Float {
         if (isInRenderMode) {
@@ -80,38 +74,6 @@ class AudioProcessor constructor(
         } else {
             fft.getAvg(i) * gain
         }
-    }
-
-    fun drawDebug() {
-        val rectHeight = 12 // px
-
-        sketch.pushMatrix()
-        sketch.translate(12f, 12f)
-
-        if (ranges.isNotEmpty()) {
-            for (i in 0 until ranges.size) {
-                val range = ranges[i]
-                sketch.fill(110f, 225f, 255f)
-                sketch.rect(0f, i.toFloat() * rectHeight, getRange(range), rectHeight.toFloat())
-
-                // Draw band frequency value
-                sketch.fill(255f, 255f, 255f)
-                sketch.textSize(10f)
-                sketch.text("${range.start} - ${range.endInclusive} Hz", 0f, i.toFloat() * rectHeight + rectHeight)
-            }
-        } else {
-            for (i in 0 until fft.avgSize()) {
-                sketch.fill(110f, 225f, 255f)
-                sketch.rect(0f, i.toFloat() * rectHeight, fft.getAvg(i) * gain, rectHeight.toFloat())
-
-                // Draw band frequency value
-                sketch.fill(255f, 255f, 255f)
-                sketch.textSize(10f)
-                sketch.text("${fft.getAverageCenterFrequency(i)} Hz", 0f, i.toFloat() * rectHeight + rectHeight)
-            }
-        }
-
-        sketch.popMatrix()
     }
 
     fun mockFft(left: List<Float>, right: List<Float>) {

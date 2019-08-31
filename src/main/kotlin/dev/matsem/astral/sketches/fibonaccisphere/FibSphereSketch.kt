@@ -21,10 +21,6 @@ class FibSphereSketch : BaseSketch() {
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
 
-    override fun onBecameActive() {
-        audioProcessor.drawRanges(listOf((30f..200f)))
-    }
-
     data class SpherePoint(val lat: Float, val lon: Float, val radius: Float)
 
     companion object {
@@ -130,10 +126,6 @@ class FibSphereSketch : BaseSketch() {
 
         background(bgHue, bgSat, bgBrightness)
         renderGlobe(drawMode)
-
-        if (isInDebugMode) {
-            debugWindow()
-        }
     }
 
     fun onTimerTick() {
@@ -398,9 +390,5 @@ class FibSphereSketch : BaseSketch() {
         }
 
         popMatrix()
-    }
-
-    fun debugWindow() {
-        audioProcessor.drawDebug()
     }
 }
