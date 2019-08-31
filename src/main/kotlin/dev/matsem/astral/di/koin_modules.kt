@@ -3,6 +3,7 @@ package dev.matsem.astral.di
 import com.hamoid.VideoExport
 import controlP5.ControlP5
 import dev.matsem.astral.Config
+import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.attractor.AttractorSketch
 import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
@@ -27,8 +28,7 @@ import processing.core.PApplet
 import shiffman.box2d.Box2DProcessing
 
 val appModule = module {
-    //    single { SketchLoader() } bind PApplet::class
-    single { StarfieldSketch() } bind PApplet::class
+    single { SketchLoader() } bind PApplet::class
 
     // Controllers
     single { KontrolF1() }
@@ -68,4 +68,5 @@ val appModule = module {
     factory { SpikesSketch() }
     factory { CubesSketch() }
     factory { VideoSketch() }
+    factory { StarfieldSketch() }
 }

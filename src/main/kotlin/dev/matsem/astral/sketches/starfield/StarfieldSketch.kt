@@ -1,20 +1,22 @@
 package dev.matsem.astral.sketches.starfield
 
+import dev.matsem.astral.sketches.BaseSketch
+import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.extensions.constrain
-import dev.matsem.astral.tools.extensions.midiRange
 import dev.matsem.astral.tools.extensions.remap
 import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
 
-class StarfieldSketch : PApplet(), KoinComponent {
+class StarfieldSketch : BaseSketch(), KoinComponent {
+
+    override val sketch: SketchLoader by inject()
 
     data class Star(
             val vec: PVector,
@@ -32,14 +34,7 @@ class StarfieldSketch : PApplet(), KoinComponent {
     private val starField = mutableListOf<Star>()
     private val galaxy = mutableListOf<Star>()
 
-    override fun settings() {
-        size(1280, 720, PConstants.P3D)
-    }
-
-    override fun setup() {
-        kontrol.connect()
-        colorMode(PConstants.HSB, 360f, 100f, 100f)
-
+    override fun setup() = with(sketch) {
         // Create galaxy from image
         val galaxyImage: PImage = loadImage("images/galaxy-transparent-bw.png").apply { resize(720, 720) }
         galaxyImage.loadPixels()
@@ -74,9 +69,9 @@ class StarfieldSketch : PApplet(), KoinComponent {
         }
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         beatCounter.update()
-        background(0)
+        background(30)
 
         noFill()
         stroke(0f, 0f, 100f)
@@ -85,8 +80,9 @@ class StarfieldSketch : PApplet(), KoinComponent {
         galaxy.forEach {
             pushMatrix()
             translateCenter()
-            it.rotationExtra += audioProcessor.getRange(20f..100f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
-            rotateX(kontrol.knob1.midiRange(PConstants.PI / 4f, -PConstants.PI / 4f))
+            it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
+//            rotateX(kontrol.knob1.midiRange(PConstants.PI / 4f, -PConstants.PI / 4f))
+            rotateX(-0.34f)
             rotateY(millis() * it.ySpeed + it.rotationExtra)
             rotateZ(millis() * it.zSpeed)
 
