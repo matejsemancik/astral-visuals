@@ -8,6 +8,7 @@ import dev.matsem.astral.tools.extensions.constrain
 import dev.matsem.astral.tools.extensions.remap
 import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PConstants
@@ -33,6 +34,11 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
 
     private val starField = mutableListOf<Star>()
     private val galaxy = mutableListOf<Star>()
+
+    private val logger = SketchLogger.Builder()
+            .withResolution()
+            .withFps()
+            .build()
 
     override fun setup() = with(sketch) {
         // Create galaxy from image
@@ -122,5 +128,8 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         sphere(25f)
         endShape()
         popMatrix()
+
+        // Debug
+        logger.draw(this)
     }
 }
