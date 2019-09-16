@@ -4,6 +4,7 @@ import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.extensions.constrain
 import dev.matsem.astral.tools.extensions.midiRange
 import dev.matsem.astral.tools.extensions.remap
@@ -23,7 +24,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
 
     data class Star(
             val vec: PVector,
-            val diameter: Float,
+            var diameter: Float,
             val ySpeed: Float = 0f,
             val zSpeed: Float = 0f,
             val randomFactor: Float = 0f,
@@ -48,9 +49,11 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
             GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f)
     )
 
+    private var bassGain: Float = 0f
+
     override fun setup() = with(sketch) {
         // Create galaxy from image
-        createGalaxy(images[1])
+        createGalaxy(images[0])
 
         // Create starfield
         repeat(2000) {
@@ -64,16 +67,26 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
             )
         }
 
-        kontrol.onTriggerPad(0, 0, 40) {
+        kontrol.onTriggerPad(0, 0, 50) {
             if (it) {
                 createGalaxy(images[0])
             }
         }
 
-        kontrol.onTriggerPad(0, 1, 40) {
+        kontrol.onTriggerPad(0, 1, 50) {
             if (it) {
                 createGalaxy(images[1])
             }
+        }
+
+        kontrol.onTriggerPad(3, 0, 70) {
+            if (it) {
+                randomizeDiameters()
+            }
+        }
+
+        beatCounter.addListener(OnSnare, 1) {
+            randomizeDiameters()
         }
     }
 
@@ -97,7 +110,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                                         random(-4f, 4f),
                                         y.toFloat() - galaxyImage.height / 2f
                                 ),
-                                diameter = random(1f, 4f),
+                                diameter = random(1f, 5f),
                                 ySpeed = random(PConstants.TWO_PI * 6e-6f, PConstants.TWO_PI * 8e-6f),
                                 birth = millis(),
                                 randomFactor = random(0.01f, 0.1f)
@@ -108,7 +121,17 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         }
     }
 
+    private fun randomizeDiameters() = with(sketch) {
+        synchronized(lock) {
+            galaxy.forEach {
+                it.diameter = random(1f, 5f)
+            }
+        }
+    }
+
     override fun draw() = with(sketch) {
+        bassGain = kontrol.slider1.midiRange(1f)
+
         beatCounter.update()
         background(30)
 
@@ -127,7 +150,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                 rotateZ((millis() - it.birth) * it.zSpeed)
 
                 strokeWeight(it.diameter)
-                val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * kontrol.slider1.midiRange(1f)
+                val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * bassGain
                 point(it.vec.x, it.vec.y + amp, it.vec.z)
                 popMatrix()
             }

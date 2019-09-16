@@ -45,10 +45,9 @@ class BeatCounter(private val audioProcessor: AudioProcessor) {
         hatsCount = 0
     }
 
-    fun addListener(type: Type, modulo: Int, onBeat: () -> Unit): BeatListener {
+    fun addListener(type: Type, modulo: Int, onBeat: () -> Unit) {
         val listener = BeatListener(type, modulo)
         listeners[listener] = onBeat
-        return listener
     }
 
     fun removeListener(listener: BeatListener) {
