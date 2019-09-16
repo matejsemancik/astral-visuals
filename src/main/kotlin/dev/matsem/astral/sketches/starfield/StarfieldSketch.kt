@@ -9,6 +9,7 @@ import dev.matsem.astral.tools.extensions.midiRange
 import dev.matsem.astral.tools.extensions.remap
 import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -26,43 +27,30 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
             val ySpeed: Float = 0f,
             val zSpeed: Float = 0f,
             val randomFactor: Float = 0f,
+            val birth: Int = 0,
             var rotationExtra: Float = 0f
     )
-
-    private val audioProcessor: AudioProcessor by inject()
-    private val beatCounter: BeatCounter by inject()
-    private val kontrol: KontrolF1 by inject()
-
-    private val starField = mutableListOf<Star>()
-    private val galaxy = mutableListOf<Star>()
 
     private val logger = SketchLogger.Builder()
             .withResolution()
             .withFps()
             .build()
 
+    private val audioProcessor: AudioProcessor by inject()
+    private val beatCounter: BeatCounter by inject()
+    private val kontrol: KontrolF1 by inject()
+
+    private val lock = Any()
+    private val starField = mutableListOf<Star>()
+    private val galaxy = mutableListOf<Star>()
+    private val images = arrayOf(
+            GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 60f),
+            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f)
+    )
+
     override fun setup() = with(sketch) {
         // Create galaxy from image
-        val galaxyImage: PImage = loadImage("images/galaxy-transparent-bw.png").apply { resize(720, 720) }
-        galaxyImage.loadPixels()
-        var pixelBrightness: Float
-        for (x in 0 until galaxyImage.width step 3) {
-            for (y in 0 until galaxyImage.height step 3) {
-                pixelBrightness = brightness(galaxyImage[x, y])
-                if (pixelBrightness > 60f) {
-                    galaxy += Star(
-                            vec = PVector(
-                                    x.toFloat() - galaxyImage.width / 2f,
-                                    random(-4f, 4f),
-                                    y.toFloat() - galaxyImage.height / 2f
-                            ),
-                            diameter = random(1f, 4f),
-                            ySpeed = random(PConstants.TWO_PI * 6e-6f, PConstants.TWO_PI * 8e-6f),
-                            randomFactor = random(0.01f, 0.1f)
-                    )
-                }
-            }
-        }
+        createGalaxy(images[1])
 
         // Create starfield
         repeat(2000) {
@@ -71,8 +59,52 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                     diameter = if (random(1f) > 0.99f) random(6f, 10f) else random(1f, 4f),
                     ySpeed = random(0.00002f, 0.00005f),
                     zSpeed = random(-0.00001f, 0.00001f),
+                    birth = millis(),
                     randomFactor = if (random(1f) > 0.50f) random(0.2f, 1f) else 0f
             )
+        }
+
+        kontrol.onTriggerPad(0, 0, 40) {
+            if (it) {
+                createGalaxy(images[0])
+            }
+        }
+
+        kontrol.onTriggerPad(0, 1, 40) {
+            if (it) {
+                createGalaxy(images[1])
+            }
+        }
+    }
+
+    private fun createGalaxy(image: GalaxyImage) = with(sketch) {
+        synchronized(lock) {
+            galaxy.clear()
+            val galaxyImage: PImage = loadImage(image.path).apply {
+                val ratio = pixelWidth / pixelHeight.toFloat()
+                resize(720, (720 / ratio).toInt())
+            }
+
+            galaxyImage.loadPixels()
+            var pixelBrightness: Float
+            for (x in 0 until galaxyImage.width step image.pixelStep) {
+                for (y in 0 until galaxyImage.height step image.pixelStep) {
+                    pixelBrightness = brightness(galaxyImage[x, y])
+                    if (pixelBrightness > image.threshold) {
+                        galaxy += Star(
+                                vec = PVector(
+                                        x.toFloat() - galaxyImage.width / 2f,
+                                        random(-4f, 4f),
+                                        y.toFloat() - galaxyImage.height / 2f
+                                ),
+                                diameter = random(1f, 4f),
+                                ySpeed = random(PConstants.TWO_PI * 6e-6f, PConstants.TWO_PI * 8e-6f),
+                                birth = millis(),
+                                randomFactor = random(0.01f, 0.1f)
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -84,19 +116,21 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         stroke(0f, 0f, 100f)
 
         // Galaxy
-        galaxy.forEach {
-            pushMatrix()
-            translateCenter()
+        synchronized(lock) {
+            galaxy.forEach {
+                pushMatrix()
+                translateCenter()
 
-            it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
-            rotateX(-0.34f)
-            rotateY(millis() * it.ySpeed + it.rotationExtra)
-            rotateZ(millis() * it.zSpeed)
+                it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
+                rotateX(-0.34f)
+                rotateY((millis() - it.birth) * it.ySpeed + it.rotationExtra)
+                rotateZ((millis() - it.birth) * it.zSpeed)
 
-            strokeWeight(it.diameter)
-            val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * kontrol.slider1.midiRange(1f)
-            point(it.vec.x, it.vec.y + amp, it.vec.z)
-            popMatrix()
+                strokeWeight(it.diameter)
+                val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * kontrol.slider1.midiRange(1f)
+                point(it.vec.x, it.vec.y + amp, it.vec.z)
+                popMatrix()
+            }
         }
 
         // Stars
