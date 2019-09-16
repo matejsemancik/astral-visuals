@@ -5,6 +5,7 @@ import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.extensions.constrain
+import dev.matsem.astral.tools.extensions.midiRange
 import dev.matsem.astral.tools.extensions.remap
 import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
@@ -88,13 +89,13 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
             translateCenter()
 
             it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
-//            rotateX(kontrol.knob1.midiRange(PConstants.PI / 4f, -PConstants.PI / 4f))
             rotateX(-0.34f)
             rotateY(millis() * it.ySpeed + it.rotationExtra)
             rotateZ(millis() * it.zSpeed)
 
             strokeWeight(it.diameter)
-            point(it.vec.x, it.vec.y, it.vec.z)
+            val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * kontrol.slider1.midiRange(1f)
+            point(it.vec.x, it.vec.y + amp, it.vec.z)
             popMatrix()
         }
 
@@ -130,6 +131,8 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         popMatrix()
 
         // Debug
-        logger.draw(this)
+        if (isInDebugMode) {
+            logger.draw(this)
+        }
     }
 }

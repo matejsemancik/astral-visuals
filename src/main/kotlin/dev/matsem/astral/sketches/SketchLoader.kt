@@ -108,7 +108,7 @@ class SketchLoader : PApplet(), KoinComponent {
         kontrolF1.connect()
 
         gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
-        debugButton = galaxy.createToggleButton(15, 65, false)
+        debugButton = galaxy.createToggleButton(15, 65, true)
         resendButton = galaxy.createPushButton(15, 66) {
             galaxy.sendClientUpdates()
         }
