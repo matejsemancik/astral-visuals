@@ -50,7 +50,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
     )
 
     private var bassGain: Float = 0f
-    private var expanding: Boolean = false
+    private var expandingQuantized: Boolean = false
     private var expandingOnBeat: Boolean = false
     private var expandingValue = 1f
     private var randomDiameters: Boolean = false
@@ -84,7 +84,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         }
 
         kontrol.onTogglePad(0, 2, 0) {
-            expanding = it
+            expandingQuantized = it
         }
 
         kontrol.onTogglePad(1, 2, 10) {
@@ -172,7 +172,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                 strokeWeight(it.diameter)
                 val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * bassGain
 
-                if (expanding) {
+                if (expandingQuantized) {
                     expandingValue = sin(saw(1 / 5f)).mapp(1f, 1.5f).quantize(0.05f)
                 }
 
