@@ -2,17 +2,13 @@ package dev.matsem.astral.sketches.gameoflife
 
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnSnare
-import dev.matsem.astral.tools.extensions.midiRange
-import dev.matsem.astral.tools.extensions.remap
+import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import processing.core.PApplet
-import processing.core.PConstants
-import processing.core.PFont
-import processing.core.PGraphics
+import processing.core.*
 
 // TODO convert to BaseSketch
 // ideas:
@@ -32,7 +28,11 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     lateinit var overlay: PGraphics
     lateinit var pixelFont: PFont
 
+    private lateinit var semLogo: PImage
+
     private var overlayText: String? = null
+    private var overlayImage: PImage? = null
+
     private var hueStart: Float = 160f
     private var hueEnd: Float = 220f
     private var heatMapEnabled: Boolean = false
@@ -40,6 +40,7 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     private var stepMillis = 60
     private var coolingFactor = 0.90f
     private var heatMapSaturation = 100f
+    private var outlineEnabled = false
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
@@ -49,10 +50,14 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         kontrol.connect()
 
         kontrol.onTriggerPad(0, 0, midiHue = 0) { if (it) randomize(randomizeThresh) }
-        kontrol.onTogglePad(0, 1, midiHue = 64) { heatMapEnabled = it }
-        kontrol.onTriggerPad(3, 0, midiHue = 100) { overlayText = if (it) "ASTRAL" else null }
-        kontrol.onTriggerPad(3, 1, midiHue = 100) { overlayText = if (it) "16/11" else null }
-        kontrol.onTriggerPad(3, 2, midiHue = 100) { overlayText = if (it) "SEBA" else null }
+        kontrol.onTogglePad(0, 1, midiHue = 8) { heatMapEnabled = it }
+        kontrol.onTriggerPad(3, 0, midiHue = 48) { overlayText = if (it) "ASTRAL" else null }
+        kontrol.onTriggerPad(3, 1, midiHue = 48) { overlayText = if (it) "16/11" else null }
+        kontrol.onTriggerPad(3, 2, midiHue = 48) { overlayText = if (it) "SEBA" else null }
+        kontrol.onTriggerPad(3, 3, midiHue = 48) {
+            overlayImage = if (it) semLogo else null
+        }
+        kontrol.onTogglePad(0, 2, midiHue = 16) { outlineEnabled = it }
 
         colorMode(PConstants.HSB, 360f, 100f, 100f)
         rectMode(PConstants.CORNER)
@@ -60,6 +65,10 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         universe = Universe(Array(height / cellSize) { Array<Cell>(width / cellSize) { DeadCell } })
         pixelFont = createFont("fonts/fff-forward.ttf", 24f, false)
         overlay = createGraphics(universe.width, universe.height, PConstants.P2D)
+
+        semLogo = loadImage("images/semlogo.png").apply {
+            resizeRatioAware(width = overlay.shorterDimension() / 2)
+        }
 
         beatCounter.addListener(OnSnare, 2) {
             randomize(0.996f)
@@ -82,15 +91,22 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
             textSize(24f)
 
             // Text stroke hack
-            for (xOff in -1..1) {
-                for (yOff in -1..1) {
-                    fill(0f)
-                    text(text, width / 2f + xOff, height / 2 - 24 / 2f + yOff)
+            if (outlineEnabled) {
+                for (xOff in -1..1) {
+                    for (yOff in -1..1) {
+                        fill(0f)
+                        text(text, width / 2f + xOff, height / 2 - 24 / 2f + yOff)
+                    }
                 }
             }
 
             fill(255f)
             text(text, width / 2f, height / 2 - 24 / 2f)
+        }
+
+        overlayImage?.let { image ->
+            translateCenter()
+            image(image, -image.width / 2f, -image.height / 2f)
         }
 
         endDraw()
@@ -119,7 +135,7 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         for (y in 0 until overlay.pixelHeight) {
             for (x in 0 until overlay.width) {
                 brightness = brightness(overlay.pixels[x + (y * overlay.pixelWidth)])
-                when(brightness) {
+                when (brightness) {
                     100f -> universe.cells[y][x] = AliveCell
                     0f -> universe.cells[y][x] = DeadCell
                 }
