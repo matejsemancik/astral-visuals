@@ -4,7 +4,7 @@ import controlP5.ControlP5Constants.CENTER
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
-import dev.matsem.astral.tools.audio.beatcounter.OnSnare
+import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
@@ -74,8 +74,8 @@ class GameOfLifeSketch : BaseSketch() {
             resizeRatioAware(width = overlay.shorterDimension() / 2)
         }
 
-        beatCounter.addListener(OnSnare, 2) {
-            randomize(0.996f)
+        beatCounter.addListener(OnKick, 2) {
+            randomize(0.995f)
         }
     }
 
