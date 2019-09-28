@@ -13,7 +13,6 @@ import processing.core.*
 // TODO convert to BaseSketch
 // ideas:
 // - color inversion
-// - SEM logo
 // - Astral logo
 // - optimization: do not create new array for each new universe generation
 class GameOfLifeSketch : PApplet(), KoinComponent {
