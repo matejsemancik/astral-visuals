@@ -11,6 +11,7 @@ import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
 import org.koin.core.inject
 import processing.core.PApplet.constrain
+import processing.core.PApplet.map
 import processing.core.PConstants
 import processing.core.PFont
 import processing.core.PGraphics
@@ -66,7 +67,11 @@ class GameOfLifeSketch : BaseSketch() {
         colorMode(PConstants.HSB, 360f, 100f, 100f)
         rectMode(PConstants.CORNER)
 
-        universe = Universe(Array(height / cellSize) { Array<Cell>(width / cellSize) { DeadCell } })
+        universe = Universe(
+                Array(height / cellSize) {
+                    Array<Cell>(width / cellSize) { DeadCell }
+                }
+        )
         pixelFont = createFont("fonts/fff-forward.ttf", 24f, false)
         overlay = createGraphics(universe.width, universe.height, PConstants.P2D)
 
@@ -127,6 +132,8 @@ class GameOfLifeSketch : BaseSketch() {
         beatCounter.update()
         drawOverlay()
         background(0f, 0f, 10f)
+        translateCenter()
+        scale(map(saw(1/10f), -1f, 1f, 1f, 1.20f))
 
         if (millis() > nextRound) {
             nextRound = millis() + stepMillis
@@ -163,12 +170,14 @@ class GameOfLifeSketch : BaseSketch() {
 
                 noStroke()
                 fill(color)
-                rect(x.toFloat() + (x * (cellSize - 1)), y.toFloat() + (y * (cellSize - 1)), cellSize.toFloat(), cellSize.toFloat())
+                rect(
+                        x.toFloat() + (x * (cellSize - 1)) - width / 2f,
+                        y.toFloat() + (y * (cellSize - 1)) - height / 2f,
+                        cellSize.toFloat(),
+                        cellSize.toFloat()
+                )
             }
         }
-
-        // Debug overlay
-        image(overlay, 0f, 0f)
     }
 
     override fun mouseClicked() = with(sketch) {
