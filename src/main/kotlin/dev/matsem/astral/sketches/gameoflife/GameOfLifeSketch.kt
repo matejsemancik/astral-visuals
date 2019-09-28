@@ -15,14 +15,15 @@ import processing.core.PFont
 import processing.core.PGraphics
 
 // TODO convert to BaseSketch
+// ideas:
+// - color inversion
+// - black canvas kills cells
 class GameOfLifeSketch : PApplet(), KoinComponent {
 
     private val kontrol: KontrolF1 by inject()
     private val beatCounter: BeatCounter by inject()
 
     private var cellSize = 5
-
-    private var speedMillis = 60
     private var nextRound = 0
 
     lateinit var universe: Universe
@@ -34,6 +35,9 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     private var hueEnd: Float = 220f
     private var heatMapEnabled: Boolean = false
     private var randomizeThresh: Float = 1f
+    private var stepMillis = 60
+    private var coolingFactor = 0.90f
+    private var heatMapSaturation = 100f
 
     override fun settings() {
         size(1280, 720, PConstants.P3D)
@@ -43,10 +47,10 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         kontrol.connect()
 
         kontrol.onTogglePad(0, 0, midiHue = 64) { heatMapEnabled = it }
+        kontrol.onTriggerPad(0, 1, midiHue = 80) { if (it) randomize(randomizeThresh) }
         kontrol.onTriggerPad(3, 0, midiHue = 100) { overlayText = if (it) "astral" else null }
         kontrol.onTriggerPad(3, 1, midiHue = 100) { overlayText = if (it) "soul ex\nmachina" else null }
         kontrol.onTriggerPad(3, 2, midiHue = 100) { overlayText = if (it) "16/11" else null }
-        kontrol.onTriggerPad(3, 3, midiHue = 80) { if (it) randomize(randomizeThresh) }
 
         colorMode(PConstants.HSB, 360f, 100f, 100f)
         rectMode(PConstants.CORNER)
@@ -80,13 +84,17 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         hueStart = kontrol.knob1.midiRange(0f, 360f)
         hueEnd = kontrol.knob2.midiRange(0f, 360f)
         randomizeThresh = kontrol.slider1.midiRange(1f, 0f)
+        stepMillis = kontrol.knob3.midiRange(50f, 120f).toInt()
+        coolingFactor = kontrol.knob4.midiRange(0.10f, 0.99f)
+        heatMapSaturation = kontrol.slider2.midiRange(0f, 100f)
 
         beatCounter.update()
         drawOverlay()
         background(0f, 0f, 10f)
 
         if (millis() > nextRound) {
-            nextRound = millis() + speedMillis
+            nextRound = millis() + stepMillis
+            universe.coolingFactor = coolingFactor
             universe.nextGeneration()
         }
 
@@ -110,7 +118,7 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
 
                 val color = color(
                         universe.heatMap[y][x].remap(1f, 0f, hueStart, hueEnd),
-                        if (universe.cells[y][x] is AliveCell) 10f else 100f,
+                        if (universe.cells[y][x] is AliveCell) 10f else heatMapSaturation,
                         brightness
                 )
 
