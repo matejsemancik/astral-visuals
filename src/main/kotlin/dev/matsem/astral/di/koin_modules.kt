@@ -9,6 +9,7 @@ import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
+import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
@@ -67,4 +68,5 @@ val appModule = module {
     factory { CubesSketch() }
     factory { VideoSketch() }
     factory { StarfieldSketch() }
+    factory { GameOfLifeSketch() }
 }

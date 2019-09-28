@@ -55,21 +55,8 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
     private var expandingValue = 1f
     private var randomDiameters: Boolean = false
 
-    override fun setup() = with(sketch) {
-        // Create galaxy from image
-        createGalaxy(images[0])
-
-        // Create starfield
-        repeat(2000) {
-            starField += Star(
-                    vec = PVector.random3D().mult(random(0f, 2500f)),
-                    diameter = if (random(1f) > 0.99f) random(6f, 10f) else random(1f, 4f),
-                    ySpeed = random(0.00002f, 0.00005f),
-                    zSpeed = random(-0.00001f, 0.00001f),
-                    birth = millis(),
-                    randomFactor = if (random(1f) > 0.50f) random(0.2f, 1f) else 0f
-            )
-        }
+    override fun onBecameActive() {
+        kontrol.reset()
 
         kontrol.onTriggerPad(0, 0, 50) {
             if (it) {
@@ -93,6 +80,23 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
 
         kontrol.onTogglePad(0, 3, 70) {
             randomDiameters = it
+        }
+    }
+
+    override fun setup() = with(sketch) {
+        // Create galaxy from image
+        createGalaxy(images[0])
+
+        // Create starfield
+        repeat(2000) {
+            starField += Star(
+                    vec = PVector.random3D().mult(random(0f, 2500f)),
+                    diameter = if (random(1f) > 0.99f) random(6f, 10f) else random(1f, 4f),
+                    ySpeed = random(0.00002f, 0.00005f),
+                    zSpeed = random(-0.00001f, 0.00001f),
+                    birth = millis(),
+                    randomFactor = if (random(1f) > 0.50f) random(0.2f, 1f) else 0f
+            )
         }
 
         beatCounter.addListener(OnSnare, 1) {

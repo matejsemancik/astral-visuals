@@ -1,9 +1,9 @@
 package dev.matsem.astral
 
-interface Config {
+object Config {
 
     object Sketch {
-        const val DEFAULT_SELECTOR = 's'
+        const val DEFAULT_SELECTOR = 'g'
     }
 
     object Color {

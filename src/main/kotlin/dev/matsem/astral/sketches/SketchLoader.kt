@@ -11,6 +11,7 @@ import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
+import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
@@ -84,6 +85,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val cubesSketch: CubesSketch by inject()
     private val videoSketch: VideoSketch by inject()
     private val starfieldSketch: StarfieldSketch by inject()
+    private val gameOfLifeSketch: GameOfLifeSketch by inject()
 
     // endregion
 
@@ -144,6 +146,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('p', cubesSketch)
             put('m', videoSketch)
             put('s', starfieldSketch)
+            put('g', gameOfLifeSketch)
         }
 
         sketches.forEach { key, sketch ->
@@ -245,8 +248,7 @@ class SketchLoader : PApplet(), KoinComponent {
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             if (sketches.keys.contains(it.key)) {
-                selector = it.key
-                activeSketch().onBecameActive()
+                switchSketch(it.key)
             } else {
                 activeSketch().keyPressed(event)
             }

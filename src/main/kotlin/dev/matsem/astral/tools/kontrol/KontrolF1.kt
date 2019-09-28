@@ -60,7 +60,11 @@ class KontrolF1 {
 
     fun connect() {
         midibus = MidiBus(this, "Traktor Kontrol F1 - 1 Input", "Traktor Kontrol F1 - 1 Output")
-        pads.forEach { it.ledOff() }
+        reset()
+    }
+
+    fun reset() {
+        pads.forEach { it.onStateChanged(0) }
     }
 
     // MidiBus override

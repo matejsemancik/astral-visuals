@@ -1,21 +1,28 @@
 package dev.matsem.astral.sketches.gameoflife
 
+import controlP5.ControlP5Constants.CENTER
+import dev.matsem.astral.sketches.BaseSketch
+import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
-import org.koin.core.KoinComponent
 import org.koin.core.inject
-import processing.core.*
+import processing.core.PApplet.constrain
+import processing.core.PConstants
+import processing.core.PFont
+import processing.core.PGraphics
+import processing.core.PImage
 
-// TODO convert to BaseSketch
 // ideas:
 // - color inversion
 // - Astral logo
 // - optimization: do not create new array for each new universe generation
-class GameOfLifeSketch : PApplet(), KoinComponent {
+class GameOfLifeSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
 
     private val kontrol: KontrolF1 by inject()
     private val beatCounter: BeatCounter by inject()
@@ -41,13 +48,8 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     private var heatMapSaturation = 100f
     private var outlineEnabled = false
 
-    override fun settings() {
-        size(1280, 720, PConstants.P3D)
-    }
-
-    override fun setup() {
-        kontrol.connect()
-
+    override fun onBecameActive() {
+        kontrol.reset()
         kontrol.onTriggerPad(0, 0, midiHue = 0) { if (it) randomize(randomizeThresh) }
         kontrol.onTogglePad(0, 1, midiHue = 8) { heatMapEnabled = it }
         kontrol.onTriggerPad(3, 0, midiHue = 48) { overlayText = if (it) "ASTRAL" else null }
@@ -57,6 +59,9 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
             overlayImage = if (it) semLogo else null
         }
         kontrol.onTogglePad(0, 2, midiHue = 16) { outlineEnabled = it }
+    }
+
+    override fun setup() = with(sketch) {
 
         colorMode(PConstants.HSB, 360f, 100f, 100f)
         rectMode(PConstants.CORNER)
@@ -111,7 +116,7 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         endDraw()
     }
 
-    override fun draw() {
+    override fun draw() = with(sketch) {
         hueStart = kontrol.knob1.midiRange(0f, 360f)
         hueEnd = kontrol.knob2.midiRange(0f, 360f)
         randomizeThresh = kontrol.slider1.midiRange(1f, 0f)
@@ -166,13 +171,13 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         image(overlay, 0f, 0f)
     }
 
-    override fun mouseClicked() {
+    override fun mouseClicked() = with(sketch) {
         val x = mouseX / cellSize
         val y = mouseY / cellSize
         universe.cells[y][x] = AliveCell
     }
 
-    private fun randomize(threshold: Float) {
+    private fun randomize(threshold: Float) = with(sketch) {
         universe.cells.forEach {
             it.forEachIndexed { index, cell ->
                 it[index] = if (random(1f) > constrain(threshold, 0f, 1f)) AliveCell else cell
