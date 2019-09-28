@@ -17,7 +17,9 @@ import processing.core.PGraphics
 // TODO convert to BaseSketch
 // ideas:
 // - color inversion
-// - black canvas kills cells
+// - SEM logo
+// - Astral logo
+// - optimization: do not create new array for each new universe generation
 class GameOfLifeSketch : PApplet(), KoinComponent {
 
     private val kontrol: KontrolF1 by inject()
@@ -46,11 +48,11 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
     override fun setup() {
         kontrol.connect()
 
-        kontrol.onTogglePad(0, 0, midiHue = 64) { heatMapEnabled = it }
-        kontrol.onTriggerPad(0, 1, midiHue = 80) { if (it) randomize(randomizeThresh) }
-        kontrol.onTriggerPad(3, 0, midiHue = 100) { overlayText = if (it) "astral" else null }
-        kontrol.onTriggerPad(3, 1, midiHue = 100) { overlayText = if (it) "soul ex\nmachina" else null }
-        kontrol.onTriggerPad(3, 2, midiHue = 100) { overlayText = if (it) "16/11" else null }
+        kontrol.onTriggerPad(0, 0, midiHue = 0) { if (it) randomize(randomizeThresh) }
+        kontrol.onTogglePad(0, 1, midiHue = 64) { heatMapEnabled = it }
+        kontrol.onTriggerPad(3, 0, midiHue = 100) { overlayText = if (it) "ASTRAL" else null }
+        kontrol.onTriggerPad(3, 1, midiHue = 100) { overlayText = if (it) "16/11" else null }
+        kontrol.onTriggerPad(3, 2, midiHue = 100) { overlayText = if (it) "SEBA" else null }
 
         colorMode(PConstants.HSB, 360f, 100f, 100f)
         rectMode(PConstants.CORNER)
@@ -64,16 +66,30 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         }
     }
 
-    fun drawOverlay() = with(overlay) {
+    /**
+     * Draws cells into universe.
+     * All white pixels will be alive cells.
+     * All black pixels will be dead cells.
+     * All other pixel values are ignored.
+     */
+    private fun drawOverlay() = with(overlay) {
         beginDraw()
-        noStroke()
-        background(0f)
+        background(128f)
 
         overlayText?.let { text ->
-            fill(255f)
             textFont(pixelFont)
             textAlign(CENTER, CENTER)
             textSize(24f)
+
+            // Text stroke hack
+            for (xOff in -1..1) {
+                for (yOff in -1..1) {
+                    fill(0f)
+                    text(text, width / 2f + xOff, height / 2 - 24 / 2f + yOff)
+                }
+            }
+
+            fill(255f)
             text(text, width / 2f, height / 2 - 24 / 2f)
         }
 
@@ -99,10 +115,13 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
         }
 
         overlay.loadPixels()
+        var brightness: Float
         for (y in 0 until overlay.pixelHeight) {
             for (x in 0 until overlay.width) {
-                if (brightness(overlay.pixels[x + (y * overlay.pixelWidth)]) > 0) {
-                    universe.cells[y][x] = AliveCell
+                brightness = brightness(overlay.pixels[x + (y * overlay.pixelWidth)])
+                when(brightness) {
+                    100f -> universe.cells[y][x] = AliveCell
+                    0f -> universe.cells[y][x] = DeadCell
                 }
             }
         }
@@ -127,6 +146,9 @@ class GameOfLifeSketch : PApplet(), KoinComponent {
                 rect(x.toFloat() + (x * (cellSize - 1)), y.toFloat() + (y * (cellSize - 1)), cellSize.toFloat(), cellSize.toFloat())
             }
         }
+
+        // Debug overlay
+        image(overlay, 0f, 0f)
     }
 
     override fun mouseClicked() {
