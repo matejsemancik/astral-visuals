@@ -26,6 +26,10 @@ class MidiPlayer(private val sketch: PApplet) {
         isPlaying = true
     }
 
+    fun stop() {
+        isPlaying = false
+    }
+
     fun update() {
         if (messages.isEmpty() || isPlaying.not()) {
             return
@@ -33,7 +37,6 @@ class MidiPlayer(private val sketch: PApplet) {
 
         while(messages.peek().frame + frameOffset <= sketch.frameCount) {
             val msg = messages.pop()
-            println("taking $msg")
             when (msg.type) {
                 ControllerChange -> device.mockControlChange(msg.channel, msg.control, msg.value)
                 NoteOn -> device.mockNoteOn(msg.channel, msg.control, msg.value)
