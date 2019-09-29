@@ -18,5 +18,6 @@ object Config {
         const val SEP = "|"
         const val MOVIE_FPS = 25f
         const val FRAME_DURATION = 1f / MOVIE_FPS
+        const val MIDI_AUTOMATION_FILE = "midi/videoexport_midi.json"
     }
 }
