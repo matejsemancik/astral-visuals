@@ -76,6 +76,8 @@ class AudioProcessor constructor(
         }
     }
 
+    fun loadFile(file: String) = minim.loadFile(file)
+
     fun mockFft(left: List<Float>, right: List<Float>) {
         mockLeft = ArrayList(left)
         mockRight = ArrayList(right)
