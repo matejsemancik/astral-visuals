@@ -24,15 +24,15 @@ class KontrolF1 : MidiDevice {
         val PADS = listOf(10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25)
     }
 
-    var knob1 = 64; private set
-    var knob2 = 64; private set
-    var knob3 = 64; private set
-    var knob4 = 64; private set
+    var knob1 = 64
+    var knob2 = 64
+    var knob3 = 64
+    var knob4 = 64
 
-    var slider1 = 0; private set
-    var slider2 = 0; private set
-    var slider3 = 0; private set
-    var slider4 = 0; private set
+    var slider1 = 0
+    var slider2 = 0
+    var slider3 = 0
+    var slider4 = 0
 
     var encoder = 0; private set
 

@@ -1,6 +1,7 @@
 package dev.matsem.astral.sketches.gameoflife
 
 import controlP5.ControlP5Constants.CENTER
+import dev.matsem.astral.Config.VideoExport.MIDI_AUTOMATION_FILE
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
@@ -50,13 +51,13 @@ class GameOfLifeSketch : BaseSketch() {
     private var overlayText: String? = null
     private var overlayImage: PImage? = null
 
-    private var hueStart: Float = 210f
-    private var hueEnd: Float = 241f
-    private var heatMapEnabled: Boolean = false
+    private var hueStart: Float = 221.1f
+    private var hueEnd: Float = 277.9f
+    private var heatMapEnabled: Boolean = true
     private var randomizeThresh: Float = 1f
-    private var stepMillis = 40
-    private var coolingFactor = 0.99f
-    private var heatMapSaturation = 100f
+    private var stepMillis = 60
+    private var coolingFactor = 0.10f
+    private var heatMapSaturation = 0f
     private var outlineEnabled = true
     private var targetZoom = 1f
     private var actualZoom = 1f
@@ -80,14 +81,14 @@ class GameOfLifeSketch : BaseSketch() {
         }
 
         // Record button
-        kontrol.onTogglePad(1, 0, midiHue = 50) {
+        kontrol.onTogglePad(1, 0, midiHue = 100) {
             if (it) {
                 midiRecorder.startRecording()
                 midiPlayer.enqueue(
                         midiRecorder.getMessages(excludedCCs = blacklistButtons)
                 )
                 midiPlayer.play()
-//                musicPlayer.play()
+                musicPlayer.play()
             } else {
                 midiRecorder.stopRecording()
                 midiPlayer.stop()
@@ -104,7 +105,7 @@ class GameOfLifeSketch : BaseSketch() {
                             midiRecorder.getMessages(excludedCCs = blacklistButtons)
                     )
                     midiPlayer.play()
-//                    musicPlayer.play()
+                    musicPlayer.play()
                 } else {
                     midiPlayer.stop()
                     musicPlayer.pause()
@@ -114,14 +115,24 @@ class GameOfLifeSketch : BaseSketch() {
         }
 
         // Save automation to file button
-        kontrol.onTriggerPad(1, 2, midiHue = 70) {
+        kontrol.onTriggerPad(1, 2, midiHue = 65) {
             if (it) {
-                midiFileParser.saveFile(midiRecorder.getMessages(excludedCCs = blacklistButtons), "midi/automation.json")
+                midiFileParser.saveFile(
+                        midiRecorder.getMessages(excludedCCs = blacklistButtons),
+                        MIDI_AUTOMATION_FILE
+                )
             }
         }
     }
 
     override fun setup() = with(sketch) {
+        kontrol.knob1 = hueStart.toMidi(0f, 360f)
+        kontrol.knob2 = hueEnd.toMidi(0f, 360f)
+        kontrol.slider1 = randomizeThresh.toMidi(1f, 0f)
+        kontrol.knob3 = stepMillis.toMidi(40, 120)
+        kontrol.knob4 = coolingFactor.toMidi(0.10f, 0.99f)
+        kontrol.slider2 = heatMapSaturation.toMidi(0f, 100f)
+
         midiRecorder.plugIn(kontrol)
         midiPlayer.plugIn(kontrol)
         musicPlayer.addListener(audioProcessor)
@@ -148,8 +159,6 @@ class GameOfLifeSketch : BaseSketch() {
         beatCounter.addListener(OnKick, 4) {
             targetZoom = random(1f, 1.2f)
         }
-
-        randomize(0.30f)
     }
 
     /**
