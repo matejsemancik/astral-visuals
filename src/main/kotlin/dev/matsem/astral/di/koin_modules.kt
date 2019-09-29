@@ -2,6 +2,7 @@ package dev.matsem.astral.di
 
 import com.hamoid.VideoExport
 import controlP5.ControlP5
+import ddf.minim.Minim
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.attractor.AttractorSketch
@@ -44,6 +45,7 @@ val appModule = module {
     factory { MidiPlayer(get()) }
 
     // Audio
+    single { Minim(get() as PApplet) }
     single { AudioProcessor(get(), Config.VideoExport.IS_IN_RENDER_MODE) }
     factory { BeatCounter(get()) }
 

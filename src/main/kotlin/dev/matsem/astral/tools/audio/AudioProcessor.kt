@@ -5,10 +5,9 @@ import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import processing.core.PApplet
 
 class AudioProcessor constructor(
-        private val sketch: PApplet,
+        private val minim: Minim,
         private val isInRenderMode: Boolean
 ) : AudioListener {
 
@@ -26,7 +25,6 @@ class AudioProcessor constructor(
         beatDetect.detect(p0)
     }
 
-    private val minim = Minim(sketch)
     val audioInput: AudioInput = minim.lineIn.apply {
         if (!isInRenderMode) addListener(this@AudioProcessor)
     }
