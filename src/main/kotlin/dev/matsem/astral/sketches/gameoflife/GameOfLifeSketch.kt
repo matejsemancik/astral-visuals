@@ -40,6 +40,8 @@ class GameOfLifeSketch : BaseSketch() {
     lateinit var pixelFont: PFont
 
     private lateinit var semLogo: PImage
+    private lateinit var astralLogo: PImage
+
     private var overlayText: String? = null
     private var overlayImage: PImage? = null
 
@@ -66,7 +68,9 @@ class GameOfLifeSketch : BaseSketch() {
         kontrol.onTriggerPad(0, 0, midiHue = 0) { if (it) randomize(randomizeThresh) }
         kontrol.onTogglePad(0, 1, midiHue = 8) { heatMapEnabled = it }
         kontrol.onTogglePad(0, 2, midiHue = 16) { outlineEnabled = !it }
-        kontrol.onTriggerPad(3, 0, midiHue = 48) { overlayText = if (it) "ASTRAL" else null }
+        kontrol.onTriggerPad(3, 0, midiHue = 48) {
+            overlayImage = if (it) astralLogo else null
+        }
         kontrol.onTriggerPad(3, 1, midiHue = 48) { overlayText = if (it) "16/11" else null }
         kontrol.onTriggerPad(3, 2, midiHue = 48) { overlayText = if (it) "SEBA" else null }
         kontrol.onTriggerPad(3, 3, midiHue = 48) {

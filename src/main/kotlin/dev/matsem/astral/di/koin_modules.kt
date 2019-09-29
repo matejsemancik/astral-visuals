@@ -21,6 +21,9 @@ import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import dev.matsem.astral.tools.midi.MidiFileParser
+import dev.matsem.astral.tools.midi.MidiPlayer
+import dev.matsem.astral.tools.midi.MidiRecorder
 import org.jbox2d.common.Vec2
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -34,6 +37,11 @@ val appModule = module {
     single { KontrolF1() }
     single { Galaxy() }
     single { ControlP5(get()).apply { isAutoDraw = false } }
+
+    // Midi tools
+    single { MidiFileParser(get()) }
+    factory { MidiRecorder(get()) }
+    factory { MidiPlayer(get()) }
 
     // Audio
     single { AudioProcessor(get(), Config.VideoExport.IS_IN_RENDER_MODE) }
