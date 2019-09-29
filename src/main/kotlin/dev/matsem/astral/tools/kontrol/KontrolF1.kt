@@ -1,10 +1,11 @@
 package dev.matsem.astral.tools.kontrol
 
+import dev.matsem.astral.tools.midi.MidiDevice
+import dev.matsem.astral.tools.midi.MidiListener
 import themidibus.MidiBus
+import themidibus.SimpleMidiListener
 
-class KontrolF1 {
-
-    var ccReceiver: F1ControlChangeReceiver? = null
+class KontrolF1 : MidiDevice {
 
     companion object {
         const val KNOB1 = 2
@@ -69,7 +70,6 @@ class KontrolF1 {
 
     // MidiBus override
     fun controllerChange(channel: Int, cc: Int, value: Int) {
-        ccReceiver?.onF1ControlChange(channel, cc, value)
 
         // Analogue knobs, sliders and encoder
         when (cc) {
@@ -112,15 +112,25 @@ class KontrolF1 {
         midibus.sendControllerChange(2, cc, brightness) // Brightness
     }
 
-    fun setCCReceiver(ccReceiver: F1ControlChangeReceiver) {
-        this.ccReceiver = ccReceiver
+    // region MidiDevice
+
+    override fun plugIn(listener: MidiListener) {
+        midibus.addMidiListener(object : SimpleMidiListener {
+            override fun controllerChange(p0: Int, p1: Int, p2: Int) = listener.controllerChange(p0, p1, p2)
+
+            override fun noteOn(p0: Int, p1: Int, p2: Int) = listener.noteOn(p0, p1, p2)
+
+            override fun noteOff(p0: Int, p1: Int, p2: Int) = listener.noteOff(p0, p1, p2)
+        })
     }
 
-    // region Interfaces
-
-    interface F1ControlChangeReceiver {
-        fun onF1ControlChange(channel: Int, number: Int, value: Int)
+    override fun mockControlChange(channel: Int, control: Int, value: Int) {
+        controllerChange(channel, control, value)
     }
+
+    override fun mockNoteOff(channel: Int, control: Int, value: Int) = Unit
+
+    override fun mockNoteOn(channel: Int, control: Int, value: Int) = Unit
 
     // endregion
 }
