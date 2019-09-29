@@ -3,15 +3,18 @@ package dev.matsem.astral.sketches.gameoflife
 import controlP5.ControlP5Constants.CENTER
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
+import dev.matsem.astral.tools.midi.MidiPlayer
+import dev.matsem.astral.tools.midi.MidiRecorder
 import org.koin.core.inject
 import processing.core.PApplet.constrain
-import processing.core.PApplet.map
+import processing.core.PApplet.lerp
 import processing.core.PConstants
 import processing.core.PFont
 import processing.core.PGraphics
@@ -27,6 +30,7 @@ class GameOfLifeSketch : BaseSketch() {
 
     private val kontrol: KontrolF1 by inject()
     private val beatCounter: BeatCounter by inject()
+    private val audioProcessor: AudioProcessor by inject()
 
     private var cellSize = 5
     private var nextRound = 0
@@ -36,36 +40,78 @@ class GameOfLifeSketch : BaseSketch() {
     lateinit var pixelFont: PFont
 
     private lateinit var semLogo: PImage
-
     private var overlayText: String? = null
     private var overlayImage: PImage? = null
 
-    private var hueStart: Float = 160f
-    private var hueEnd: Float = 220f
+    private var hueStart: Float = 210f
+    private var hueEnd: Float = 241f
     private var heatMapEnabled: Boolean = false
     private var randomizeThresh: Float = 1f
-    private var stepMillis = 60
-    private var coolingFactor = 0.90f
+    private var stepMillis = 40
+    private var coolingFactor = 0.99f
     private var heatMapSaturation = 100f
-    private var outlineEnabled = false
+    private var outlineEnabled = true
+    private var targetZoom = 1f
+    private var actualZoom = 1f
 
-    override fun onBecameActive() {
+    private val blacklistButtons = arrayOf(14, 15) // record and play midi buttons
+    private val midiRecorder: MidiRecorder = MidiRecorder(sketch)
+    private val midiPlayer: MidiPlayer = MidiPlayer(sketch)
+    private val musicPlayer = audioProcessor.loadFile("music/seba2.wav")
+
+    override fun onBecameActive() = with(sketch) {
+        rectMode(PConstants.CORNER)
+
         kontrol.reset()
         kontrol.onTriggerPad(0, 0, midiHue = 0) { if (it) randomize(randomizeThresh) }
         kontrol.onTogglePad(0, 1, midiHue = 8) { heatMapEnabled = it }
+        kontrol.onTogglePad(0, 2, midiHue = 16) { outlineEnabled = !it }
         kontrol.onTriggerPad(3, 0, midiHue = 48) { overlayText = if (it) "ASTRAL" else null }
         kontrol.onTriggerPad(3, 1, midiHue = 48) { overlayText = if (it) "16/11" else null }
         kontrol.onTriggerPad(3, 2, midiHue = 48) { overlayText = if (it) "SEBA" else null }
         kontrol.onTriggerPad(3, 3, midiHue = 48) {
             overlayImage = if (it) semLogo else null
         }
-        kontrol.onTogglePad(0, 2, midiHue = 16) { outlineEnabled = it }
+
+        // Record button
+        kontrol.onTogglePad(1, 0, midiHue = 0) {
+            if (it) {
+                midiRecorder.startRecording()
+                midiPlayer.enqueue(
+                        midiRecorder.getMessages().filter { !blacklistButtons.contains(it.control) }
+                )
+                midiPlayer.play()
+                musicPlayer.play()
+            } else {
+                midiRecorder.stopRecording()
+                midiPlayer.stop()
+                musicPlayer.pause()
+                musicPlayer.rewind()
+            }
+        }
+
+        // Play button
+        kontrol.onTriggerPad(1, 1, midiHue = 40) {
+            if (it) {
+                if (!midiPlayer.isPlaying) {
+                    midiPlayer.enqueue(
+                            midiRecorder.getMessages().filter { !blacklistButtons.contains(it.control) }
+                    )
+                    midiPlayer.play()
+                    musicPlayer.play()
+                } else {
+                    midiPlayer.stop()
+                    musicPlayer.pause()
+                    musicPlayer.rewind()
+                }
+            }
+        }
     }
 
     override fun setup() = with(sketch) {
-
-        colorMode(PConstants.HSB, 360f, 100f, 100f)
-        rectMode(PConstants.CORNER)
+        midiRecorder.plugIn(kontrol)
+        midiPlayer.plugIn(kontrol)
+        musicPlayer.addListener(audioProcessor)
 
         universe = Universe(
                 Array(height / cellSize) {
@@ -79,9 +125,15 @@ class GameOfLifeSketch : BaseSketch() {
             resizeRatioAware(width = overlay.shorterDimension() / 2)
         }
 
-        beatCounter.addListener(OnKick, 2) {
+        beatCounter.addListener(OnKick, 1) {
             randomize(0.995f)
         }
+
+        beatCounter.addListener(OnKick, 4) {
+            targetZoom = random(1f, 1.2f)
+        }
+
+        randomize(0.30f)
     }
 
     /**
@@ -122,10 +174,12 @@ class GameOfLifeSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
+        midiPlayer.update()
+
         hueStart = kontrol.knob1.midiRange(0f, 360f)
         hueEnd = kontrol.knob2.midiRange(0f, 360f)
         randomizeThresh = kontrol.slider1.midiRange(1f, 0f)
-        stepMillis = kontrol.knob3.midiRange(50f, 120f).toInt()
+        stepMillis = kontrol.knob3.midiRange(40f, 120f).toInt()
         coolingFactor = kontrol.knob4.midiRange(0.10f, 0.99f)
         heatMapSaturation = kontrol.slider2.midiRange(0f, 100f)
 
@@ -133,7 +187,8 @@ class GameOfLifeSketch : BaseSketch() {
         drawOverlay()
         background(0f, 0f, 10f)
         translateCenter()
-        scale(map(saw(1/10f), -1f, 1f, 1f, 1.20f))
+        actualZoom = lerp(actualZoom, targetZoom, 0.50f)
+        scale(actualZoom)
 
         if (millis() > nextRound) {
             nextRound = millis() + stepMillis
