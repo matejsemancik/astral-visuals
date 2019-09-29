@@ -11,7 +11,7 @@ class MidiFileParser(private val sketch: PApplet) {
 
     private val json = Json(JsonConfiguration.Stable.copy(prettyPrint = true))
 
-    private fun loadFile(filePath: String): List<MidiMessage>? = with(sketch) {
+    fun loadFile(filePath: String): List<MidiMessage>? = with(sketch) {
         try {
             File(dataPath(filePath)).readText().let { jsonString ->
                 json.parse(MidiMessage.serializer().list, jsonString)
