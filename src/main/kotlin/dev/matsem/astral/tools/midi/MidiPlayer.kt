@@ -1,9 +1,13 @@
 package dev.matsem.astral.tools.midi
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import processing.core.PApplet
 import java.util.*
 
 class MidiPlayer(private val sketch: PApplet) {
+
+    private val json = Json(JsonConfiguration.Stable)
 
     private lateinit var device: MidiDevice
     private var messages: Stack<MidiMessage> = Stack()
@@ -35,7 +39,7 @@ class MidiPlayer(private val sketch: PApplet) {
             return
         }
 
-        while(messages.peek().frame + frameOffset <= sketch.frameCount) {
+        while (messages.peek().frame + frameOffset <= sketch.frameCount) {
             val msg = messages.pop()
             when (msg.type) {
                 MidiMessageType.CONTROLLER_CHANGE -> device.mockControlChange(msg.channel, msg.control, msg.value)

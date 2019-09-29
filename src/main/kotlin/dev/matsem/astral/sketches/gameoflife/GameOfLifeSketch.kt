@@ -10,6 +10,7 @@ import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
+import dev.matsem.astral.tools.midi.MidiFileParser
 import dev.matsem.astral.tools.midi.MidiPlayer
 import dev.matsem.astral.tools.midi.MidiRecorder
 import org.koin.core.inject
@@ -31,6 +32,10 @@ class GameOfLifeSketch : BaseSketch() {
     private val kontrol: KontrolF1 by inject()
     private val beatCounter: BeatCounter by inject()
     private val audioProcessor: AudioProcessor by inject()
+    private val midiRecorder: MidiRecorder by inject()
+    private val midiPlayer: MidiPlayer by inject()
+    private val midiFileParser: MidiFileParser by inject()
+    private val musicPlayer = audioProcessor.loadFile("music/seba2.wav")
 
     private var cellSize = 5
     private var nextRound = 0
@@ -56,10 +61,7 @@ class GameOfLifeSketch : BaseSketch() {
     private var targetZoom = 1f
     private var actualZoom = 1f
 
-    private val blacklistButtons = arrayOf(14, 15) // record and play midi buttons
-    private val midiRecorder: MidiRecorder = MidiRecorder(sketch)
-    private val midiPlayer: MidiPlayer = MidiPlayer(sketch)
-    private val musicPlayer = audioProcessor.loadFile("music/seba2.wav")
+    private val blacklistButtons = listOf(14, 15, 16, 17) // record control buttons
 
     override fun onBecameActive() = with(sketch) {
         rectMode(PConstants.CORNER)
@@ -78,14 +80,14 @@ class GameOfLifeSketch : BaseSketch() {
         }
 
         // Record button
-        kontrol.onTogglePad(1, 0, midiHue = 0) {
+        kontrol.onTogglePad(1, 0, midiHue = 50) {
             if (it) {
                 midiRecorder.startRecording()
                 midiPlayer.enqueue(
-                        midiRecorder.getMessages().filter { !blacklistButtons.contains(it.control) }
+                        midiRecorder.getMessages(excludedCCs = blacklistButtons)
                 )
                 midiPlayer.play()
-                musicPlayer.play()
+//                musicPlayer.play()
             } else {
                 midiRecorder.stopRecording()
                 midiPlayer.stop()
@@ -95,19 +97,26 @@ class GameOfLifeSketch : BaseSketch() {
         }
 
         // Play button
-        kontrol.onTriggerPad(1, 1, midiHue = 40) {
+        kontrol.onTriggerPad(1, 1, midiHue = 65) {
             if (it) {
                 if (!midiPlayer.isPlaying) {
                     midiPlayer.enqueue(
-                            midiRecorder.getMessages().filter { !blacklistButtons.contains(it.control) }
+                            midiRecorder.getMessages(excludedCCs = blacklistButtons)
                     )
                     midiPlayer.play()
-                    musicPlayer.play()
+//                    musicPlayer.play()
                 } else {
                     midiPlayer.stop()
                     musicPlayer.pause()
                     musicPlayer.rewind()
                 }
+            }
+        }
+
+        // Save automation to file button
+        kontrol.onTriggerPad(1, 2, midiHue = 70) {
+            if (it) {
+                midiFileParser.saveFile(midiRecorder.getMessages(excludedCCs = blacklistButtons), "midi/automation.json")
             }
         }
     }
@@ -127,6 +136,9 @@ class GameOfLifeSketch : BaseSketch() {
 
         semLogo = loadImage("images/semlogo.png").apply {
             resizeRatioAware(width = overlay.shorterDimension() / 2)
+        }
+        astralLogo = loadImage("images/astrallogo.png").apply {
+            resizeRatioAware(width = (overlay.shorterDimension() / 1.5f).toInt())
         }
 
         beatCounter.addListener(OnKick, 1) {
