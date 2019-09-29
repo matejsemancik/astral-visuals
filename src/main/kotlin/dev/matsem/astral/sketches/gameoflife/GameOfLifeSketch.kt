@@ -203,7 +203,7 @@ class GameOfLifeSketch : BaseSketch() {
         drawOverlay()
         background(0f, 0f, 10f)
         translateCenter()
-        actualZoom = lerp(actualZoom, targetZoom, 0.50f)
+        actualZoom = lerp(actualZoom, targetZoom, 0.20f)
         scale(actualZoom)
 
         if (millis() > nextRound) {
