@@ -38,9 +38,9 @@ class MidiPlayer(private val sketch: PApplet) {
         while(messages.peek().frame + frameOffset <= sketch.frameCount) {
             val msg = messages.pop()
             when (msg.type) {
-                ControllerChange -> device.mockControlChange(msg.channel, msg.control, msg.value)
-                NoteOn -> device.mockNoteOn(msg.channel, msg.control, msg.value)
-                NoteOff -> device.mockNoteOff(msg.channel, msg.control, msg.value)
+                MidiMessageType.CONTROLLER_CHANGE -> device.mockControlChange(msg.channel, msg.control, msg.value)
+                MidiMessageType.NOTE_ON -> device.mockNoteOn(msg.channel, msg.control, msg.value)
+                MidiMessageType.NOTE_OFF -> device.mockNoteOff(msg.channel, msg.control, msg.value)
             }
 
             if (messages.isEmpty()) {

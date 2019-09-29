@@ -1,9 +1,7 @@
 package dev.matsem.astral.tools.midi
 
-sealed class MidiMessageType
-
-object ControllerChange : MidiMessageType()
-
-object NoteOn : MidiMessageType()
-
-object NoteOff : MidiMessageType()
+enum class MidiMessageType {
+    CONTROLLER_CHANGE,
+    NOTE_ON,
+    NOTE_OFF
+}

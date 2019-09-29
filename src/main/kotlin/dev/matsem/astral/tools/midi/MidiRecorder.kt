@@ -21,7 +21,7 @@ class MidiRecorder(private val sketch: PApplet) {
 
                 if (isRecording) {
                     messages += MidiMessage(
-                            type = ControllerChange,
+                            type = MidiMessageType.CONTROLLER_CHANGE,
                             millis = sketch.millis() - millisOffset,
                             frame = sketch.frameCount - frameOffset,
                             channel = channel,
@@ -38,7 +38,7 @@ class MidiRecorder(private val sketch: PApplet) {
 
                 if (isRecording) {
                     messages += MidiMessage(
-                            type = NoteOn,
+                            type = MidiMessageType.NOTE_ON,
                             millis = sketch.millis() - millisOffset,
                             frame = sketch.frameCount - frameOffset,
                             channel = channel,
@@ -55,7 +55,7 @@ class MidiRecorder(private val sketch: PApplet) {
 
                 if (isRecording) {
                     messages += MidiMessage(
-                            type = NoteOff,
+                            type = MidiMessageType.NOTE_OFF,
                             millis = sketch.millis() - millisOffset,
                             frame = sketch.frameCount - frameOffset,
                             channel = channel,

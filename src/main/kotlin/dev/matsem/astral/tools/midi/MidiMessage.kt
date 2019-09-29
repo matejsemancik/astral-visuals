@@ -1,5 +1,8 @@
 package dev.matsem.astral.tools.midi
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class MidiMessage(
         val type: MidiMessageType,
         val millis: Int,
