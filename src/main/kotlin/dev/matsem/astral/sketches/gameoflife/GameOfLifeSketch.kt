@@ -1,19 +1,15 @@
 package dev.matsem.astral.sketches.gameoflife
 
 import controlP5.ControlP5Constants.CENTER
-import dev.matsem.astral.Config.VideoExport.MIDI_AUTOMATION_FILE
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
-import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
-import dev.matsem.astral.tools.midi.MidiFileParser
-import dev.matsem.astral.tools.midi.MidiPlayer
-import dev.matsem.astral.tools.midi.MidiRecorder
+import dev.matsem.astral.tools.video.VideoPreparationTool
 import org.koin.core.inject
 import processing.core.PApplet.constrain
 import processing.core.PApplet.lerp
@@ -32,11 +28,7 @@ class GameOfLifeSketch : BaseSketch() {
 
     private val kontrol: KontrolF1 by inject()
     private val beatCounter: BeatCounter by inject()
-    private val audioProcessor: AudioProcessor by inject()
-    private val midiRecorder: MidiRecorder by inject()
-    private val midiPlayer: MidiPlayer by inject()
-    private val midiFileParser: MidiFileParser by inject()
-    private val musicPlayer = audioProcessor.loadFile("music/seba2.wav")
+    private val preparationTool: VideoPreparationTool by inject()
 
     private var cellSize = 5
     private var nextRound = 0
@@ -83,33 +75,19 @@ class GameOfLifeSketch : BaseSketch() {
         // Record button
         kontrol.onTogglePad(1, 0, midiHue = 100) {
             if (it) {
-                midiRecorder.startRecording()
-                midiPlayer.enqueue(
-                        midiRecorder.getMessages(excludedCCs = blacklistButtons)
-                )
-                midiPlayer.play()
-                musicPlayer.play()
+                preparationTool.startRecording()
             } else {
-                midiRecorder.stopRecording()
-                midiPlayer.stop()
-                musicPlayer.pause()
-                musicPlayer.rewind()
+                preparationTool.stopRecording()
             }
         }
 
         // Play button
         kontrol.onTriggerPad(1, 1, midiHue = 65) {
             if (it) {
-                if (!midiPlayer.isPlaying) {
-                    midiPlayer.enqueue(
-                            midiRecorder.getMessages(excludedCCs = blacklistButtons)
-                    )
-                    midiPlayer.play()
-                    musicPlayer.play()
+                if (preparationTool.isPlaying.not()) {
+                    preparationTool.startReplay()
                 } else {
-                    midiPlayer.stop()
-                    musicPlayer.pause()
-                    musicPlayer.rewind()
+                    preparationTool.stopReplay()
                 }
             }
         }
@@ -117,10 +95,7 @@ class GameOfLifeSketch : BaseSketch() {
         // Save automation to file button
         kontrol.onTriggerPad(1, 2, midiHue = 65) {
             if (it) {
-                midiFileParser.saveFile(
-                        midiRecorder.getMessages(excludedCCs = blacklistButtons),
-                        MIDI_AUTOMATION_FILE
-                )
+                preparationTool.saveIntoFile()
             }
         }
     }
@@ -133,9 +108,10 @@ class GameOfLifeSketch : BaseSketch() {
         kontrol.knob4 = coolingFactor.toMidi(0.10f, 0.99f)
         kontrol.slider2 = heatMapSaturation.toMidi(0f, 100f)
 
-        midiRecorder.plugIn(kontrol)
-        midiPlayer.plugIn(kontrol)
-        musicPlayer.addListener(audioProcessor)
+        preparationTool
+                .plugInMidiDevice(kontrol)
+                .setMusicFile("music/seba2.wav")
+                .setBlacklistedMessages(blacklistButtons)
 
         universe = Universe(
                 Array(height / cellSize) {
@@ -199,7 +175,7 @@ class GameOfLifeSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
-        midiPlayer.update()
+        preparationTool.update()
 
         hueStart = kontrol.knob1.midiRange(0f, 360f)
         hueEnd = kontrol.knob2.midiRange(0f, 360f)

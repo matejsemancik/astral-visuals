@@ -25,6 +25,7 @@ import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.midi.MidiFileParser
 import dev.matsem.astral.tools.midi.MidiPlayer
 import dev.matsem.astral.tools.midi.MidiRecorder
+import dev.matsem.astral.tools.video.VideoPreparationTool
 import org.jbox2d.common.Vec2
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -43,6 +44,9 @@ val appModule = module {
     single { MidiFileParser(get()) }
     factory { MidiRecorder(get()) }
     factory { MidiPlayer(get()) }
+
+    // Video tools
+    factory { VideoPreparationTool(get(), get(), get(), get(), get()) }
 
     // Audio
     single { Minim(get() as PApplet) }
