@@ -5,10 +5,9 @@ import ddf.minim.AudioListener
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import processing.core.PApplet
 
 class AudioProcessor constructor(
-        private val sketch: PApplet,
+        private val minim: Minim,
         private val isInRenderMode: Boolean
 ) : AudioListener {
 
@@ -26,7 +25,6 @@ class AudioProcessor constructor(
         beatDetect.detect(p0)
     }
 
-    private val minim = Minim(sketch)
     val audioInput: AudioInput = minim.lineIn.apply {
         if (!isInRenderMode) addListener(this@AudioProcessor)
     }
@@ -75,6 +73,8 @@ class AudioProcessor constructor(
             fft.getAvg(i) * gain
         }
     }
+
+    fun loadFile(file: String) = minim.loadFile(file)
 
     fun mockFft(left: List<Float>, right: List<Float>) {
         mockLeft = ArrayList(left)

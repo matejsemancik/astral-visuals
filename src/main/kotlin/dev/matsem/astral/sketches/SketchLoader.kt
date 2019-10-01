@@ -11,6 +11,7 @@ import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
+import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
@@ -25,6 +26,8 @@ import dev.matsem.astral.tools.galaxy.controls.Pot
 import dev.matsem.astral.tools.galaxy.controls.PushButton
 import dev.matsem.astral.tools.galaxy.controls.ToggleButton
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import dev.matsem.astral.tools.midi.MidiFileParser
+import dev.matsem.astral.tools.midi.MidiPlayer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -44,6 +47,8 @@ class SketchLoader : PApplet(), KoinComponent {
     private val galaxy: Galaxy by inject()
     private val kontrolF1: KontrolF1 by inject()
     private val videoExport: VideoExport by inject()
+    private val midiPlayer: MidiPlayer by inject()
+    private val midiFileParser: MidiFileParser by inject()
 
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
@@ -84,6 +89,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val cubesSketch: CubesSketch by inject()
     private val videoSketch: VideoSketch by inject()
     private val starfieldSketch: StarfieldSketch by inject()
+    private val gameOfLifeSketch: GameOfLifeSketch by inject()
 
     // endregion
 
@@ -144,6 +150,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('p', cubesSketch)
             put('m', videoSketch)
             put('s', starfieldSketch)
+            put('g', gameOfLifeSketch)
         }
 
         sketches.forEach { key, sketch ->
@@ -167,6 +174,11 @@ class SketchLoader : PApplet(), KoinComponent {
             frameRate(1000f)
             audioToTextFile(Config.VideoExport.AUDIO_FILE_PATH)
             reader = createReader("${Config.VideoExport.AUDIO_FILE_PATH}.txt")
+            midiFileParser.loadFile(Config.VideoExport.MIDI_AUTOMATION_FILE)?.let {
+                midiPlayer.plugIn(kontrolF1)
+                midiPlayer.enqueue(it)
+                midiPlayer.play()
+            }
             videoExport.startMovie()
         }
     }
@@ -226,6 +238,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
                     audioProcessor.mockFft(channelLeft, channelRight)
                     audioProcessor.mockBeatDetect(BeatDetectData(beat == 1, beat == 2, beat == 3))
+                    midiPlayer.update(soundTime * 1000f)
                     activeSketch().draw()
                     videoExport.saveFrame()
                 }
@@ -245,8 +258,7 @@ class SketchLoader : PApplet(), KoinComponent {
     override fun keyPressed(event: KeyEvent?) {
         event?.let {
             if (sketches.keys.contains(it.key)) {
-                selector = it.key
-                activeSketch().onBecameActive()
+                switchSketch(it.key)
             } else {
                 activeSketch().keyPressed(event)
             }
