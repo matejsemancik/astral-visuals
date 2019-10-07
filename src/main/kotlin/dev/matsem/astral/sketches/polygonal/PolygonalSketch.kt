@@ -5,6 +5,7 @@ import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.asteroid.Asteroid
 import dev.matsem.astral.sketches.polygonal.star.Starfield
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.newLine
@@ -24,6 +25,7 @@ class PolygonalSketch : BaseSketch() {
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     // region params
 
@@ -83,6 +85,7 @@ class PolygonalSketch : BaseSketch() {
         starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightButton.isPressed, audioProcessor)) })
         fftLogger = FFTLogger(sketch, audioProcessor)
+        automator.setupWithGalaxy(0, 26, 27, 28)
     }
 
     override fun onBecameActive() = with(sketch) {
