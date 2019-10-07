@@ -17,9 +17,8 @@ class ToggleButton internal constructor(
         updatePhone()
     }
 
-    fun attachListener(listener: (Boolean) -> Unit): ToggleButton {
+    fun addListener(listener: (Boolean) -> Unit) {
         this.onStateChanged = listener
-        return this
     }
 
     override fun controllerChange(channel: Int, control: Int, v: Int) {

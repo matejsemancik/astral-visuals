@@ -30,8 +30,14 @@ class Galaxy : MidiDevice {
     fun createPushButton(channel: Int, cc: Int, onPress: () -> Unit) =
             PushButton(channel, cc, onPress).also { controls.add(it) }
 
-    fun createToggleButton(channel: Int, cc: Int, defaultValue: Boolean = false) =
-            ToggleButton(midiBus, channel, cc, defaultValue).also { controls.add(it) }
+    fun createToggleButton(
+            channel: Int,
+            cc: Int,
+            defaultValue: Boolean = false,
+            listener: ((Boolean) -> Unit)? = null
+    ) = ToggleButton(midiBus, channel, cc, defaultValue)
+            .apply { listener?.let { addListener(it) } }
+            .also { controls.add(it) }
 
     fun createPot(channel: Int, cc: Int, min: Float = 0f, max: Float = 1f, initialValue: Float = 0f) =
             Pot(midiBus, channel, cc, min, max, initialValue).also { controls.add(it) }
