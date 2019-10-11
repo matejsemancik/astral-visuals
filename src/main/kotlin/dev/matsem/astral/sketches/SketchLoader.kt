@@ -55,9 +55,9 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(0f, 100f, 0f)
-    private val fgColor = PVector(128f, 100f, 100f)
-    private val accentColor = PVector(0f, 0f, 10f)
+    private val bgColor = PVector(239f, 78f, 100f)
+    private val fgColor = PVector(0f, 0f, 100f)
+    private val accentColor = PVector(0f, 0f, 100f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -114,7 +114,7 @@ class SketchLoader : PApplet(), KoinComponent {
         kontrolF1.connect()
 
         gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
-        debugButton = galaxy.createToggleButton(15, 65, true)
+        debugButton = galaxy.createToggleButton(15, 65, false)
         resendButton = galaxy.createPushButton(15, 66) {
             galaxy.updatePhone()
         }
