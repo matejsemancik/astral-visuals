@@ -2,8 +2,8 @@ package dev.matsem.astral.sketches.terrain
 
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
-import dev.matsem.astral.sketches.polygonal.star.Starfield
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.newLine
@@ -19,6 +19,7 @@ class TerrainSketch : BaseSketch() {
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     companion object {
         const val RENDER_MODE_TRIANGLE_STRIP = "RENDER_MODE_TRIANGLE_STRIP"
@@ -85,23 +86,22 @@ class TerrainSketch : BaseSketch() {
 
     // endregion
 
-    // region other shit
-
-    private lateinit var starfield: Starfield
-    private lateinit var starfield2: Starfield
-    val font = sketch.createFont("georgiab.ttf", 24f, true)
-
-    // endregion
-
     private lateinit var fftLogger: FFTLogger
 
     override fun setup() {
         fftLogger = FFTLogger(sketch, audioProcessor)
-        starfield = Starfield(sketch, 1200)
-        starfield2 = Starfield(sketch, 1200)
+        automator.setupWithGalaxy(
+                channel = 1,
+                recordButtonCC = 21,
+                playButtonCC = 22,
+                loopButtonCC = 23,
+                clearButtonCC = 24,
+                channelFilter = null
+        )
     }
 
     override fun draw() = with(sketch) {
+        automator.update()
         renderMode = renderModeButtons.activeButtonsIndices().first()
         terrainMode = terrainModeButtons.activeButtonsIndices().first()
 
@@ -111,15 +111,8 @@ class TerrainSketch : BaseSketch() {
 
         background(bgColor)
 
-        starfield.update(3 + (audioProcessor.getRange(6000f..12000f) * 5f).toInt())
-        starfield.setColor(fgHue, fgSat, fgBrightness)
-        starfield.draw()
-        starfield2.update(3 + (audioProcessor.getRange(2500f..2600f) * 3f).toInt())
-        starfield2.setColor(fgHue + 2, fgSat, fgBrightness)
-        starfield2.draw()
-
         stroke(fgColor)
-        strokeWeight(1.4f)
+        strokeWeight(6f)
         fill(accentColor)
 
         regenerate()
