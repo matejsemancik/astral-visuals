@@ -72,12 +72,10 @@ class MidiAutomator(
         }
 
         midiRecorder.plugIn(galaxy, channelFilter)
-        midiPlayer.plugIn(galaxy)
-        midiPlayer.doOnPlay {
-            playButton.turnOn()
-        }
-        midiPlayer.doOnStop {
-            playButton.turnOff()
+        midiPlayer.apply {
+            plugIn(galaxy)
+            doOnPlay { playButton.turnOn() }
+            doOnStop { playButton.turnOff() }
         }
     }
 
@@ -103,13 +101,9 @@ class MidiAutomator(
         midiPlayer.play(loop = true)
     }
 
-    private fun stopPlayer() {
-        midiPlayer.stop()
-    }
+    private fun stopPlayer() = midiPlayer.stop()
 
-    fun update() {
-        midiPlayer.update()
-    }
+    fun update() = midiPlayer.update()
 
     private fun clear() {
         stopRecording()
