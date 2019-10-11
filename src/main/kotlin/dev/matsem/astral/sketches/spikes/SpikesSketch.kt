@@ -3,6 +3,7 @@ package dev.matsem.astral.sketches.spikes
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.quantize
@@ -18,6 +19,7 @@ class SpikesSketch : BaseSketch() {
     override val sketch: SketchLoader by inject()
     val galaxy: Galaxy by inject()
     val audioProcessor: AudioProcessor by inject()
+    private val automator: MidiAutomator by inject()
 
     lateinit var positions: Array<Array<PVector>>
     lateinit var fftMapping: Array<IntArray>
@@ -64,9 +66,20 @@ class SpikesSketch : BaseSketch() {
                 paddHorizontal = paddX,
                 paddVertical = paddY
         )
+
+        automator.setupWithGalaxy(
+                channel = 7,
+                recordButtonCC = 16,
+                playButtonCC = 17,
+                loopButtonCC = 18,
+                clearButtonCC = 19,
+                channelFilter = null
+        )
     }
 
     override fun draw() = with(sketch) {
+        automator.update()
+
         if (beatRandomize.isPressed && audioProcessor.beatDetect.isKick) {
             beatRandomizeCounter++
 

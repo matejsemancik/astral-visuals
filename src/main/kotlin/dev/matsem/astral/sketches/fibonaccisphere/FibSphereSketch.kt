@@ -3,6 +3,7 @@ package dev.matsem.astral.sketches.fibonaccisphere
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.shorterDimension
@@ -20,6 +21,7 @@ class FibSphereSketch : BaseSketch() {
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     data class SpherePoint(val lat: Float, val lon: Float, val radius: Float)
 
@@ -97,9 +99,19 @@ class FibSphereSketch : BaseSketch() {
     override fun setup() = with(sketch) {
         sphereDetail(8)
         initSphere(numPoints)
+
+        automator.setupWithGalaxy(
+                channel = 2,
+                recordButtonCC = 24,
+                playButtonCC = 25,
+                loopButtonCC = 26,
+                clearButtonCC = 27,
+                channelFilter = null
+        )
     }
 
     override fun draw() = with(sketch) {
+        automator.update()
         if (millis() > timerLastTick + timerIntervalPot.value) {
             timerLastTick = millis()
             onTimerTick()

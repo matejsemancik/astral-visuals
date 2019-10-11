@@ -4,6 +4,7 @@ import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.starglitch.star.Starfield2
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.newLine
 import dev.matsem.astral.tools.extensions.threshold
 import dev.matsem.astral.tools.galaxy.Galaxy
@@ -15,6 +16,7 @@ class StarGlitchSketch : BaseSketch() {
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     // region params
 
@@ -54,7 +56,14 @@ class StarGlitchSketch : BaseSketch() {
         starfield1 = Starfield2(sketch, 300).apply { motion = Starfield2.Motion.TRANSLATING_FORWARD }
         starfield2 = Starfield2(sketch, 300).apply { motion = Starfield2.Motion.TRANSLATING_FORWARD }
 
-        // TouchOSC
+        automator.setupWithGalaxy(
+                channel = 3,
+                recordButtonCC = 28,
+                playButtonCC = 29,
+                loopButtonCC = 30,
+                clearButtonCC = 31,
+                channelFilter = null
+        )
     }
 
     fun onTimerTick() {
@@ -64,6 +73,8 @@ class StarGlitchSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
+        automator.update()
+
         if (millis() > timerLastTick + timerIntervalPot.value) {
             timerLastTick = millis()
             onTimerTick()
