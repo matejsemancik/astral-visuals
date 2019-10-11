@@ -4,6 +4,7 @@ import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.star.Starfield
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
@@ -18,6 +19,7 @@ class BoxesSketch : BaseSketch() {
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
     private val box2d: Box2DProcessing by inject()
+    private val automator: MidiAutomator by inject()
 
     var starMotion = Starfield.Motion.ZOOMING
 
@@ -78,7 +80,16 @@ class BoxesSketch : BaseSketch() {
         sphereDetail(sphereDetailPot.value.toInt())
     }
 
-    override fun setup() = Unit
+    override fun setup() {
+        automator.setupWithGalaxy(
+                channel = 6,
+                recordButtonCC = 29,
+                playButtonCC = 30,
+                loopButtonCC = 31,
+                clearButtonCC = 32,
+                channelFilter = null
+        )
+    }
 
     private fun addBox() = with(sketch) {
         bodies.add(
@@ -97,6 +108,7 @@ class BoxesSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
+        automator.update()
         if (keyPressed) {
             when (key) {
                 'b' -> {

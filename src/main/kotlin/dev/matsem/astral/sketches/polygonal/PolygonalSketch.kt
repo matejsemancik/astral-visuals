@@ -5,6 +5,7 @@ import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.polygonal.asteroid.Asteroid
 import dev.matsem.astral.sketches.polygonal.star.Starfield
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.centerX
 import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.newLine
@@ -24,6 +25,7 @@ class PolygonalSketch : BaseSketch() {
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     // region params
 
@@ -43,7 +45,7 @@ class PolygonalSketch : BaseSketch() {
     val wiggleButton = galaxy.createToggleButton(0, 17, false)
     val starfieldRotationEnabledButton = galaxy.createToggleButton(0, 18, true)
     val wiggleMultiplierPot = galaxy.createPot(0, 19, 0f, 20f, 5f)
-    val hudButton = galaxy.createToggleButton(0, 23, true)
+    val hudButton = galaxy.createToggleButton(0, 23, false)
     val rotationZPot = galaxy.createPot(0, 24, -1f, 1f, 0f)
     val rotationZResetButton = galaxy.createPushButton(0, 25) {
         rotationZPot.reset()
@@ -83,6 +85,13 @@ class PolygonalSketch : BaseSketch() {
         starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
         repeat(NUMBER_ASTEROIDS, action = { triangloids.add(Asteroid(sketch, centerWeightButton.isPressed, audioProcessor)) })
         fftLogger = FFTLogger(sketch, audioProcessor)
+        automator.setupWithGalaxy(
+                channel = 0,
+                recordButtonCC = 26,
+                playButtonCC = 27,
+                loopButtonCC = 28,
+                clearButtonCC = 29
+        )
     }
 
     override fun onBecameActive() = with(sketch) {
@@ -90,6 +99,7 @@ class PolygonalSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
+        automator.update()
         if (shouldRegenerate) {
             regenerate()
             shouldRegenerate = false

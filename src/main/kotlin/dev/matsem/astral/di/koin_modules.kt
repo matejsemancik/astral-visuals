@@ -20,6 +20,7 @@ import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.midi.MidiFileParser
@@ -44,6 +45,7 @@ val appModule = module {
     single { MidiFileParser(get()) }
     factory { MidiRecorder(get()) }
     factory { MidiPlayer(get()) }
+    factory { MidiAutomator(get(), get(), get()) }
 
     // Video tools
     factory { VideoPreparationTool(get(), get(), get(), get(), get()) }

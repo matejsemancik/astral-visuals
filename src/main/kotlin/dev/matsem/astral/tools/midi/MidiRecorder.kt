@@ -1,12 +1,8 @@
 package dev.matsem.astral.tools.midi
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import processing.core.PApplet
 
 class MidiRecorder(private val sketch: PApplet) {
-
-    private val json = Json(JsonConfiguration.Stable)
 
     private val messages = mutableListOf<MidiMessage>()
     private var frameOffset = 0
@@ -16,11 +12,15 @@ class MidiRecorder(private val sketch: PApplet) {
     var isRecording = false
         private set
 
-    fun plugIn(device: MidiDevice) {
+    fun plugIn(device: MidiDevice, channelFilter: Int? = null) {
         device.plugIn(object : MidiListener {
             override fun controllerChange(channel: Int, control: Int, value: Int) {
                 if (debugLogging) {
                     println("MidiRecorder controllerChange: chan $channel, control $control, value $value")
+                }
+
+                if (channelFilter != null && channelFilter != channel) {
+                    return
                 }
 
                 if (isRecording) {
@@ -79,11 +79,13 @@ class MidiRecorder(private val sketch: PApplet) {
 
     fun stopRecording() {
         isRecording = false
-
-        println("Recorded messages:")
         messages.sortBy { it.millis }
-        messages.forEach { println(it) }
+
+//        println("Recorded messages:")
+//        messages.forEach { println(it) }
     }
+
+    fun clear() = messages.clear()
 
     fun getMessages(excludedCCs: List<Int> = listOf()) = messages
             .toList()

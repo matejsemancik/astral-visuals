@@ -3,6 +3,7 @@ package dev.matsem.astral.sketches.attractor
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.Pot
@@ -19,6 +20,7 @@ class AttractorSketch : BaseSketch() {
     override val sketch: SketchLoader by inject()
     val audioProcessor: AudioProcessor by inject()
     val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     private var rightmost = Float.MIN_VALUE
     private var leftmost = Float.MAX_VALUE
@@ -70,9 +72,19 @@ class AttractorSketch : BaseSketch() {
 
     private val dotSizePot = galaxy.createPot(5, 44, 1f, 5f, 1f)
 
-    override fun setup() = Unit
+    override fun setup() {
+        automator.setupWithGalaxy(
+                channel = 5,
+                recordButtonCC = 45,
+                playButtonCC = 46,
+                loopButtonCC = 47,
+                clearButtonCC = 48,
+                channelFilter = null
+        )
+    }
 
     override fun draw() = with(sketch) {
+        automator.update()
         background(bgColor)
         strokeWeight(dotSizePot.value)
 

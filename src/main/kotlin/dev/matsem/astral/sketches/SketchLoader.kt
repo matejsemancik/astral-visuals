@@ -55,9 +55,9 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(0f, 100f, 0f)
-    private val fgColor = PVector(128f, 100f, 100f)
-    private val accentColor = PVector(0f, 0f, 10f)
+    private val bgColor = PVector(239f, 0f, 0f)
+    private val fgColor = PVector(0f, 0f, 100f)
+    private val accentColor = PVector(0f, 0f, 100f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -114,9 +114,9 @@ class SketchLoader : PApplet(), KoinComponent {
         kontrolF1.connect()
 
         gainPot = galaxy.createPot(15, 64, 0f, 5f, 1f)
-        debugButton = galaxy.createToggleButton(15, 65, true)
+        debugButton = galaxy.createToggleButton(15, 65, false)
         resendButton = galaxy.createPushButton(15, 66) {
-            galaxy.sendClientUpdates()
+            galaxy.updatePhone()
         }
 
         val colorPots = mutableListOf<Pot>()
@@ -159,16 +159,17 @@ class SketchLoader : PApplet(), KoinComponent {
 
         activeSketch().onBecameActive()
 
-        PushButton(galaxy.midiBus, 15, 1) { switchSketch('1') }
-        PushButton(galaxy.midiBus, 15, 2) { switchSketch('2') }
-        PushButton(galaxy.midiBus, 15, 3) { switchSketch('3') }
-        PushButton(galaxy.midiBus, 15, 4) { switchSketch('4') }
-        PushButton(galaxy.midiBus, 15, 5) { switchSketch('5') }
-        PushButton(galaxy.midiBus, 15, 6) { switchSketch('8') }
-        PushButton(galaxy.midiBus, 15, 7) { switchSketch('7') }
-        PushButton(galaxy.midiBus, 15, 8) { switchSketch('9') }
-        PushButton(galaxy.midiBus, 15, 9) { switchSketch('p') }
-        PushButton(galaxy.midiBus, 15, 10) { switchSketch('m') }
+        galaxy.createPushButton(15, 1) {}
+        galaxy.createPushButton(15, 1) { switchSketch('1') }
+        galaxy.createPushButton(15, 2) { switchSketch('2') }
+        galaxy.createPushButton(15, 3) { switchSketch('3') }
+        galaxy.createPushButton(15, 4) { switchSketch('4') }
+        galaxy.createPushButton(15, 5) { switchSketch('5') }
+        galaxy.createPushButton(15, 6) { switchSketch('8') }
+        galaxy.createPushButton(15, 7) { switchSketch('7') }
+        galaxy.createPushButton(15, 8) { switchSketch('9') }
+        galaxy.createPushButton(15, 9) { switchSketch('p') }
+        galaxy.createPushButton(15, 10) { switchSketch('m') }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)
