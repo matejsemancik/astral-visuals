@@ -90,8 +90,7 @@ class PolygonalSketch : BaseSketch() {
                 recordButtonCC = 26,
                 playButtonCC = 27,
                 loopButtonCC = 28,
-                clearButtonCC = 29,
-                channelFilter = 0
+                clearButtonCC = 29
         )
     }
 

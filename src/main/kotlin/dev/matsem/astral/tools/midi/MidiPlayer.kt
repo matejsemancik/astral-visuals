@@ -2,6 +2,7 @@ package dev.matsem.astral.tools.midi
 
 import processing.core.PApplet
 import java.util.*
+import kotlin.properties.Delegates
 
 class MidiPlayer(private val sketch: PApplet) {
 
@@ -10,7 +11,16 @@ class MidiPlayer(private val sketch: PApplet) {
     private var frameOffset: Int = 0
     private var millisOffset: Int = 0
 
-    var isPlaying = false
+    private var onPlayStart: (() -> Unit)? = null
+    private var onPlayStop: (() -> Unit)? = null
+
+    var isPlaying: Boolean by Delegates.observable(false) { _, _, isPlaying ->
+        if (isPlaying) {
+            onPlayStart?.invoke()
+        } else {
+            onPlayStop?.invoke()
+        }
+    }
         private set
 
     fun plugIn(device: MidiDevice) {
@@ -30,6 +40,14 @@ class MidiPlayer(private val sketch: PApplet) {
 
     fun stop() {
         isPlaying = false
+    }
+
+    fun doOnPlay(func: () -> Unit) {
+        onPlayStart = func
+    }
+
+    fun doOnStop(func: () -> Unit) {
+        onPlayStop = func
     }
 
     fun update() {

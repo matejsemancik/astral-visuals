@@ -79,11 +79,13 @@ class MidiRecorder(private val sketch: PApplet) {
 
     fun stopRecording() {
         isRecording = false
-
-        println("Recorded messages:")
         messages.sortBy { it.millis }
-        messages.forEach { println(it) }
+
+//        println("Recorded messages:")
+//        messages.forEach { println(it) }
     }
+
+    fun clear() = messages.clear()
 
     fun getMessages(excludedCCs: List<Int> = listOf()) = messages
             .toList()

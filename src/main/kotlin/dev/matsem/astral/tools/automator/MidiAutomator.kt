@@ -17,10 +17,10 @@ class MidiAutomator(
         private val galaxy: Galaxy
 ) {
 
-    private var recordButton: ToggleButton? = null
-    private var playButton: ToggleButton? = null
-    private var loopButton: ToggleButton? = null
-    private var clearButton: PushButton? = null
+    private lateinit var recordButton: ToggleButton
+    private lateinit var playButton: ToggleButton
+    private lateinit var loopButton: ToggleButton
+    private lateinit var clearButton: PushButton
 
     private val buttonList = mutableListOf<Int>()
 
@@ -35,7 +35,7 @@ class MidiAutomator(
         recordButton = galaxy
                 .createToggleButton(channel, recordButtonCC, false) {
                     if (it) {
-                        startRecording(startOnFirstNote = false)
+                        startRecording()
                     } else {
                         stopRecording()
                     }
@@ -52,8 +52,12 @@ class MidiAutomator(
         playButton = galaxy
                 .createToggleButton(channel, playButtonCC, false) { isPressed ->
                     when {
-                        isPressed && loopButton?.isPressed == true -> playLoop()
-                        isPressed && loopButton?.isPressed == false -> playOneShot()
+                        isPressed && loopButton.isPressed -> {
+                            playLoop()
+                        }
+                        isPressed && !loopButton.isPressed -> {
+                            playOneShot()
+                        }
                         else -> stopPlayer()
                     }
                 }
@@ -69,20 +73,27 @@ class MidiAutomator(
 
         midiRecorder.plugIn(galaxy, channelFilter)
         midiPlayer.plugIn(galaxy)
+        midiPlayer.doOnPlay {
+            playButton.turnOn()
+        }
+        midiPlayer.doOnStop {
+            playButton.turnOff()
+        }
     }
 
-    private fun startRecording(startOnFirstNote: Boolean) {
-        //TODO first note
-        midiPlayer.stop()
+    private fun startRecording() {
         midiRecorder.startRecording()
+        recordButton.turnOn()
+
+        playOneShot()
     }
 
     private fun stopRecording() {
         midiRecorder.stopRecording()
+        recordButton.turnOff()
     }
 
     private fun playOneShot() {
-        midiRecorder.stopRecording()
         midiPlayer.enqueue(midiRecorder.getMessages(excludedCCs = buttonList))
         midiPlayer.play()
     }
@@ -93,7 +104,6 @@ class MidiAutomator(
 
     private fun stopPlayer() {
         midiPlayer.stop()
-        playButton?.isPressed
     }
 
     fun update() {
@@ -101,6 +111,8 @@ class MidiAutomator(
     }
 
     private fun clear() {
-        // TODO
+        stopRecording()
+        stopPlayer()
+        midiRecorder.clear()
     }
 }

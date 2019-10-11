@@ -30,6 +30,16 @@ class ToggleButton internal constructor(
 
     override fun update() = Unit
 
+    fun turnOn() {
+        isPressed = true
+        updatePhone()
+    }
+
+    fun turnOff() {
+        isPressed = false
+        updatePhone()
+    }
+
     override fun updatePhone() {
         midiBus.sendControllerChange(ch, cc, if (isPressed) 127 else 0)
     }
