@@ -95,11 +95,12 @@ class MidiAutomator(
 
     private fun playOneShot() {
         midiPlayer.enqueue(midiRecorder.getMessages(excludedCCs = buttonList))
-        midiPlayer.play()
+        midiPlayer.play(loop = false)
     }
 
     private fun playLoop() {
-        // TODO()
+        midiPlayer.enqueue(midiRecorder.getMessages(excludedCCs = buttonList))
+        midiPlayer.play(loop = true)
     }
 
     private fun stopPlayer() {
