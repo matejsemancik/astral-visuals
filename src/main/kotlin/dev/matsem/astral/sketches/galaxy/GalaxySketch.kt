@@ -7,6 +7,7 @@ import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.extensions.*
+import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
@@ -18,9 +19,8 @@ import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
 
+// TODO automator
 class GalaxySketch : BaseSketch(), KoinComponent {
-
-    override val sketch: SketchLoader by inject()
 
     data class Star(
             val vec: PVector,
@@ -37,13 +37,15 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             .withFps()
             .build()
 
+    override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val beatCounter: BeatCounter by inject()
     private val kontrol: KontrolF1 by inject()
+    private val galaxy: Galaxy by inject()
 
     private val lock = Any()
     private val starField = mutableListOf<Star>()
-    private val galaxy = mutableListOf<Star>()
+    private val galaxyStars = mutableListOf<Star>()
     private val images = arrayOf(
             GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 60f),
             GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f)
@@ -121,7 +123,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
     private fun createGalaxy(image: GalaxyImage) = with(sketch) {
         synchronized(lock) {
-            galaxy.clear()
+            galaxyStars.clear()
             val galaxyImage: PImage = loadImage(image.path).apply {
                 val ratio = pixelWidth / pixelHeight.toFloat()
                 resize(720, (720 / ratio).toInt())
@@ -133,7 +135,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
                 for (y in 0 until galaxyImage.height step image.pixelStep) {
                     pixelBrightness = brightness(galaxyImage[x, y])
                     if (pixelBrightness > image.threshold) {
-                        galaxy += Star(
+                        galaxyStars += Star(
                                 vec = PVector(
                                         x.toFloat() - galaxyImage.width / 2f,
                                         random(-4f, 4f),
@@ -151,7 +153,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     }
 
     private fun randomizeDiameters() = synchronized(lock) {
-        galaxy.forEach {
+        galaxyStars.forEach {
             it.diameter = generateDiameter()
         }
     }
@@ -180,7 +182,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
         // Galaxy
         synchronized(lock) {
-            galaxy.forEach {
+            galaxyStars.forEach {
                 pushMatrix()
                 translateCenter()
                 scale(zoomValue)
