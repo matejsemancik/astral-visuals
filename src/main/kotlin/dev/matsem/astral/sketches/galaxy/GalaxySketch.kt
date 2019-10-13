@@ -18,7 +18,6 @@ import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
 
-// TODO fg bg color
 class GalaxySketch : BaseSketch(), KoinComponent {
 
     override val sketch: SketchLoader by inject()
@@ -164,7 +163,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     override fun draw() = with(sketch) {
         bassGain = kontrol.slider1.midiRange(1f)
         zoomMin = kontrol.knob1.midiRange(1f, 4f)
-        zoomMax = kontrol.knob2.midiRange(2f, 4f)
+        zoomMax = kontrol.knob2.midiRange(1f, 4f)
         zoomHz = kontrol.slider3.midiRange(1 / 60f, 1 / 5f)
         zoomQuant = kontrol.knob3.midiRange(0.5f, 0.005f)
         diameterFactor = kontrol.knob4.midiRange(0.5f, 1.5f)
