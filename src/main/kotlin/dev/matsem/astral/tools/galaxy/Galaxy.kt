@@ -45,6 +45,9 @@ class Galaxy : MidiDevice {
     fun createButtonGroup(channel: Int, ccs: List<Int>, activeCCs: List<Int>) =
             ButtonGroup(midiBus, channel, ccs, activeCCs).also { controls.add(it) }
 
+    fun createPushButtonGroup(channel: Int, ccs: List<Int>, listener: (Int) -> Unit) =
+            PushButtonGroup(midiBus, channel, ccs, listener).also { controls.add(it) }
+
     fun createEncoder(channel: Int, cc: Int, min: Int, max: Int, initialValue: Int = 0) =
             Encoder(midiBus, channel, cc, min, max, initialValue).also { controls.add(it) }
 

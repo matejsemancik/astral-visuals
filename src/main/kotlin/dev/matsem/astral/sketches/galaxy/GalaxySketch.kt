@@ -9,8 +9,6 @@ import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
-import dev.matsem.astral.tools.kontrol.onTogglePad
-import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -19,7 +17,7 @@ import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
 
-// TODO automator
+// TODO automator, bass gain slider
 class GalaxySketch : BaseSketch(), KoinComponent {
 
     data class Star(
@@ -48,49 +46,33 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     private val galaxyStars = mutableListOf<Star>()
     private val images = arrayOf(
             GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 60f),
-            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f)
+            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f),
+            GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 40f)
     )
 
     private var bassGain: Float = 0f
 
-    private var zoomQuantized: Boolean = false
-    private var zoomOnBeat: Boolean = false
-    private var zoomValue = 1f
-    private var zoomMin = 1f
-    private var zoomMax = 3f
-    private var zoomHz = 1 / 60f
-    private var zoomQuant = 0.005f
+    // region remote control
 
-    private var randomDiameters: Boolean = false
-    private var diameterFactor = 1f
-
-    override fun onBecameActive() {
-        kontrol.reset()
-
-        kontrol.onTriggerPad(0, 0, 50) {
-            if (it) {
-                createGalaxy(images[0])
-            }
-        }
-
-        kontrol.onTriggerPad(0, 1, 50) {
-            if (it) {
-                createGalaxy(images[1])
-            }
-        }
-
-        kontrol.onTogglePad(0, 2, 0) {
-            zoomQuantized = it
-        }
-
-        kontrol.onTogglePad(1, 2, 10) {
-            zoomOnBeat = it
-        }
-
-        kontrol.onTogglePad(0, 3, 70) {
-            randomDiameters = it
-        }
+    private val galaxyImageButtons = galaxy.createPushButtonGroup(10, listOf(4, 5, 6, 7)) {
+        createGalaxy(images[it])
     }
+
+    private val zoomQuantizeButton = galaxy.createToggleButton(channel = 10, cc = 8, defaultValue = false)
+    private val zoomOnBeatButton = galaxy.createToggleButton(channel = 10, cc = 9, defaultValue = false)
+    private val zoomQuantSlider = galaxy.createPot(channel = 10, cc = 10, min = 0.005f, max = 0.5f, initialValue = 0.5f)
+    private val zoomHzSlider = galaxy.createPot(channel = 10, cc = 11, min = 1 / 60f, max = 1 / 5f, initialValue = 1 / 60f)
+    private val zoomMinSlider = galaxy.createPot(channel = 10, cc = 12, min = 1f, max = 4f, initialValue = 1f)
+    private val zoomMaxSlider = galaxy.createPot(channel = 10, cc = 13, min = 1f, max = 4f, initialValue = 2f)
+    private var zoomValue = 1f
+
+    private val randomDiametersButton = galaxy.createToggleButton(channel = 10, cc = 14, defaultValue = false)
+    private val starDiameterSlider = galaxy.createPot(channel = 10, cc = 15, min = 0.5f, max = 1.5f, initialValue = 1f)
+
+    // endregion
+
+    override fun onBecameActive() = Unit
 
     override fun setup() = with(sketch) {
         // Create galaxy from image
@@ -109,14 +91,14 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         }
 
         beatCounter.addListener(OnSnare, 1) {
-            if (randomDiameters) {
+            if (randomDiametersButton.isPressed) {
                 randomizeDiameters()
             }
         }
 
         beatCounter.addListener(OnKick, 4) {
-            if (zoomOnBeat) {
-                zoomValue = random(zoomMin, zoomMax)
+            if (zoomOnBeatButton.isPressed) {
+                zoomValue = random(zoomMinSlider.value, zoomMaxSlider.value)
             }
         }
     }
@@ -164,11 +146,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
     override fun draw() = with(sketch) {
         bassGain = kontrol.slider1.midiRange(1f)
-        zoomMin = kontrol.knob1.midiRange(1f, 4f)
-        zoomMax = kontrol.knob2.midiRange(1f, 4f)
-        zoomHz = kontrol.slider3.midiRange(1 / 60f, 1 / 5f)
-        zoomQuant = kontrol.knob3.midiRange(0.5f, 0.005f)
-        diameterFactor = kontrol.knob4.midiRange(0.5f, 1.5f)
+        val diameterFactor = starDiameterSlider.value
 
         beatCounter.update()
         background(bgColor)
@@ -176,8 +154,10 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         noFill()
         stroke(fgColor)
 
-        if (zoomQuantized) {
-            zoomValue = sin(angularTimeHz(zoomHz)).mapSin(zoomMin, zoomMax).quantize(zoomQuant)
+        if (zoomQuantizeButton.isPressed) {
+            zoomValue = sin(angularTimeHz(zoomHzSlider.value))
+                    .mapSin(zoomMinSlider.value, zoomMaxSlider.value)
+                    .quantize(zoomQuantSlider.value)
         }
 
         // Galaxy
