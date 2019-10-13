@@ -170,10 +170,10 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         diameterFactor = kontrol.knob4.midiRange(0.5f, 1.5f)
 
         beatCounter.update()
-        background(30)
+        background(bgColor)
 
         noFill()
-        stroke(0f, 0f, 100f)
+        stroke(fgColor)
 
         if (zoomQuantized) {
             zoomValue = sin(angularTimeHz(zoomHz)).mapSin(zoomMin, zoomMax).quantize(zoomQuant)
@@ -226,7 +226,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         translateCenter()
         scale(zoomValue)
         noStroke()
-        fill(0)
+        fill(bgColor)
         ellipseMode(PConstants.CENTER)
         beginShape()
         sphere(25f)
