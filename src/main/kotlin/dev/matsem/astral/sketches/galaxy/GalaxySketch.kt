@@ -1,4 +1,4 @@
-package dev.matsem.astral.sketches.starfield
+package dev.matsem.astral.sketches.galaxy
 
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
@@ -13,12 +13,13 @@ import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import processing.core.PApplet.sin
 import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
-import kotlin.math.sin
 
-class StarfieldSketch : BaseSketch(), KoinComponent {
+// TODO fg bg color
+class GalaxySketch : BaseSketch(), KoinComponent {
 
     override val sketch: SketchLoader by inject()
 
@@ -50,10 +51,17 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
     )
 
     private var bassGain: Float = 0f
-    private var expandingQuantized: Boolean = false
-    private var expandingOnBeat: Boolean = false
-    private var expandingValue = 1f
+
+    private var zoomQuantized: Boolean = false
+    private var zoomOnBeat: Boolean = false
+    private var zoomValue = 1f
+    private var zoomMin = 1f
+    private var zoomMax = 3f
+    private var zoomHz = 1 / 60f
+    private var zoomQuant = 0.005f
+
     private var randomDiameters: Boolean = false
+    private var diameterFactor = 1f
 
     override fun onBecameActive() {
         kontrol.reset()
@@ -71,11 +79,11 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         }
 
         kontrol.onTogglePad(0, 2, 0) {
-            expandingQuantized = it
+            zoomQuantized = it
         }
 
         kontrol.onTogglePad(1, 2, 10) {
-            expandingOnBeat = it
+            zoomOnBeat = it
         }
 
         kontrol.onTogglePad(0, 3, 70) {
@@ -106,8 +114,8 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         }
 
         beatCounter.addListener(OnKick, 4) {
-            if (expandingOnBeat) {
-                expandingValue = random(1f, 1.5f)
+            if (zoomOnBeat) {
+                zoomValue = random(zoomMin, zoomMax)
             }
         }
     }
@@ -155,6 +163,11 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
 
     override fun draw() = with(sketch) {
         bassGain = kontrol.slider1.midiRange(1f)
+        zoomMin = kontrol.knob1.midiRange(1f, 4f)
+        zoomMax = kontrol.knob2.midiRange(2f, 4f)
+        zoomHz = kontrol.slider3.midiRange(1 / 60f, 1 / 5f)
+        zoomQuant = kontrol.knob3.midiRange(0.5f, 0.005f)
+        diameterFactor = kontrol.knob4.midiRange(0.5f, 1.5f)
 
         beatCounter.update()
         background(30)
@@ -162,25 +175,26 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         noFill()
         stroke(0f, 0f, 100f)
 
+        if (zoomQuantized) {
+            zoomValue = sin(angularTimeHz(zoomHz)).mapSin(zoomMin, zoomMax).quantize(zoomQuant)
+        }
+
         // Galaxy
         synchronized(lock) {
             galaxy.forEach {
                 pushMatrix()
                 translateCenter()
+                scale(zoomValue)
 
                 it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
                 rotateX(-0.34f)
                 rotateY((millis() - it.birth) * it.ySpeed + it.rotationExtra)
                 rotateZ((millis() - it.birth) * it.zSpeed)
 
-                strokeWeight(it.diameter)
+                strokeWeight(it.diameter * diameterFactor)
                 val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * bassGain
 
-                if (expandingQuantized) {
-                    expandingValue = sin(saw(1 / 5f)).mapp(1f, 1.5f).quantize(0.05f)
-                }
-
-                val v = it.vec.copy().mult(expandingValue)
+                val v = it.vec
                 point(v.x, v.y + amp, v.z)
                 popMatrix()
             }
@@ -192,16 +206,17 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                 .take(audioProcessor
                         .getRange(20f..60f)
                         .remap(0f, 400f, starField.size.toFloat(), starField.size.toFloat() / 2f).toInt()
-                        .constrain(high = starField.size - 1)
+                        .constrain(low = 0, high = starField.size - 1)
                 )
                 .forEach {
                     pushMatrix()
                     translateCenter()
+                    scale(zoomValue)
                     it.rotationExtra += audioProcessor.getRange(2500f..16000f).remap(0f, 100f, 0f, 0.2f) * it.randomFactor
                     rotateY(millis() * it.ySpeed + it.rotationExtra)
                     rotateZ(millis() * it.zSpeed)
 
-                    strokeWeight(it.diameter)
+                    strokeWeight(it.diameter * diameterFactor)
                     point(it.vec.x, it.vec.y, it.vec.z)
                     popMatrix()
                 }
@@ -209,6 +224,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         // Black hole
         pushMatrix()
         translateCenter()
+        scale(zoomValue)
         noStroke()
         fill(0)
         ellipseMode(PConstants.CENTER)

@@ -14,7 +14,7 @@ import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
-import dev.matsem.astral.sketches.starfield.StarfieldSketch
+import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
@@ -83,6 +83,6 @@ val appModule = module {
     factory { SpikesSketch() }
     factory { CubesSketch() }
     factory { VideoSketch() }
-    factory { StarfieldSketch() }
+    factory { GalaxySketch() }
     factory { GameOfLifeSketch() }
 }
