@@ -6,9 +6,9 @@ import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.audio.beatcounter.OnSnare
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
-import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -17,7 +17,6 @@ import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
 
-// TODO automator
 class GalaxySketch : BaseSketch(), KoinComponent {
 
     data class Star(
@@ -39,6 +38,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     private val audioProcessor: AudioProcessor by inject()
     private val beatCounter: BeatCounter by inject()
     private val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     private val lock = Any()
     private val starField = mutableListOf<Star>()
@@ -74,6 +74,15 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     override fun onBecameActive() = Unit
 
     override fun setup() = with(sketch) {
+        automator.setupWithGalaxy(
+                channel = 10,
+                recordButtonCC = 0,
+                playButtonCC = 1,
+                loopButtonCC = 2,
+                clearButtonCC = 3,
+                channelFilter = null
+        )
+
         // Create galaxy from image
         createGalaxy(images[0])
 
@@ -144,6 +153,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     }
 
     override fun draw() = with(sketch) {
+        automator.update()
         val diameterFactor = starDiameterSlider.value
 
         beatCounter.update()
