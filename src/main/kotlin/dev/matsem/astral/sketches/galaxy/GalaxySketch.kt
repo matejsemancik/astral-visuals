@@ -38,7 +38,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val beatCounter: BeatCounter by inject()
-    private val kontrol: KontrolF1 by inject()
     private val galaxy: Galaxy by inject()
 
     private val lock = Any()
