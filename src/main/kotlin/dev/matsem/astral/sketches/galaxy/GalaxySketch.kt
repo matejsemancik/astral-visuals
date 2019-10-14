@@ -1,4 +1,4 @@
-package dev.matsem.astral.sketches.starfield
+package dev.matsem.astral.sketches.galaxy
 
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
@@ -6,21 +6,18 @@ import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.audio.beatcounter.OnSnare
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
-import dev.matsem.astral.tools.kontrol.KontrolF1
-import dev.matsem.astral.tools.kontrol.onTogglePad
-import dev.matsem.astral.tools.kontrol.onTriggerPad
+import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import processing.core.PApplet.sin
 import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
-import kotlin.math.sin
 
-class StarfieldSketch : BaseSketch(), KoinComponent {
-
-    override val sketch: SketchLoader by inject()
+class GalaxySketch : BaseSketch(), KoinComponent {
 
     data class Star(
             val vec: PVector,
@@ -37,53 +34,55 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
             .withFps()
             .build()
 
+    override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val beatCounter: BeatCounter by inject()
-    private val kontrol: KontrolF1 by inject()
+    private val galaxy: Galaxy by inject()
+    private val automator: MidiAutomator by inject()
 
     private val lock = Any()
     private val starField = mutableListOf<Star>()
-    private val galaxy = mutableListOf<Star>()
+    private val galaxyStars = mutableListOf<Star>()
     private val images = arrayOf(
             GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 60f),
-            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f)
+            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f),
+            GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 40f)
     )
 
-    private var bassGain: Float = 0f
-    private var expandingQuantized: Boolean = false
-    private var expandingOnBeat: Boolean = false
-    private var expandingValue = 1f
-    private var randomDiameters: Boolean = false
+    // region remote control
 
-    override fun onBecameActive() {
-        kontrol.reset()
-
-        kontrol.onTriggerPad(0, 0, 50) {
-            if (it) {
-                createGalaxy(images[0])
-            }
-        }
-
-        kontrol.onTriggerPad(0, 1, 50) {
-            if (it) {
-                createGalaxy(images[1])
-            }
-        }
-
-        kontrol.onTogglePad(0, 2, 0) {
-            expandingQuantized = it
-        }
-
-        kontrol.onTogglePad(1, 2, 10) {
-            expandingOnBeat = it
-        }
-
-        kontrol.onTogglePad(0, 3, 70) {
-            randomDiameters = it
-        }
+    private val galaxyImageButtons = galaxy.createPushButtonGroup(10, listOf(4, 5, 6, 7)) {
+        createGalaxy(images[it])
     }
 
+    private val zoomQuantizeButton = galaxy.createToggleButton(channel = 10, cc = 8, defaultValue = false)
+    private val zoomOnBeatButton = galaxy.createToggleButton(channel = 10, cc = 9, defaultValue = false)
+    private val zoomQuantSlider = galaxy.createPot(channel = 10, cc = 10, min = 0.005f, max = 0.5f, initialValue = 0.5f)
+    private val zoomHzSlider = galaxy.createPot(channel = 10, cc = 11, min = 1 / 60f, max = 1 / 5f, initialValue = 1 / 60f)
+    private val zoomMinSlider = galaxy.createPot(channel = 10, cc = 12, min = 1f, max = 4f, initialValue = 1f)
+    private val zoomMaxSlider = galaxy.createPot(channel = 10, cc = 13, min = 1f, max = 4f, initialValue = 2f)
+    private var zoomValue = 1f
+
+    private val randomDiametersButton = galaxy.createToggleButton(channel = 10, cc = 14, defaultValue = false)
+    private val starDiameterSlider = galaxy.createPot(channel = 10, cc = 15, min = 0.5f, max = 1.5f, initialValue = 1f)
+
+    private val bassGainSlider = galaxy.createPot(channel = 10, cc = 16, min = 0f, max = 1f)
+
+    // endregion
+
+    override fun onBecameActive() = Unit
+
     override fun setup() = with(sketch) {
+        automator.setupWithGalaxy(
+                channel = 10,
+                recordButtonCC = 0,
+                playButtonCC = 1,
+                loopButtonCC = 2,
+                clearButtonCC = 3,
+                channelFilter = null
+        )
+
         // Create galaxy from image
         createGalaxy(images[0])
 
@@ -100,21 +99,21 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         }
 
         beatCounter.addListener(OnSnare, 1) {
-            if (randomDiameters) {
+            if (randomDiametersButton.isPressed) {
                 randomizeDiameters()
             }
         }
 
         beatCounter.addListener(OnKick, 4) {
-            if (expandingOnBeat) {
-                expandingValue = random(1f, 1.5f)
+            if (zoomOnBeatButton.isPressed) {
+                zoomValue = random(zoomMinSlider.value, zoomMaxSlider.value)
             }
         }
     }
 
     private fun createGalaxy(image: GalaxyImage) = with(sketch) {
         synchronized(lock) {
-            galaxy.clear()
+            galaxyStars.clear()
             val galaxyImage: PImage = loadImage(image.path).apply {
                 val ratio = pixelWidth / pixelHeight.toFloat()
                 resize(720, (720 / ratio).toInt())
@@ -126,7 +125,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                 for (y in 0 until galaxyImage.height step image.pixelStep) {
                     pixelBrightness = brightness(galaxyImage[x, y])
                     if (pixelBrightness > image.threshold) {
-                        galaxy += Star(
+                        galaxyStars += Star(
                                 vec = PVector(
                                         x.toFloat() - galaxyImage.width / 2f,
                                         random(-4f, 4f),
@@ -144,7 +143,7 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
     }
 
     private fun randomizeDiameters() = synchronized(lock) {
-        galaxy.forEach {
+        galaxyStars.forEach {
             it.diameter = generateDiameter()
         }
     }
@@ -154,33 +153,37 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
     }
 
     override fun draw() = with(sketch) {
-        bassGain = kontrol.slider1.midiRange(1f)
+        automator.update()
+        val diameterFactor = starDiameterSlider.value
 
         beatCounter.update()
-        background(30)
+        background(bgColor)
 
         noFill()
-        stroke(0f, 0f, 100f)
+        stroke(fgColor)
+
+        if (zoomQuantizeButton.isPressed) {
+            zoomValue = sin(angularTimeHz(zoomHzSlider.value))
+                    .mapSin(zoomMinSlider.value, zoomMaxSlider.value)
+                    .quantize(zoomQuantSlider.value)
+        }
 
         // Galaxy
         synchronized(lock) {
-            galaxy.forEach {
+            galaxyStars.forEach {
                 pushMatrix()
                 translateCenter()
+                scale(zoomValue)
 
                 it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
                 rotateX(-0.34f)
                 rotateY((millis() - it.birth) * it.ySpeed + it.rotationExtra)
                 rotateZ((millis() - it.birth) * it.zSpeed)
 
-                strokeWeight(it.diameter)
-                val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * bassGain
+                strokeWeight(it.diameter * diameterFactor)
+                val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * bassGainSlider.value
 
-                if (expandingQuantized) {
-                    expandingValue = sin(saw(1 / 5f)).mapp(1f, 1.5f).quantize(0.05f)
-                }
-
-                val v = it.vec.copy().mult(expandingValue)
+                val v = it.vec
                 point(v.x, v.y + amp, v.z)
                 popMatrix()
             }
@@ -192,16 +195,17 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
                 .take(audioProcessor
                         .getRange(20f..60f)
                         .remap(0f, 400f, starField.size.toFloat(), starField.size.toFloat() / 2f).toInt()
-                        .constrain(high = starField.size - 1)
+                        .constrain(low = 0, high = starField.size - 1)
                 )
                 .forEach {
                     pushMatrix()
                     translateCenter()
+                    scale(zoomValue)
                     it.rotationExtra += audioProcessor.getRange(2500f..16000f).remap(0f, 100f, 0f, 0.2f) * it.randomFactor
                     rotateY(millis() * it.ySpeed + it.rotationExtra)
                     rotateZ(millis() * it.zSpeed)
 
-                    strokeWeight(it.diameter)
+                    strokeWeight(it.diameter * diameterFactor)
                     point(it.vec.x, it.vec.y, it.vec.z)
                     popMatrix()
                 }
@@ -209,8 +213,9 @@ class StarfieldSketch : BaseSketch(), KoinComponent {
         // Black hole
         pushMatrix()
         translateCenter()
+        scale(zoomValue)
         noStroke()
-        fill(0)
+        fill(bgColor)
         ellipseMode(PConstants.CENTER)
         beginShape()
         sphere(25f)

@@ -15,7 +15,7 @@ import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
-import dev.matsem.astral.sketches.starfield.StarfieldSketch
+import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
@@ -88,7 +88,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val spikesSketch: SpikesSketch by inject()
     private val cubesSketch: CubesSketch by inject()
     private val videoSketch: VideoSketch by inject()
-    private val starfieldSketch: StarfieldSketch by inject()
+    private val galaxySketch: GalaxySketch by inject()
     private val gameOfLifeSketch: GameOfLifeSketch by inject()
 
     // endregion
@@ -149,7 +149,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('9', spikesSketch)
             put('p', cubesSketch)
             put('m', videoSketch)
-            put('s', starfieldSketch)
+            put('s', galaxySketch)
             put('g', gameOfLifeSketch)
         }
 

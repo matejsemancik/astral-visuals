@@ -1,4 +1,4 @@
-package dev.matsem.astral.sketches.starfield
+package dev.matsem.astral.sketches.galaxy
 
 data class GalaxyImage(
         val path: String,
