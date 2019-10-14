@@ -17,7 +17,7 @@ import processing.core.PConstants
 import processing.core.PImage
 import processing.core.PVector
 
-// TODO automator, bass gain slider
+// TODO automator
 class GalaxySketch : BaseSketch(), KoinComponent {
 
     data class Star(
@@ -51,8 +51,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 40f)
     )
 
-    private var bassGain: Float = 0f
-
     // region remote control
 
     private val galaxyImageButtons = galaxy.createPushButtonGroup(10, listOf(4, 5, 6, 7)) {
@@ -69,6 +67,8 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
     private val randomDiametersButton = galaxy.createToggleButton(channel = 10, cc = 14, defaultValue = false)
     private val starDiameterSlider = galaxy.createPot(channel = 10, cc = 15, min = 0.5f, max = 1.5f, initialValue = 1f)
+
+    private val bassGainSlider = galaxy.createPot(channel = 10, cc = 16, min = 0f, max = 1f)
 
     // endregion
 
@@ -145,7 +145,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     }
 
     override fun draw() = with(sketch) {
-        bassGain = kontrol.slider1.midiRange(1f)
         val diameterFactor = starDiameterSlider.value
 
         beatCounter.update()
@@ -173,7 +172,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
                 rotateZ((millis() - it.birth) * it.zSpeed)
 
                 strokeWeight(it.diameter * diameterFactor)
-                val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * bassGain
+                val amp = audioProcessor.getRange(20f..200f) * random(-0.1f, 0.1f) * bassGainSlider.value
 
                 val v = it.vec
                 point(v.x, v.y + amp, v.z)
