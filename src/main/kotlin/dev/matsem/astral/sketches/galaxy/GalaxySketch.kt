@@ -62,7 +62,26 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     private val zoomHzSlider = galaxy.createPot(channel = 10, cc = 11, min = 1 / 60f, max = 1 / 5f, initialValue = 1 / 60f)
     private val zoomMinSlider = galaxy.createPot(channel = 10, cc = 12, min = 1f, max = 4f, initialValue = 1f)
     private val zoomMaxSlider = galaxy.createPot(channel = 10, cc = 13, min = 1f, max = 4f, initialValue = 2f)
+    private var joystick = galaxy.createJoystick(
+            channel = 10,
+            ccX = 17,
+            ccY = 18,
+            ccTouchXY = 19,
+            ccZ = 20,
+            ccTouchZ = 21,
+            ccFeedbackEnabled = 22
+    ).flipped()
+
+    private var rotationResetButton = galaxy.createPushButton(10, 23) {
+        rotX = 0f
+        rotY = 0f
+        rotZ = 0f
+    }
+
     private var zoomValue = 1f
+    private var rotX = 0f
+    private var rotY = 0f
+    private var rotZ = 0f
 
     private val randomDiametersButton = galaxy.createToggleButton(channel = 10, cc = 14, defaultValue = false)
     private val starDiameterSlider = galaxy.createPot(channel = 10, cc = 15, min = 0.5f, max = 1.5f, initialValue = 1f)
@@ -154,10 +173,19 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
     override fun draw() = with(sketch) {
         automator.update()
+
         val diameterFactor = starDiameterSlider.value
+        rotX += joystick.x * 0.1f
+        rotY += joystick.y * 0.1f
+        rotZ += joystick.z * 0.1f
 
         beatCounter.update()
         background(bgColor)
+
+        translateCenter()
+        rotateX(rotX)
+        rotateY(rotY)
+        rotateZ(rotZ)
 
         noFill()
         stroke(fgColor)
@@ -172,7 +200,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         synchronized(lock) {
             galaxyStars.forEach {
                 pushMatrix()
-                translateCenter()
+//                translateCenter()
                 scale(zoomValue)
 
                 it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
@@ -199,7 +227,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
                 )
                 .forEach {
                     pushMatrix()
-                    translateCenter()
+//                    translateCenter()
                     scale(zoomValue)
                     it.rotationExtra += audioProcessor.getRange(2500f..16000f).remap(0f, 100f, 0f, 0.2f) * it.randomFactor
                     rotateY(millis() * it.ySpeed + it.rotationExtra)
@@ -212,7 +240,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
         // Black hole
         pushMatrix()
-        translateCenter()
+//        translateCenter()
         scale(zoomValue)
         noStroke()
         fill(bgColor)
