@@ -208,7 +208,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         synchronized(lock) {
             galaxyStars.forEach {
                 pushMatrix()
-//                translateCenter()
                 scale(zoomValue)
 
                 it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
@@ -235,7 +234,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
                 )
                 .forEach {
                     pushMatrix()
-//                    translateCenter()
                     scale(zoomValue)
                     it.rotationExtra += audioProcessor.getRange(2500f..16000f).remap(0f, 100f, 0f, 0.2f) * it.randomFactor
                     rotateY(millis() * it.ySpeed + it.rotationExtra)
@@ -248,7 +246,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
         // Black hole
         pushMatrix()
-//        translateCenter()
         scale(zoomValue)
         noStroke()
         fill(bgColor)
