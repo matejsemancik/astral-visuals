@@ -11,11 +11,12 @@ import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
+import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
+import dev.matsem.astral.sketches.radialwaves.RadialWavesSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
-import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
@@ -90,6 +91,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val videoSketch: VideoSketch by inject()
     private val galaxySketch: GalaxySketch by inject()
     private val gameOfLifeSketch: GameOfLifeSketch by inject()
+    private val radialWavesSketchLoader: RadialWavesSketch by inject()
 
     // endregion
 
@@ -151,6 +153,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('m', videoSketch)
             put('s', galaxySketch)
             put('g', gameOfLifeSketch)
+            put('r', radialWavesSketchLoader)
         }
 
         sketches.forEach { key, sketch ->
