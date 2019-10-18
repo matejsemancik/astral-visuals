@@ -70,7 +70,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             ccZ = 20,
             ccTouchZ = 21,
             ccFeedbackEnabled = 22
-    ).flipped()
+    )
 
     private var rotationResetButton = galaxy.createPushButton(10, 23) {
         rotX = 0f
@@ -175,16 +175,16 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         automator.update()
 
         val diameterFactor = starDiameterSlider.value
-        rotX += joystick.x * 0.1f
-        rotY += joystick.y * 0.1f
-        rotZ += joystick.z * 0.1f
+        rotX += joystick.x * 0.01f
+        rotY += joystick.y * 0.01f
+        rotZ += joystick.z * 0.01f
 
         beatCounter.update()
         background(bgColor)
 
         translateCenter()
-        rotateX(rotX)
-        rotateY(rotY)
+        rotateX(-rotX)
+        rotateY(-rotY)
         rotateZ(rotZ)
 
         noFill()
