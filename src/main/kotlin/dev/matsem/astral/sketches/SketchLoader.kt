@@ -11,11 +11,11 @@ import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
+import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
-import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
@@ -170,6 +170,7 @@ class SketchLoader : PApplet(), KoinComponent {
         galaxy.createPushButton(15, 8) { switchSketch('9') }
         galaxy.createPushButton(15, 9) { switchSketch('p') }
         galaxy.createPushButton(15, 10) { switchSketch('m') }
+        galaxy.createPushButton(15, 11) { switchSketch('s') }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)

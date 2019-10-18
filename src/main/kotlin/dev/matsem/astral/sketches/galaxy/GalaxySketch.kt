@@ -47,12 +47,20 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 60f),
             GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f),
             GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 50f),
-            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 40f)
+            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 40f),
+            GalaxyImage(path = "images/dj_attempt.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_johney.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_kid_kodama.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_matsem.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_rough_result.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_sbu.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_seba.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/astrallogo_clean_stroked.png", pixelStep = 4, threshold = 50f)
     )
 
     // region remote control
 
-    private val galaxyImageButtons = galaxy.createPushButtonGroup(10, listOf(4, 5, 6, 7)) {
+    private val galaxyImageButtons = galaxy.createPushButtonGroup(10, listOf(4, 5, 6, 7, 24, 25, 26, 27, 28, 29, 30, 31)) {
         createGalaxy(images[it])
     }
 
@@ -62,7 +70,26 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     private val zoomHzSlider = galaxy.createPot(channel = 10, cc = 11, min = 1 / 60f, max = 1 / 5f, initialValue = 1 / 60f)
     private val zoomMinSlider = galaxy.createPot(channel = 10, cc = 12, min = 1f, max = 4f, initialValue = 1f)
     private val zoomMaxSlider = galaxy.createPot(channel = 10, cc = 13, min = 1f, max = 4f, initialValue = 2f)
+    private var joystick = galaxy.createJoystick(
+            channel = 10,
+            ccX = 17,
+            ccY = 18,
+            ccTouchXY = 19,
+            ccZ = 20,
+            ccTouchZ = 21,
+            ccFeedbackEnabled = 22
+    )
+
+    private var rotationResetButton = galaxy.createPushButton(10, 23) {
+        rotX = 0f
+        rotY = 0f
+        rotZ = 0f
+    }
+
     private var zoomValue = 1f
+    private var rotX = 0f
+    private var rotY = 0f
+    private var rotZ = 0f
 
     private val randomDiametersButton = galaxy.createToggleButton(channel = 10, cc = 14, defaultValue = false)
     private val starDiameterSlider = galaxy.createPot(channel = 10, cc = 15, min = 0.5f, max = 1.5f, initialValue = 1f)
@@ -154,10 +181,19 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
     override fun draw() = with(sketch) {
         automator.update()
+
         val diameterFactor = starDiameterSlider.value
+        rotX += joystick.x * 0.01f
+        rotY += joystick.y * 0.01f
+        rotZ += joystick.z * 0.01f
 
         beatCounter.update()
         background(bgColor)
+
+        translateCenter()
+        rotateX(rotX)
+        rotateY(rotY)
+        rotateZ(rotZ)
 
         noFill()
         stroke(fgColor)
@@ -172,7 +208,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         synchronized(lock) {
             galaxyStars.forEach {
                 pushMatrix()
-                translateCenter()
                 scale(zoomValue)
 
                 it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
@@ -199,7 +234,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
                 )
                 .forEach {
                     pushMatrix()
-                    translateCenter()
                     scale(zoomValue)
                     it.rotationExtra += audioProcessor.getRange(2500f..16000f).remap(0f, 100f, 0f, 0.2f) * it.randomFactor
                     rotateY(millis() * it.ySpeed + it.rotationExtra)
@@ -212,7 +246,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
         // Black hole
         pushMatrix()
-        translateCenter()
         scale(zoomValue)
         noStroke()
         fill(bgColor)
