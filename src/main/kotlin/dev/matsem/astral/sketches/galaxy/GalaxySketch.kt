@@ -183,8 +183,8 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         background(bgColor)
 
         translateCenter()
-        rotateX(-rotX)
-        rotateY(-rotY)
+        rotateX(rotX)
+        rotateY(rotY)
         rotateZ(rotZ)
 
         noFill()
