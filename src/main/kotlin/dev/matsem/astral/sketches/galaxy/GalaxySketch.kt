@@ -47,12 +47,20 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 60f),
             GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 50f),
             GalaxyImage(path = "images/galaxy1.png", pixelStep = 3, threshold = 50f),
-            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 40f)
+            GalaxyImage(path = "images/galaxy2.png", pixelStep = 2, threshold = 40f),
+            GalaxyImage(path = "images/dj_attempt.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_johney.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_kid_kodama.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_matsem.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_rough_result.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_sbu.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/dj_seba.png", pixelStep = 3, threshold = 50f),
+            GalaxyImage(path = "images/astrallogo_clean_stroked.png", pixelStep = 4, threshold = 50f)
     )
 
     // region remote control
 
-    private val galaxyImageButtons = galaxy.createPushButtonGroup(10, listOf(4, 5, 6, 7)) {
+    private val galaxyImageButtons = galaxy.createPushButtonGroup(10, listOf(4, 5, 6, 7, 24, 25, 26, 27, 28, 29, 30, 31)) {
         createGalaxy(images[it])
     }
 
