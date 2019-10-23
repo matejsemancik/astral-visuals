@@ -9,7 +9,7 @@ import dev.matsem.astral.tools.extensions.shorterDimension
 import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.koin.core.inject
-import processing.core.PApplet
+import processing.core.PApplet.*
 
 class RadialWavesSketch : BaseSketch() {
 
@@ -20,38 +20,52 @@ class RadialWavesSketch : BaseSketch() {
     var numPoints = 10f
     var diameter = 100f
 
-    override fun setup() {
-
-    }
+    override fun setup() = Unit
 
     override fun draw() = with(sketch) {
         numPoints = kontrol.knob1.midiRange(0f, 100f)
         diameter = kontrol.knob2.midiRange(100f, shorterDimension().toFloat())
-        val rotInterval = kontrol.knob3.midiRange(1f, 10f)
+        val circleNum = kontrol.knob3.midiRange(3f, 100f).toInt()
+        val strokeWeight = kontrol.knob4.midiRange(1f, 10f)
 
         background(0)
         translateCenter()
-        rotateZ(angularTimeS(rotInterval))
+        rotateZ(angularTimeS(60f))
 
-        drawCircle((20f..200f), color(fgHue, fgSat, fgBrightness), 1f)
-        drawCircle((600f..1600f), color(fgHue, fgSat, fgBrightness), 5f)
-        drawCircle((4000f..16000f), color(fgHue, fgSat, fgBrightness), 15f)
+        for (i in 0 until circleNum) {
+            drawCircle(
+                    i = i,
+                    range = map(i.toFloat(), 0f, circleNum.toFloat(), 0f, 16000f).let { (it..it + 10f) },
+                    audioGain = map(i.toFloat(), 0f, circleNum.toFloat(), 3f, kontrol.slider4.midiRange(-5f, -50f)),
+                    color = fgColor,
+                    strokeWeight = strokeWeight
+            )
+        }
     }
 
-    private fun drawCircle(range: ClosedFloatingPointRange<Float>, color: Int, audioGain: Float) = with(sketch) {
-        strokeWeight(10f)
+    private fun drawCircle(
+            i: Int,
+            range: ClosedFloatingPointRange<Float>,
+            color: Int,
+            strokeWeight: Float,
+            audioGain: Float
+    ) = with(sketch) {
+        strokeWeight(strokeWeight)
         stroke(color)
         noFill()
 
-        val phiStep = PApplet.TWO_PI / numPoints
-        val numDots = (PApplet.TWO_PI / phiStep).toInt()
-        val d = diameter + audioProcessor.getRange(range) * audioGain
+        val phiStep = TWO_PI / numPoints
+        val numDots = (TWO_PI / phiStep).toInt()
 
+        beginShape()
         for (phi in 0 until numDots) {
-            val x = d * PApplet.cos(phi.toFloat() * phiStep)
-            val y = d * PApplet.sin(phi.toFloat() * phiStep)
+            val noise = noise(phi.toFloat() + i * 2f)
+            var d = diameter * (1 + noise / 10f) + audioProcessor.getRange(range).times(audioGain) * noise + i * 10f
+            val x = d * cos(phi.toFloat() * phiStep)
+            val y = d * sin(phi.toFloat() * phiStep)
 
-            point(x, y)
+            curveVertex(x, y)
         }
+        endShape(CLOSE)
     }
 }
