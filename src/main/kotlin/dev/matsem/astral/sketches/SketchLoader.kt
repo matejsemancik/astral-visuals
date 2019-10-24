@@ -15,7 +15,7 @@ import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
-import dev.matsem.astral.sketches.radialwaves.RadialWavesSketch
+import dev.matsem.astral.sketches.radialwaves.TunnelSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
@@ -56,8 +56,8 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(239f, 0f, 0f)
-    private val fgColor = PVector(0f, 0f, 100f)
+    private val bgColor = PVector(0f, 0f, 10f)
+    private val fgColor = PVector(157f, 100f, 100f)
     private val accentColor = PVector(0f, 0f, 100f)
 
     lateinit var bgHuePot: Pot
@@ -91,7 +91,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val videoSketch: VideoSketch by inject()
     private val galaxySketch: GalaxySketch by inject()
     private val gameOfLifeSketch: GameOfLifeSketch by inject()
-    private val radialWavesSketchLoader: RadialWavesSketch by inject()
+    private val tunnelSketch: TunnelSketch by inject()
 
     // endregion
 
@@ -153,7 +153,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('m', videoSketch)
             put('s', galaxySketch)
             put('g', gameOfLifeSketch)
-            put('r', radialWavesSketchLoader)
+            put('t', tunnelSketch)
         }
 
         sketches.forEach { key, sketch ->
