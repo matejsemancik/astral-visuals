@@ -3,12 +3,11 @@ package dev.matsem.astral.sketches.oldskool
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
-import dev.matsem.astral.tools.audio.beatcounter.OnHat
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
-import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.extensions.*
 import org.koin.core.inject
 import processing.core.PApplet
+import processing.core.PApplet.radians
 import processing.core.PVector
 import kotlin.math.absoluteValue
 
@@ -48,28 +47,24 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     override fun setup() = with(sketch) {
-        repeat(300) { boxes.add(newBox()) }
+        repeat(500) { boxes.add(newBox()) }
 
+        // TODO tapper!
         beatCounter.addListener(OnKick, 1) {
             boxes.shuffled().take(boxes.size / 10).forEach {
+                // TODO tweakable!
+                it.targetSize = random(it.size * 0.7f, it.size * 1.1f)
                 it.size *= 1.4f
             }
         }
 
-        beatCounter.addListener(OnSnare, 1) {
-            boxes.shuffled().take(boxes.size / 10).forEach {
-                it.size *= 1.2f
-            }
-        }
-
-        beatCounter.addListener(OnHat, 1) {
-            boxes.shuffled().take(boxes.size / 10).forEach {
-                it.size *= 1.1f
-            }
-        }
-
         beatCounter.addListener(OnKick, 32) {
-            targetSceneRotation = PVector.random3D()
+            // TODO tweakable!
+            if (random(1f) > 0.5f) {
+                targetSceneRotation = PVector(0f, 0f, random(-radians(90f), radians(90f)))
+            } else {
+                targetSceneRotation = PVector.random3D()
+            }
         }
     }
 
