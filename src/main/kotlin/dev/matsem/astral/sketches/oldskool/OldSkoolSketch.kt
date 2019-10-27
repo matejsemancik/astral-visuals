@@ -3,7 +3,9 @@ package dev.matsem.astral.sketches.oldskool
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.tools.audio.beatcounter.OnHat
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.extensions.*
 import org.koin.core.inject
 import processing.core.PApplet
@@ -49,12 +51,24 @@ class OldSkoolSketch : BaseSketch() {
         repeat(300) { boxes.add(newBox()) }
 
         beatCounter.addListener(OnKick, 1) {
-            boxes.shuffled().take(boxes.size / 4).forEach {
+            boxes.shuffled().take(boxes.size / 10).forEach {
+                it.size *= 1.4f
+            }
+        }
+
+        beatCounter.addListener(OnSnare, 1) {
+            boxes.shuffled().take(boxes.size / 10).forEach {
+                it.size *= 1.2f
+            }
+        }
+
+        beatCounter.addListener(OnHat, 1) {
+            boxes.shuffled().take(boxes.size / 10).forEach {
                 it.size *= 1.1f
             }
         }
 
-        beatCounter.addListener(OnKick, 16) {
+        beatCounter.addListener(OnKick, 32) {
             targetSceneRotation = PVector.random3D()
         }
     }
@@ -81,7 +95,7 @@ class OldSkoolSketch : BaseSketch() {
             var box: Box
             do {
                 box = newBox()
-            } while(box.position.x.absoluteValue < 20 && box.position.y.absoluteValue < 20)
+            } while (box.position.x.absoluteValue < 20 && box.position.y.absoluteValue < 20)
 
             boxes.add(box)
         }
