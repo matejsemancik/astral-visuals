@@ -13,6 +13,7 @@ import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
+import dev.matsem.astral.sketches.oldskool.OldSkoolSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
@@ -55,8 +56,8 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var resendButton: PushButton
     private lateinit var colorResetButton: PushButton
 
-    private val bgColor = PVector(239f, 0f, 0f)
-    private val fgColor = PVector(0f, 0f, 100f)
+    private val bgColor = PVector(0f, 0f, 10f)
+    private val fgColor = PVector(150f, 100f, 100f)
     private val accentColor = PVector(0f, 0f, 100f)
 
     lateinit var bgHuePot: Pot
@@ -90,6 +91,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val videoSketch: VideoSketch by inject()
     private val galaxySketch: GalaxySketch by inject()
     private val gameOfLifeSketch: GameOfLifeSketch by inject()
+    private val oldSkoolSketch: OldSkoolSketch by inject()
 
     // endregion
 
@@ -124,17 +126,18 @@ class SketchLoader : PApplet(), KoinComponent {
             colorPots.forEach { it.reset() }
         }
 
-        bgHuePot = galaxy.createPot(15, 67, 0f, Config.Color.HUE_MAX, bgColor.x).also { colorPots.add(it) }
-        bgSatPot = galaxy.createPot(15, 68, 0f, Config.Color.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }
-        bgBriPot = galaxy.createPot(15, 69, 0f, Config.Color.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }
+        val lerping = 0.02f
+        bgHuePot = galaxy.createPot(15, 67, 0f, Config.Color.HUE_MAX, bgColor.x).also { colorPots.add(it) }.lerp(lerping)
+        bgSatPot = galaxy.createPot(15, 68, 0f, Config.Color.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }.lerp(lerping)
+        bgBriPot = galaxy.createPot(15, 69, 0f, Config.Color.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }.lerp(lerping)
 
-        fgHuePot = galaxy.createPot(15, 70, 0f, Config.Color.HUE_MAX, fgColor.x).also { colorPots.add(it) }
-        fgSatPot = galaxy.createPot(15, 71, 0f, Config.Color.SATURATION_MAX, fgColor.y).also { colorPots.add(it) }
-        fgBriPot = galaxy.createPot(15, 72, 0f, Config.Color.BRIGHTNESS_MAX, fgColor.z).also { colorPots.add(it) }
+        fgHuePot = galaxy.createPot(15, 70, 0f, Config.Color.HUE_MAX, fgColor.x).also { colorPots.add(it) }.lerp(lerping)
+        fgSatPot = galaxy.createPot(15, 71, 0f, Config.Color.SATURATION_MAX, fgColor.y).also { colorPots.add(it) }.lerp(lerping)
+        fgBriPot = galaxy.createPot(15, 72, 0f, Config.Color.BRIGHTNESS_MAX, fgColor.z).also { colorPots.add(it) }.lerp(lerping)
 
-        accentHuePot = galaxy.createPot(15, 73, 0f, Config.Color.HUE_MAX, accentColor.x).also { colorPots.add(it) }
-        accentSatPot = galaxy.createPot(15, 74, 0f, Config.Color.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }
-        accentBriPot = galaxy.createPot(15, 75, 0f, Config.Color.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }
+        accentHuePot = galaxy.createPot(15, 73, 0f, Config.Color.HUE_MAX, accentColor.x).also { colorPots.add(it) }.lerp(lerping)
+        accentSatPot = galaxy.createPot(15, 74, 0f, Config.Color.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }.lerp(lerping)
+        accentBriPot = galaxy.createPot(15, 75, 0f, Config.Color.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }.lerp(lerping)
 
         sketches.apply {
             put('0', blankSketch)
@@ -143,7 +146,6 @@ class SketchLoader : PApplet(), KoinComponent {
             put('3', fibSphereSketch)
             put('4', starGlitchSketch)
             put('5', patternsSketch)
-            put('6', blankSketch) // TODO free slot
             put('7', boxesSketch)
             put('8', attractorSketch)
             put('9', spikesSketch)
@@ -151,6 +153,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('m', videoSketch)
             put('s', galaxySketch)
             put('g', gameOfLifeSketch)
+            put('o', oldSkoolSketch)
         }
 
         sketches.forEach { key, sketch ->
