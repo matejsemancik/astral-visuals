@@ -6,8 +6,8 @@ import processing.core.PVector
 
 abstract class FlyingObject(
         var position: PVector,
-        val rotation: PVector,
-        val rotationVector: PVector,
+        var rotation: PVector,
+        var rotationVector: PVector,
         var size: Float,
         var targetSize: Float
 ) {
