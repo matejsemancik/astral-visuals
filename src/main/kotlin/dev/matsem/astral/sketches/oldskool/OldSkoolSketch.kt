@@ -35,7 +35,7 @@ class OldSkoolSketch : BaseSketch() {
     private var sceneRotation = PVector(0f, 0f, 0f)
     private var targetSceneRotation = PVector(0f, 0f, 0f)
 
-    private var deadZone = sketch.shorterDimension()
+    private var deadZone = sketch.shorterDimension().toFloat()
     private var expandOnBeatScale = 1.4f
     private var flyingSpeed = 1f
     private var affectedBeatPercentage = 0.5f
@@ -115,19 +115,19 @@ class OldSkoolSketch : BaseSketch() {
             beatMode = BeatMode.TAP
         }
 
-        kontrol.onTriggerPad(1, 1, midiHue = 15) {
+        kontrol.onTriggerPad(1, 1, midiHue = 10) {
             beatMode = BeatMode.KICK
         }
 
-        kontrol.onTriggerPad(2, 0, midiHue = 15) {
+        kontrol.onTriggerPad(2, 0, midiHue = 30) {
             strokeMode = StrokeMode.TAP
         }
 
-        kontrol.onTriggerPad(2, 1, midiHue = 20) {
+        kontrol.onTriggerPad(2, 1, midiHue = 30) {
             strokeMode = StrokeMode.FREQ
         }
 
-        kontrol.onTriggerPad(2, 2, midiHue = 20) {
+        kontrol.onTriggerPad(2, 2, midiHue = 30) {
             strokeMode = StrokeMode.STILL
         }
 
@@ -177,6 +177,7 @@ class OldSkoolSketch : BaseSketch() {
         expandOnBeatScale = kontrol.knob1.midiRange(0.5f, 1.5f)
         strokeWeight = kontrol.knob2.midiRange(1f, 4f)
         strokeFreq = kontrol.knob2.midiRange(0.2f, 30f)
+        deadZone = kontrol.slider3.midiRange(0f, shorterDimension().toFloat())
 
         beatCounter.update()
 
