@@ -19,7 +19,7 @@ fun PApplet.longerDimension(): Int = max(width, height)
 /**
  * Generates saw signal with given frequency in range from 0f to 1f
  */
-fun PApplet.saw(fHz: Float): Float = (millis() % (1000f * 1 / fHz)) / (1000f * 1 / fHz)
+fun PApplet.saw(fHz: Float, offset: Int = 0): Float = ((millis() - offset) % (1000f * 1 / fHz)) / (1000f * 1 / fHz)
 
 fun PApplet.angularTimeS(periodSeconds: Float) = millis() / 1000f * PConstants.TWO_PI / periodSeconds
 

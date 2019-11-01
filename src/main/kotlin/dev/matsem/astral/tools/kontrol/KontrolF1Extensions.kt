@@ -4,13 +4,13 @@ fun KontrolF1.onTriggerPad(
         y: Int,
         x: Int,
         midiHue: Int = 0,
-        triggerFunc: (Boolean) -> Unit
+        triggerFunc: () -> Unit
 ) {
     pad(y, x).apply {
         colorOn = Triple(midiHue, 127, 127)
         colorOff = Triple(midiHue, 127, 24)
         mode = Pad.Mode.TRIGGER
-        setStateListener(triggerFunc)
+        setTriggerListener(triggerFunc)
     }
 }
 

@@ -13,7 +13,7 @@ abstract class FlyingObject(
 ) {
     open var fillColor: Int? = 0
     open var strokeColor: Int? = 0
-    open var strokeWeight: Float = 4f
+    open var strokeWeight: Float = 2f
 
     fun update(speed: Float) {
         position += PVector(0f, 0f, speed)

@@ -1,14 +1,21 @@
 package dev.matsem.astral.tools.shapes
 
+import dev.matsem.astral.Files
 import extruder.extruder
+import geomerative.RG
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PShape
 
 class ExtrusionCache(
-        sketch: PApplet,
-        ex: extruder
+        private val sketch: PApplet,
+        private val ex: extruder
 ) {
+
+    init {
+        RG.init(sketch)
+    }
+
     val semLogo: Array<PShape> by lazy {
         val upper = sketch.createShape().apply {
             beginShape()
@@ -37,5 +44,33 @@ class ExtrusionCache(
             this += ex.extrude(lower, 40, "box")
             forEach { it.translate(-50f, -50f) }
         }.toTypedArray()
+    }
+
+    private val textCache = mutableMapOf<String, Array<PShape>>()
+
+    fun getText(text: String): Array<PShape> {
+        return textCache.getOrPut(text) {
+
+            val rShape = RG.getText(text, Files.Font.FFF_FORWARD, 48, PApplet.CENTER)
+
+            RG.setPolygonizer(RG.UNIFORMSTEP)
+            RG.setPolygonizerStep(1f)
+
+            val letters = rShape.children
+
+            letters
+                    .map { it.points }
+                    .map { points ->
+                        sketch.createShape().apply {
+                            beginShape()
+                            for (point in points) {
+                                vertex(point.x, point.y)
+                            }
+                            endShape(PApplet.CLOSE)
+                        }
+                    }
+                    .flatMap { ex.extrude(it, 20, "box").toList() }
+                    .toTypedArray()
+        }
     }
 }
