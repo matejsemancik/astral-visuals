@@ -11,10 +11,6 @@ abstract class FlyingObject(
         var size: Float,
         var targetSize: Float
 ) {
-    open var fillColor: Int? = 0
-    open var strokeColor: Int? = 0
-    open var strokeWeight: Float = 2f
-
     fun update(speed: Float) {
         position += PVector(0f, 0f, speed)
         rotation += rotationVector

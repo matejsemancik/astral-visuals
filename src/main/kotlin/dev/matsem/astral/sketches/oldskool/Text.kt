@@ -23,17 +23,8 @@ class Text(
         scale(size / 48f)
 
         for (shape in cache.getText(text)) {
-            fillColor?.let {
-                shape.setFill(true)
-                shape.setFill(it)
-            } ?: shape.setFill(false)
-
-            strokeColor?.let {
-                shape.setStroke(true)
-                shape.setStroke(it)
-                shape.setStrokeWeight(strokeWeight)
-            } ?: shape.setStroke(false)
-
+            shape.disableStyle()
+            shape.setStroke(true)
             shape(shape)
         }
 

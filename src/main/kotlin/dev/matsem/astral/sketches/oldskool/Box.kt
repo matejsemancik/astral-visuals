@@ -14,15 +14,6 @@ class Box(
 ) : FlyingObject(position, rotation, rotationVector, size, targetSize) {
 
     override fun draw(sketch: PApplet) = with(sketch) {
-        fillColor?.let {
-            fill(it)
-        } ?: noFill()
-
-        strokeColor?.let {
-            stroke(it)
-            strokeWeight(strokeWeight)
-        } ?: noStroke()
-
         pushMatrix()
         translate(position)
         rotate(rotation)

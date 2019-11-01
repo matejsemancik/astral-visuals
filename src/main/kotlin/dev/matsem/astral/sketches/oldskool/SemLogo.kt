@@ -22,17 +22,7 @@ class SemLogo(
         scale(size / 100f)
 
         for (shape in cache.semLogo) {
-            fillColor?.let {
-                shape.setFill(true)
-                shape.setFill(it)
-            } ?: shape.setFill(false)
-
-            strokeColor?.let {
-                shape.setStroke(true)
-                shape.setStroke(it)
-                shape.setStrokeWeight(strokeWeight)
-            } ?: shape.setStroke(false)
-
+            shape.disableStyle()
             shape(shape)
         }
 

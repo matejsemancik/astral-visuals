@@ -47,6 +47,7 @@ class OldSkoolSketch : BaseSketch() {
     private var bgFill = false
 
     private val flyingObjects = mutableListOf<FlyingObject>()
+    val lock = Any()
 
     private fun newObject(): FlyingObject = with(sketch) {
         val random = random(1f)
@@ -141,6 +142,29 @@ class OldSkoolSketch : BaseSketch() {
             bgFill = it
         }
 
+        kontrol.onTriggerPad(3, 0, midiHue = 60) {
+            synchronized(lock) {
+                flyingObjects.removeIf { it is Text }
+            }
+        }
+
+        kontrol.onTriggerPad(3, 1, midiHue = 60) {
+            synchronized(lock) {
+                flyingObjects += Text(
+                        text = "SEMTV",
+                        cache = extrusionCache,
+                        position = newRandomPosition().apply {
+                            x = 0f
+                            y = 0f
+                        },
+                        rotation = PVector(0f, 0f, 0f),
+                        rotationVector = PVector(random(0.001f), random(0.001f), random(0.001f)),
+                        size = 0f,
+                        targetSize = random(20f, 40f)
+                )
+            }
+        }
+
         tapper.doOnBeat {
             if (beatMode == BeatMode.TAP) {
                 flyingObjects.shuffled().take((flyingObjects.size * affectedBeatPercentage).toInt()).forEach {
@@ -165,19 +189,6 @@ class OldSkoolSketch : BaseSketch() {
             }
         }
 
-        flyingObjects += Text(
-                text = "SEMTV",
-                cache = extrusionCache,
-                position = newRandomPosition().apply {
-                    x = 0f
-                    y = 0f
-                },
-                rotation = PVector(0f, 0f, 0f),
-                rotationVector = PVector(random(0.001f), random(0.001f), random(0.001f)),
-                size = 0f,
-                targetSize = random(20f, 40f)
-        )
-
         repeat(500) { flyingObjects.add(newObject()) }
     }
 
@@ -196,33 +207,35 @@ class OldSkoolSketch : BaseSketch() {
         sceneRotation = PVector.lerp(sceneRotation, targetSceneRotation, 0.001f)
         rotate(sceneRotation)
 
-        updateObjects()
+        synchronized(lock) {
+            updateObjects()
 
-        flyingObjects.forEach {
-            when (it) {
-                is Text -> {
-                    it.fillColor = bgColor
-                    it.strokeColor = fgColor
-                    it.strokeWeight = 1f
-                }
-                else -> {
-                    it.fillColor = if (bgFill) {
-                        bgColor
-                    } else {
-                        null
+            flyingObjects.forEach {
+                when (it) {
+                    is Text -> {
+                        fill(bgColor)
+                        stroke(fgColor)
                     }
+                    else -> {
+                        if (bgFill) {
+                            fill(bgColor)
+                        } else {
+                            noFill()
+                        }
 
-                    it.strokeColor = fgColor
-
-                    when (strokeMode) {
-                        StrokeMode.STILL -> it.strokeWeight = strokeWeight
-                        StrokeMode.FREQ -> it.strokeWeight = saw(strokeFreq).mapp(0f, 4f)
-                        StrokeMode.TAP -> it.strokeWeight = saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight)
+                        stroke(fgColor)
                     }
                 }
+
+                // TODO bug with missing stroke in pshape once stroke is set to 0
+                when (strokeMode) {
+                    StrokeMode.STILL -> strokeWeight(strokeWeight)
+                    StrokeMode.FREQ -> strokeWeight(saw(strokeFreq).mapp(0f, 4f))
+                    StrokeMode.TAP -> strokeWeight(saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight))
+                }
+
+                it.draw(this)
             }
-
-            it.draw(this)
         }
     }
 }
