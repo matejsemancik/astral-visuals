@@ -6,6 +6,7 @@ import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.kontrol.KontrolF1
+import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.shapes.ExtrusionCache
 import dev.matsem.astral.tools.tapper.Tapper
@@ -43,6 +44,7 @@ class OldSkoolSketch : BaseSketch() {
     private var strokeWeight = 2f
     private var strokeFreq = 1f
     private var strokeMode = StrokeMode.STILL
+    private var bgFill = false
 
     private val flyingObjects = mutableListOf<FlyingObject>()
 
@@ -98,6 +100,10 @@ class OldSkoolSketch : BaseSketch() {
 
     private fun updateObjects() {
         flyingObjects.forEach {
+            if (it.position.z > deadZone - it.size * 2f) {
+                it.targetSize = 0f
+            }
+
             it.update(flyingSpeed)
             val isDead = it.position.z > deadZone
             if (isDead) {
@@ -129,6 +135,10 @@ class OldSkoolSketch : BaseSketch() {
 
         kontrol.onTriggerPad(2, 2, midiHue = 30) {
             strokeMode = StrokeMode.STILL
+        }
+
+        kontrol.onTogglePad(2, 3, midiHue = 40) {
+            bgFill = it
         }
 
         tapper.doOnBeat {
@@ -175,8 +185,8 @@ class OldSkoolSketch : BaseSketch() {
         flyingSpeed = kontrol.slider1.midiRange(1f, 4f)
         affectedBeatPercentage = kontrol.slider2.midiRange(0f, 1f)
         expandOnBeatScale = kontrol.knob1.midiRange(0.5f, 1.5f)
-        strokeWeight = kontrol.knob2.midiRange(1f, 4f)
-        strokeFreq = kontrol.knob2.midiRange(0.2f, 30f)
+        strokeWeight = kontrol.knob2.midiRange(0f, 4f)
+        strokeFreq = kontrol.knob2.midiRange(0.1f, 30f)
         deadZone = kontrol.slider3.midiRange(0f, shorterDimension().toFloat())
 
         beatCounter.update()
@@ -191,18 +201,23 @@ class OldSkoolSketch : BaseSketch() {
         flyingObjects.forEach {
             when (it) {
                 is Text -> {
-                    it.fillColor = fgColor
-                    it.strokeColor = bgColor
+                    it.fillColor = bgColor
+                    it.strokeColor = fgColor
                     it.strokeWeight = 1f
                 }
                 else -> {
-                    it.fillColor = null
+                    it.fillColor = if (bgFill) {
+                        bgColor
+                    } else {
+                        null
+                    }
+
                     it.strokeColor = fgColor
 
                     when (strokeMode) {
                         StrokeMode.STILL -> it.strokeWeight = strokeWeight
-                        StrokeMode.FREQ -> it.strokeWeight = saw(strokeFreq).mapp(1f, 4f)
-                        StrokeMode.TAP -> it.strokeWeight = saw(1000f / tapper.interval, tapper.prev).mapp(1f, 4f)
+                        StrokeMode.FREQ -> it.strokeWeight = saw(strokeFreq).mapp(0f, 4f)
+                        StrokeMode.TAP -> it.strokeWeight = saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight)
                     }
                 }
             }
