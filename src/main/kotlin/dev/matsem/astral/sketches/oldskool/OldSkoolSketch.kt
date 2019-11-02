@@ -227,12 +227,14 @@ class OldSkoolSketch : BaseSketch() {
                     }
                 }
 
-                // TODO bug with missing stroke in pshape once stroke is set to 0
-                when (strokeMode) {
-                    StrokeMode.STILL -> strokeWeight(strokeWeight)
-                    StrokeMode.FREQ -> strokeWeight(saw(strokeFreq).mapp(0f, 4f))
-                    StrokeMode.TAP -> strokeWeight(saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight))
-                }
+                // constrain to 0.001f - bug with missing stroke in PShapes once stroke is set to 0
+                val strokeW = when (strokeMode) {
+                    StrokeMode.STILL -> strokeWeight
+                    StrokeMode.FREQ -> saw(strokeFreq).mapp(0f, 4f)
+                    StrokeMode.TAP -> saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight)
+                }.constrain(low = 0.001f)
+
+                strokeWeight(strokeW)
 
                 it.draw(this)
             }
