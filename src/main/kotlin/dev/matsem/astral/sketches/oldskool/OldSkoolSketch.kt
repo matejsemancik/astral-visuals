@@ -74,6 +74,23 @@ class OldSkoolSketch : BaseSketch() {
         }
     }
 
+    private fun addText(text: String) = with(sketch) {
+        synchronized(lock) {
+            flyingObjects += Text(
+                    text = text,
+                    cache = extrusionCache,
+                    position = newRandomPosition().apply {
+                        x = 0f
+                        y = 0f
+                    },
+                    rotation = PVector(0f, 0f, 0f),
+                    rotationVector = PVector(random(0.001f), random(0.001f), random(0.001f)),
+                    size = 0f,
+                    targetSize = random(20f, 40f)
+            )
+        }
+    }
+
     private fun newRandomPosition(allowCenter: Boolean = true): PVector = with(sketch) {
         if (allowCenter) {
             return PVector.random3D().mult(random(longerDimension().toFloat()))
@@ -151,21 +168,28 @@ class OldSkoolSketch : BaseSketch() {
             }
         }
 
-        kontrol.onTriggerPad(3, 1, midiHue = 60) {
-            synchronized(lock) {
-                flyingObjects += Text(
-                        text = "SEMTV",
-                        cache = extrusionCache,
-                        position = newRandomPosition().apply {
-                            x = 0f
-                            y = 0f
-                        },
-                        rotation = PVector(0f, 0f, 0f),
-                        rotationVector = PVector(random(0.001f), random(0.001f), random(0.001f)),
-                        size = 0f,
-                        targetSize = random(20f, 40f)
-                )
-            }
+        kontrol.onTriggerPad(3, 1, midiHue = 70) {
+            addText("SEMTV")
+        }
+
+        kontrol.onTriggerPad(0, 1, midiHue = 70) {
+            addText("A T T E M P T")
+        }
+
+        kontrol.onTriggerPad(0, 2, midiHue = 70) {
+            addText("M A T S E M")
+        }
+
+        kontrol.onTriggerPad(0, 3, midiHue = 70) {
+            addText("S B U")
+        }
+
+        kontrol.onTriggerPad(1, 2, midiHue = 70) {
+            addText("ROUGH : RESULT")
+        }
+
+        kontrol.onTriggerPad(1, 3, midiHue = 70) {
+            addText("J O H N E Y")
         }
 
         tapper.doOnBeat {
