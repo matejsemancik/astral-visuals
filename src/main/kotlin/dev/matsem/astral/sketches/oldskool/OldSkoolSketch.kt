@@ -8,7 +8,6 @@ import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
-import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.shapes.ExtrusionCache
 import dev.matsem.astral.tools.tapper.Tapper
@@ -27,7 +26,7 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     enum class StrokeMode {
-        STILL, TAP, FREQ
+        TAP, FREQ, STILL
     }
 
     override val sketch: SketchLoader by inject()
@@ -49,6 +48,10 @@ class OldSkoolSketch : BaseSketch() {
     private var expandAffectedPercentageSlider = galaxy.createPot(12, 10, 0f, 1f, 0.5f)
     private var expandScalePot = galaxy.createPot(12, 11, 0f, 2f, 1f)
 
+    private val strokeModeButtons = galaxy.createButtonGroup(12, listOf(12, 13, 14), listOf(14))
+    private val strokeControlSlider = galaxy.createPot(12, 15, 0f, 4f, 1f)
+    private val fillToggleButton = galaxy.createToggleButton(12, 16, false)
+
     private var expandMode: ExpandMode = ExpandMode.TAP
     private var sceneRotation = PVector(0f, 0f, 0f)
     private var targetSceneRotation = PVector(0f, 0f, 0f)
@@ -57,7 +60,6 @@ class OldSkoolSketch : BaseSketch() {
     private var strokeWeight = 2f
     private var strokeFreq = 1f
     private var strokeMode = StrokeMode.STILL
-    private var bgFill = false
 
     private val flyingObjects = mutableListOf<FlyingObject>()
     private val lock = Any()
@@ -157,22 +159,6 @@ class OldSkoolSketch : BaseSketch() {
             tapper.tap()
         }
 
-        kontrol.onTriggerPad(2, 0, midiHue = 30) {
-            strokeMode = StrokeMode.TAP
-        }
-
-        kontrol.onTriggerPad(2, 1, midiHue = 30) {
-            strokeMode = StrokeMode.FREQ
-        }
-
-        kontrol.onTriggerPad(2, 2, midiHue = 30) {
-            strokeMode = StrokeMode.STILL
-        }
-
-        kontrol.onTogglePad(2, 3, midiHue = 40) {
-            bgFill = it
-        }
-
         kontrol.onTriggerPad(3, 0, midiHue = 60) {
             synchronized(lock) {
                 flyingObjects.removeIf { it is Text }
@@ -231,13 +217,13 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
+        beatCounter.update()
+
         textAwareRotationZ += textAwareRotationZAccelSlider.value
         expandMode = ExpandMode.values()[expandModeButtons.activeButtonsIndices(true).first()]
-
-        strokeWeight = kontrol.knob2.midiRange(0f, 4f)
-        strokeFreq = kontrol.knob2.midiRange(0.1f, 30f)
-
-        beatCounter.update()
+        strokeMode = StrokeMode.values()[strokeModeButtons.activeButtonsIndices(true).first()]
+        strokeWeight = strokeControlSlider.rawValue.midiRange(0f, 4f)
+        strokeFreq = strokeControlSlider.rawValue.midiRange(0.1f, 30f)
 
         background(bgColor)
         translateCenter()
@@ -255,7 +241,7 @@ class OldSkoolSketch : BaseSketch() {
                         stroke(fgColor)
                     }
                     else -> {
-                        if (bgFill) {
+                        if (fillToggleButton.isPressed) {
                             fill(bgColor)
                         } else {
                             noFill()
