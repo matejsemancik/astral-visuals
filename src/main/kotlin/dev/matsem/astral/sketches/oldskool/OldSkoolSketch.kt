@@ -22,7 +22,7 @@ import processing.core.PVector
  */
 class OldSkoolSketch : BaseSketch() {
 
-    enum class BeatMode {
+    enum class ExpandMode {
         TAP, KICK
     }
 
@@ -45,13 +45,15 @@ class OldSkoolSketch : BaseSketch() {
         textAwareRotationZAccelSlider.reset()
     }
 
+    private var expandModeButtons = galaxy.createButtonGroup(12, listOf(8, 9), listOf(8))
+    private var expandAffectedPercentageSlider = galaxy.createPot(12, 10, 0f, 1f, 0.5f)
+    private var expandScalePot = galaxy.createPot(12, 11, 0f, 2f, 1f)
+
+    private var expandMode: ExpandMode = ExpandMode.TAP
     private var sceneRotation = PVector(0f, 0f, 0f)
     private var targetSceneRotation = PVector(0f, 0f, 0f)
     private var textAwareRotationZ = 0f
 
-    private var expandOnBeatScale = 1.4f
-    private var affectedBeatPercentage = 0.5f
-    private var beatMode: BeatMode = BeatMode.TAP
     private var strokeWeight = 2f
     private var strokeFreq = 1f
     private var strokeMode = StrokeMode.STILL
@@ -155,14 +157,6 @@ class OldSkoolSketch : BaseSketch() {
             tapper.tap()
         }
 
-        kontrol.onTriggerPad(1, 0, midiHue = 10) {
-            beatMode = BeatMode.TAP
-        }
-
-        kontrol.onTriggerPad(1, 1, midiHue = 10) {
-            beatMode = BeatMode.KICK
-        }
-
         kontrol.onTriggerPad(2, 0, midiHue = 30) {
             strokeMode = StrokeMode.TAP
         }
@@ -210,17 +204,17 @@ class OldSkoolSketch : BaseSketch() {
         }
 
         tapper.doOnBeat {
-            if (beatMode == BeatMode.TAP) {
-                flyingObjects.shuffled().take((flyingObjects.size * affectedBeatPercentage).toInt()).forEach {
-                    it.size *= expandOnBeatScale
+            if (expandMode == ExpandMode.TAP) {
+                flyingObjects.shuffled().take((flyingObjects.size * expandAffectedPercentageSlider.value).toInt()).forEach {
+                    it.size *= expandScalePot.value
                 }
             }
         }
 
         beatCounter.addListener(OnKick, 1) {
-            if (beatMode == BeatMode.KICK) {
-                flyingObjects.shuffled().take((flyingObjects.size * affectedBeatPercentage).toInt()).forEach {
-                    it.size *= expandOnBeatScale
+            if (expandMode == ExpandMode.KICK) {
+                flyingObjects.shuffled().take((flyingObjects.size * expandAffectedPercentageSlider.value).toInt()).forEach {
+                    it.size *= expandScalePot.value
                 }
             }
         }
@@ -237,10 +231,9 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
-        affectedBeatPercentage = kontrol.slider2.midiRange(0f, 1f)
         textAwareRotationZ += textAwareRotationZAccelSlider.value
+        expandMode = ExpandMode.values()[expandModeButtons.activeButtonsIndices(true).first()]
 
-        expandOnBeatScale = kontrol.knob1.midiRange(0f, 2f)
         strokeWeight = kontrol.knob2.midiRange(0f, 4f)
         strokeFreq = kontrol.knob2.midiRange(0.1f, 30f)
 
