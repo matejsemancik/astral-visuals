@@ -29,6 +29,19 @@ class OldSkoolSketch : BaseSketch() {
         TAP, FREQ, STILL
     }
 
+    companion object {
+        val TEXTS = arrayOf(
+                "A T T E M P T",
+                "M A T S E M",
+                "S B U",
+                "ROUGH : RESULT",
+                "J O H N E Y",
+                "K I D  K O D A M A",
+                "S E B A",
+                "SEMTV"
+        )
+    }
+
     override val sketch: SketchLoader by inject()
     private val beatCounter: BeatCounter by inject()
     private val automator: MidiAutomator by inject()
@@ -37,20 +50,28 @@ class OldSkoolSketch : BaseSketch() {
     private val galaxy: Galaxy by inject()
     private val extrusionCache: ExtrusionCache by inject()
 
-    private var flyingSpeedSlider = galaxy.createPot(12, 4, 0.2f, 4f, 1f)
-    private var deadZoneSlider = galaxy.createPot(12, 5, 0f, sketch.shorterDimension().toFloat(), sketch.shorterDimension().toFloat())
-    private var textAwareRotationZAccelSlider = galaxy.createPot(12, 6, -PI * 0.005f, PI * 0.005f, 0f)
-    private var textAwareRotationResetBtn = galaxy.createPushButton(12, 7) {
+    private val flyingSpeedSlider = galaxy.createPot(12, 4, 0.2f, 4f, 1f)
+    private val deadZoneSlider = galaxy.createPot(12, 5, 0f, sketch.shorterDimension().toFloat(), sketch.shorterDimension().toFloat())
+    private val textAwareRotationZAccelSlider = galaxy.createPot(12, 6, -PI * 0.005f, PI * 0.005f, 0f)
+    private val textAwareRotationResetBtn = galaxy.createPushButton(12, 7) {
         textAwareRotationZAccelSlider.reset()
     }
 
-    private var expandModeButtons = galaxy.createButtonGroup(12, listOf(8, 9), listOf(8))
-    private var expandAffectedPercentageSlider = galaxy.createPot(12, 10, 0f, 1f, 0.5f)
-    private var expandScalePot = galaxy.createPot(12, 11, 0f, 2f, 1f)
+    private val expandModeButtons = galaxy.createButtonGroup(12, listOf(8, 9), listOf(8))
+    private val expandAffectedPercentageSlider = galaxy.createPot(12, 10, 0f, 1f, 0.5f)
+    private val expandScalePot = galaxy.createPot(12, 11, 0f, 2f, 1f)
 
     private val strokeModeButtons = galaxy.createButtonGroup(12, listOf(12, 13, 14), listOf(14))
     private val strokeControlSlider = galaxy.createPot(12, 15, 0f, 4f, 1f)
     private val fillToggleButton = galaxy.createToggleButton(12, 16, false)
+
+    private val textClearBtn = galaxy.createPushButton(12, 17) {
+        clearText()
+    }
+
+    private val textButtons = galaxy.createPushButtonGroup(12, listOf(18, 19, 20, 21, 22, 23, 24, 25)) {
+        addText(TEXTS[it])
+    }
 
     private var expandMode: ExpandMode = ExpandMode.TAP
     private var sceneRotation = PVector(0f, 0f, 0f)
@@ -100,6 +121,12 @@ class OldSkoolSketch : BaseSketch() {
                     size = 0f,
                     targetSize = random(20f, 40f)
             )
+        }
+    }
+
+    private fun clearText() {
+        synchronized(lock) {
+            flyingObjects.removeIf { it is Text }
         }
     }
 
@@ -157,36 +184,6 @@ class OldSkoolSketch : BaseSketch() {
 
         kontrol.onTriggerPad(0, 0, midiHue = 0) {
             tapper.tap()
-        }
-
-        kontrol.onTriggerPad(3, 0, midiHue = 60) {
-            synchronized(lock) {
-                flyingObjects.removeIf { it is Text }
-            }
-        }
-
-        kontrol.onTriggerPad(3, 1, midiHue = 80) {
-            addText("SEMTV")
-        }
-
-        kontrol.onTriggerPad(0, 1, midiHue = 80) {
-            addText("A T T E M P T")
-        }
-
-        kontrol.onTriggerPad(0, 2, midiHue = 80) {
-            addText("M A T S E M")
-        }
-
-        kontrol.onTriggerPad(0, 3, midiHue = 80) {
-            addText("S B U")
-        }
-
-        kontrol.onTriggerPad(1, 2, midiHue = 80) {
-            addText("ROUGH : RESULT")
-        }
-
-        kontrol.onTriggerPad(1, 3, midiHue = 80) {
-            addText("J O H N E Y")
         }
 
         tapper.doOnBeat {
