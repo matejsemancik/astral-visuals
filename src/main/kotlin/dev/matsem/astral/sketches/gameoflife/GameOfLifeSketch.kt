@@ -221,11 +221,19 @@ class GameOfLifeSketch : BaseSketch() {
                     if (universe.cells[y][x] is AliveCell) 100f else 0f
                 }
 
-                val color = color(
-                        universe.heatMap[y][x].remap(1f, 0f, heatHueStartPot.value, heatHueEndPot.value),
-                        if (universe.cells[y][x] is AliveCell) 10f else heatMapSaturationSlider.value,
-                        brightness
-                )
+                val color = if (heatMapButton.isPressed) {
+                    color(
+                            universe.heatMap[y][x].remap(1f, 0f, heatHueStartPot.value, heatHueEndPot.value),
+                            if (universe.cells[y][x] is AliveCell) 10f else heatMapSaturationSlider.value,
+                            brightness
+                    )
+                } else {
+                    if (universe.cells[y][x] is AliveCell) {
+                        fgColor
+                    } else {
+                        bgColor
+                    }
+                }
 
                 noStroke()
                 fill(color)
