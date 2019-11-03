@@ -12,6 +12,7 @@ import dev.matsem.astral.tools.shapes.ExtrusionCache
 import dev.matsem.astral.tools.tapper.Tapper
 import org.koin.core.inject
 import processing.core.PApplet.radians
+import processing.core.PConstants.PI
 import processing.core.PVector
 
 /**
@@ -45,9 +46,11 @@ class OldSkoolSketch : BaseSketch() {
     private var strokeFreq = 1f
     private var strokeMode = StrokeMode.STILL
     private var bgFill = false
+    private var textAwareRotationZ = 0f
+    private var textAwareRotationZAccel = 0f
 
     private val flyingObjects = mutableListOf<FlyingObject>()
-    val lock = Any()
+    private val lock = Any()
 
     private fun newObject(): FlyingObject = with(sketch) {
         val random = random(1f)
@@ -181,8 +184,8 @@ class OldSkoolSketch : BaseSketch() {
             }
         }
 
-        beatCounter.addListener(OnKick, 32) {
-            if (random(1f) > 0.5f) {
+        beatCounter.addListener(OnKick, 24) {
+            if (random(1f) > 0.9f) {
                 targetSceneRotation = PVector(0f, 0f, random(-radians(90f), radians(90f)))
             } else {
                 targetSceneRotation = PVector.random3D()
@@ -193,12 +196,14 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
-        flyingSpeed = kontrol.slider1.midiRange(1f, 4f)
+        flyingSpeed = kontrol.slider1.midiRange(0.2f, 4f)
         affectedBeatPercentage = kontrol.slider2.midiRange(0f, 1f)
-        expandOnBeatScale = kontrol.knob1.midiRange(0.5f, 1.5f)
+        expandOnBeatScale = kontrol.knob1.midiRange(0f, 2f)
         strokeWeight = kontrol.knob2.midiRange(0f, 4f)
         strokeFreq = kontrol.knob2.midiRange(0.1f, 30f)
         deadZone = kontrol.slider3.midiRange(0f, shorterDimension().toFloat())
+        textAwareRotationZAccel = kontrol.slider4.midiRange(-PI * 0.005f, PI * 0.005f)
+        textAwareRotationZ += textAwareRotationZAccel
 
         beatCounter.update()
 
@@ -206,6 +211,7 @@ class OldSkoolSketch : BaseSketch() {
         translateCenter()
         sceneRotation = PVector.lerp(sceneRotation, targetSceneRotation, 0.001f)
         rotate(sceneRotation)
+        rotateZ(textAwareRotationZ)
 
         synchronized(lock) {
             updateObjects()
@@ -236,7 +242,14 @@ class OldSkoolSketch : BaseSketch() {
 
                 strokeWeight(strokeW)
 
-                it.draw(this)
+                if (it is Text) {
+                    pushMatrix()
+                    rotateZ(-textAwareRotationZ)
+                    it.draw(this)
+                    popMatrix()
+                } else {
+                    it.draw(this)
+                }
             }
         }
     }
