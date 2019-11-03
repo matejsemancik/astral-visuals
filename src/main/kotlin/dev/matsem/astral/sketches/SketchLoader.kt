@@ -126,7 +126,7 @@ class SketchLoader : PApplet(), KoinComponent {
             colorPots.forEach { it.reset() }
         }
 
-        val lerping = 0.02f
+        val lerping = 0.08f
         bgHuePot = galaxy.createPot(15, 67, 0f, Config.Color.HUE_MAX, bgColor.x).also { colorPots.add(it) }.lerp(lerping)
         bgSatPot = galaxy.createPot(15, 68, 0f, Config.Color.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }.lerp(lerping)
         bgBriPot = galaxy.createPot(15, 69, 0f, Config.Color.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }.lerp(lerping)
