@@ -4,7 +4,9 @@ import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
+import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTogglePad
 import dev.matsem.astral.tools.kontrol.onTriggerPad
@@ -30,24 +32,30 @@ class OldSkoolSketch : BaseSketch() {
 
     override val sketch: SketchLoader by inject()
     private val beatCounter: BeatCounter by inject()
+    private val automator: MidiAutomator by inject()
     private val tapper: Tapper by inject()
     private val kontrol: KontrolF1 by inject()
+    private val galaxy: Galaxy by inject()
     private val extrusionCache: ExtrusionCache by inject()
+
+    private var flyingSpeedSlider = galaxy.createPot(12, 4, 0.2f, 4f, 1f)
+    private var deadZoneSlider = galaxy.createPot(12, 5, 0f, sketch.shorterDimension().toFloat(), sketch.shorterDimension().toFloat())
+    private var textAwareRotationZAccelSlider = galaxy.createPot(12, 6, -PI * 0.005f, PI * 0.005f, 0f)
+    private var textAwareRotationResetBtn = galaxy.createPushButton(12, 7) {
+        textAwareRotationZAccelSlider.reset()
+    }
 
     private var sceneRotation = PVector(0f, 0f, 0f)
     private var targetSceneRotation = PVector(0f, 0f, 0f)
+    private var textAwareRotationZ = 0f
 
-    private var deadZone = sketch.shorterDimension().toFloat()
     private var expandOnBeatScale = 1.4f
-    private var flyingSpeed = 1f
     private var affectedBeatPercentage = 0.5f
     private var beatMode: BeatMode = BeatMode.TAP
     private var strokeWeight = 2f
     private var strokeFreq = 1f
     private var strokeMode = StrokeMode.STILL
     private var bgFill = false
-    private var textAwareRotationZ = 0f
-    private var textAwareRotationZAccel = 0f
 
     private val flyingObjects = mutableListOf<FlyingObject>()
     private val lock = Any()
@@ -121,12 +129,12 @@ class OldSkoolSketch : BaseSketch() {
 
     private fun updateObjects() {
         flyingObjects.forEach {
-            if (it.position.z > deadZone - it.size * 2f) {
+            if (it.position.z > deadZoneSlider.value - it.size * 2f) {
                 it.targetSize = 0f
             }
 
-            it.update(flyingSpeed)
-            val isDead = it.position.z > deadZone
+            it.update(flyingSpeedSlider.value)
+            val isDead = it.position.z > deadZoneSlider.value
             if (isDead) {
                 resetObject(it)
             }
@@ -134,6 +142,15 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     override fun setup() = with(sketch) {
+        automator.setupWithGalaxy(
+                channel = 12,
+                recordButtonCC = 0,
+                playButtonCC = 1,
+                loopButtonCC = 2,
+                clearButtonCC = 3,
+                channelFilter = null
+        )
+
         kontrol.onTriggerPad(0, 0, midiHue = 0) {
             tapper.tap()
         }
@@ -220,14 +237,12 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
-        flyingSpeed = kontrol.slider1.midiRange(0.2f, 4f)
         affectedBeatPercentage = kontrol.slider2.midiRange(0f, 1f)
+        textAwareRotationZ += textAwareRotationZAccelSlider.value
+
         expandOnBeatScale = kontrol.knob1.midiRange(0f, 2f)
         strokeWeight = kontrol.knob2.midiRange(0f, 4f)
         strokeFreq = kontrol.knob2.midiRange(0.1f, 30f)
-        deadZone = kontrol.slider3.midiRange(0f, shorterDimension().toFloat())
-        textAwareRotationZAccel = kontrol.slider4.midiRange(-PI * 0.005f, PI * 0.005f)
-        textAwareRotationZ += textAwareRotationZAccel
 
         beatCounter.update()
 
