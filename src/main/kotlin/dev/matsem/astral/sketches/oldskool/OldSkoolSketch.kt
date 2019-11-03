@@ -168,27 +168,27 @@ class OldSkoolSketch : BaseSketch() {
             }
         }
 
-        kontrol.onTriggerPad(3, 1, midiHue = 70) {
+        kontrol.onTriggerPad(3, 1, midiHue = 80) {
             addText("SEMTV")
         }
 
-        kontrol.onTriggerPad(0, 1, midiHue = 70) {
+        kontrol.onTriggerPad(0, 1, midiHue = 80) {
             addText("A T T E M P T")
         }
 
-        kontrol.onTriggerPad(0, 2, midiHue = 70) {
+        kontrol.onTriggerPad(0, 2, midiHue = 80) {
             addText("M A T S E M")
         }
 
-        kontrol.onTriggerPad(0, 3, midiHue = 70) {
+        kontrol.onTriggerPad(0, 3, midiHue = 80) {
             addText("S B U")
         }
 
-        kontrol.onTriggerPad(1, 2, midiHue = 70) {
+        kontrol.onTriggerPad(1, 2, midiHue = 80) {
             addText("ROUGH : RESULT")
         }
 
-        kontrol.onTriggerPad(1, 3, midiHue = 70) {
+        kontrol.onTriggerPad(1, 3, midiHue = 80) {
             addText("J O H N E Y")
         }
 
