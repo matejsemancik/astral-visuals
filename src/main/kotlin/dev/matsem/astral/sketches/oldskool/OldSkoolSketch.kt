@@ -215,6 +215,7 @@ class OldSkoolSketch : BaseSketch() {
 
     override fun draw() = with(sketch) {
         beatCounter.update()
+        automator.update()
 
         textAwareRotationZ += textAwareRotationZAccelSlider.value
         expandMode = ExpandMode.values()[expandModeButtons.activeButtonsIndices(true).first()]
