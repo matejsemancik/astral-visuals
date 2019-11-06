@@ -65,34 +65,6 @@ class GameOfLifeSketch : BaseSketch() {
 
     override fun onBecameActive() = with(sketch) {
         rectMode(PConstants.CORNER)
-
-        // TODO extract to VideoPreparationTool
-//        // Record button
-//        kontrol.onTogglePad(1, 0, midiHue = 100) {
-//            if (it) {
-//                preparationTool.startRecording()
-//            } else {
-//                preparationTool.stopRecording()
-//            }
-//        }
-//
-//        // Play button
-//        kontrol.onTriggerPad(1, 1, midiHue = 65) {
-//            if (it) {
-//                if (preparationTool.isPlaying.not()) {
-//                    preparationTool.startReplay()
-//                } else {
-//                    preparationTool.stopReplay()
-//                }
-//            }
-//        }
-//
-//        // Save automation to file button
-//        kontrol.onTriggerPad(1, 2, midiHue = 65) {
-//            if (it) {
-//                preparationTool.saveIntoFile()
-//            }
-//        }
     }
 
     override fun setup() = with(sketch) {

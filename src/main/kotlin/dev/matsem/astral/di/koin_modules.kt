@@ -51,7 +51,7 @@ val appModule = module {
     factory { MidiAutomator(get(), get(), get()) }
 
     // Video tools
-    factory { VideoPreparationTool(get(), get(), get(), get(), get()) }
+    factory { VideoPreparationTool(get(), get(), get(), get(), get(), get(), get(), get()) }
 
     // Audio
     single { Minim(get() as PApplet) }

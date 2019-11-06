@@ -8,6 +8,8 @@ import themidibus.SimpleMidiListener
 class KontrolF1 : MidiDevice {
 
     companion object {
+        val SHIFT_CC_OFFSET = 41
+
         const val KNOB1 = 2
         const val KNOB2 = 3
         const val KNOB3 = 4
@@ -22,41 +24,66 @@ class KontrolF1 : MidiDevice {
         const val ENCODER_DISPLAY = 41
 
         val PADS = listOf(10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25)
+        val SHIFT_PADS = PADS.map { it + SHIFT_CC_OFFSET }
     }
 
     var knob1 = 64
+        private set
     var knob2 = 64
+        private set
     var knob3 = 64
+        private set
     var knob4 = 64
+        private set
+    var knob1Shift = 64
+        private set
+    var knob2Shift = 64
+        private set
+    var knob3Shift = 64
+        private set
+    var knob4Shift = 64
+        private set
 
     var slider1 = 0
+        private set
     var slider2 = 0
+        private set
     var slider3 = 0
+        private set
     var slider4 = 0
+        private set
+    var slider1Shift = 0
+        private set
+    var slider2Shift = 0
+        private set
+    var slider3Shift = 0
+        private set
+    var slider4Shift = 0
+        private set
 
     var encoder = 0; private set
 
-    var pads = listOf(
-            Pad(this, 10, 0, 0),
-            Pad(this, 11, 1, 0),
-            Pad(this, 12, 2, 0),
-            Pad(this, 13, 3, 0),
-            Pad(this, 14, 0, 1),
-            Pad(this, 15, 1, 1),
-            Pad(this, 16, 2, 1),
-            Pad(this, 17, 3, 1),
-            Pad(this, 18, 0, 2),
-            Pad(this, 19, 1, 2),
-            Pad(this, 20, 2, 2),
-            Pad(this, 21, 3, 2),
-            Pad(this, 22, 0, 3),
-            Pad(this, 23, 1, 3),
-            Pad(this, 24, 2, 3),
-            Pad(this, 25, 3, 3)
+    private val pads = listOf(
+            Pad(kontrol = this, cc = 10, x = 0, y = 0),
+            Pad(kontrol = this, cc = 11, x = 1, y = 0),
+            Pad(kontrol = this, cc = 12, x = 2, y = 0),
+            Pad(kontrol = this, cc = 13, x = 3, y = 0),
+            Pad(kontrol = this, cc = 14, x = 0, y = 1),
+            Pad(kontrol = this, cc = 15, x = 1, y = 1),
+            Pad(kontrol = this, cc = 16, x = 2, y = 1),
+            Pad(kontrol = this, cc = 17, x = 3, y = 1),
+            Pad(kontrol = this, cc = 18, x = 0, y = 2),
+            Pad(kontrol = this, cc = 19, x = 1, y = 2),
+            Pad(kontrol = this, cc = 20, x = 2, y = 2),
+            Pad(kontrol = this, cc = 21, x = 3, y = 2),
+            Pad(kontrol = this, cc = 22, x = 0, y = 3),
+            Pad(kontrol = this, cc = 23, x = 1, y = 3),
+            Pad(kontrol = this, cc = 24, x = 2, y = 3),
+            Pad(kontrol = this, cc = 25, x = 3, y = 3)
     )
-        private set
 
-    var onEncoder: (Int) -> Unit = {}
+    private val shiftPads = pads.map { Pad(kontrol = this, cc = it.cc + SHIFT_CC_OFFSET, x = it.x, y = it.y) }
+
     lateinit var midibus: MidiBus
 
     fun connect() {
@@ -77,15 +104,22 @@ class KontrolF1 : MidiDevice {
             KNOB2 -> knob2 = value
             KNOB3 -> knob3 = value
             KNOB4 -> knob4 = value
+            KNOB1 + SHIFT_CC_OFFSET -> knob1Shift = value
+            KNOB2 + SHIFT_CC_OFFSET -> knob2Shift = value
+            KNOB3 + SHIFT_CC_OFFSET -> knob3Shift = value
+            KNOB4 + SHIFT_CC_OFFSET -> knob4Shift = value
 
             SLIDER1 -> slider1 = value
             SLIDER2 -> slider2 = value
             SLIDER3 -> slider3 = value
             SLIDER4 -> slider4 = value
+            SLIDER1 + SHIFT_CC_OFFSET -> slider1Shift = value
+            SLIDER2 + SHIFT_CC_OFFSET -> slider2Shift = value
+            SLIDER3 + SHIFT_CC_OFFSET -> slider3Shift = value
+            SLIDER4 + SHIFT_CC_OFFSET -> slider4Shift = value
 
             ENCODER -> {
                 encoder = value
-                onEncoder.invoke(value)
             }
         }
 
@@ -93,17 +127,19 @@ class KontrolF1 : MidiDevice {
         if (PADS.contains(cc)) {
             pads.first { it.cc == cc }.onStateChanged(value)
         }
+
+        if (SHIFT_PADS.contains(cc)) {
+            shiftPads.first { it.cc == cc }.onStateChanged(value)
+        }
     }
 
-    fun pad(y: Int, x: Int) =
-            if (y < 4 && x < 4) {
-                pads.first { it.y == y && it.x == x }
-            } else {
-                pads[0]
-            }
-
-    fun onEncoder(onEncoder: (Int) -> Unit) {
-        this.onEncoder = onEncoder
+    fun pad(y: Int, x: Int, shift: Boolean = false): Pad {
+        val collection = if (shift) shiftPads else pads
+        return if (y < 4 && x < 4) {
+            collection.first { it.y == y && it.x == x }
+        } else {
+            collection[0]
+        }
     }
 
     fun sendHSV(cc: Int, hue: Int, sat: Int, brightness: Int) {
