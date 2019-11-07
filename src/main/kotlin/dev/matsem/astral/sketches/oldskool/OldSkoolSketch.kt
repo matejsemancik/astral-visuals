@@ -98,6 +98,8 @@ class OldSkoolSketch : BaseSketch() {
     private var strokeMode = StrokeMode.STILL
     private var beatStrokeWeight = 2f
     private var positionMode = PositionMode.SCATTER
+    private var rotRandomMin = 0f
+    private var rotRandomMax = 0f
 
     private val flyingObjects = mutableListOf<FlyingObject>()
     private val lock = Any()
@@ -110,18 +112,46 @@ class OldSkoolSketch : BaseSketch() {
                     cache = extrusionCache,
                     position = newRandomPosition(positionMode),
                     rotation = PVector(0f, 0f, 0f),
-                    rotationVector = PVector(random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f)),
+                    rotationVector = PVector(
+                            random(rotRandomMin, rotRandomMax),
+                            random(rotRandomMin, rotRandomMax),
+                            random(rotRandomMin, rotRandomMax)
+                    ),
                     size = 0f,
                     targetSize = random(10f, 20f)
             )
             else -> Box(
                     position = newRandomPosition(positionMode),
                     rotation = PVector(0f, 0f, 0f),
-                    rotationVector = PVector(random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f)),
+                    rotationVector = PVector(
+                            random(rotRandomMin, rotRandomMax),
+                            random(rotRandomMin, rotRandomMax),
+                            random(rotRandomMin, rotRandomMax)
+                    ),
                     size = 0f,
                     targetSize = random(10f, 20f)
             )
         }
+    }
+
+    private fun resetObject(flyingObject: FlyingObject) = with(sketch) {
+        val newPosition: PVector = when (flyingObject) {
+            is Text -> newRandomPosition(PositionMode.CENTER).apply {
+                x = 0f
+                y = 0f
+            }
+            else -> newRandomPosition(positionMode)
+        }
+
+        flyingObject.position = newPosition
+        flyingObject.rotation = PVector(0f, 0f, 0f)
+        flyingObject.rotationVector = PVector(
+                random(rotRandomMin, rotRandomMax),
+                random(rotRandomMin, rotRandomMax),
+                random(rotRandomMin, rotRandomMax)
+        )
+        flyingObject.size = 0f
+        flyingObject.targetSize = random(10f, 20f)
     }
 
     private fun addText(text: String) = with(sketch) {
@@ -180,28 +210,18 @@ class OldSkoolSketch : BaseSketch() {
         }
     }
 
-    private fun resetObject(flyingObject: FlyingObject) = with(sketch) {
-        val newPosition: PVector = when (flyingObject) {
-            is Text -> newRandomPosition(PositionMode.CENTER).apply {
-                x = 0f
-                y = 0f
-            }
-            else -> newRandomPosition(positionMode)
-        }
-
-        flyingObject.position = newPosition
-        flyingObject.rotation = PVector(0f, 0f, 0f)
-        flyingObject.size = 0f
-        flyingObject.targetSize = random(10f, 20f)
-    }
-
     private fun updateObjects() {
         flyingObjects.forEach {
             if (it.position.z > deadZoneSlider.value - it.size * 2f) {
                 it.targetSize = 0f
             }
 
-            it.update(flyingSpeedSlider.value)
+            if (it is Text) {
+                it.update(flyingSpeedSlider.value / 3f)
+            } else {
+                it.update(flyingSpeedSlider.value)
+            }
+
             val isDead = it.position.z > deadZoneSlider.value
             if (isDead) {
                 resetObject(it)
@@ -263,7 +283,7 @@ class OldSkoolSketch : BaseSketch() {
         textAwareRotationZ += textAwareRotationZAccelSlider.value
         expandMode = ExpandMode.values()[expandModeButtons.activeButtonsIndices(true).first()]
         strokeMode = StrokeMode.values()[strokeModeButtons.activeButtonsIndices(true).first()]
-        positionMode = when(positionModeButtons.activeButtonsIndices(exclusive = true).first()) {
+        positionMode = when (positionModeButtons.activeButtonsIndices(exclusive = true).first()) {
             0 -> PositionMode.SCATTER
             else -> PositionMode.RADIAL
         }
@@ -274,6 +294,9 @@ class OldSkoolSketch : BaseSketch() {
             targetSceneRotation = PVector(0f, 0f, 0f)
         }
         sceneRotation = PVector.lerp(sceneRotation, targetSceneRotation, 0.001f)
+
+        rotRandomMin = -1e-2f * audioProcessor.getRange(100f..200f) * 0.04f
+        rotRandomMax = 1e-2f * audioProcessor.getRange(100f..200f) * 0.04f
 
         background(bgColor)
         translateCenter()
@@ -290,7 +313,7 @@ class OldSkoolSketch : BaseSketch() {
                         stroke(fgColor)
                     }
                     else -> {
-                        it.size += audioProcessor.getRange(20f..200f) * 0.02f
+                        it.size += audioProcessor.getRange(20f..200f) * 0.01f
                         if (fillToggleButton.isPressed) {
                             fill(bgColor)
                         } else {
