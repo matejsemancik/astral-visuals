@@ -2,6 +2,7 @@ package dev.matsem.astral.sketches.oldskool
 
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
+import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.automator.MidiAutomator
@@ -11,9 +12,12 @@ import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.shapes.ExtrusionCache
 import dev.matsem.astral.tools.tapper.Tapper
+import dev.matsem.astral.tools.video.VideoPreparationTool
 import org.koin.core.inject
+import processing.core.PApplet.lerp
 import processing.core.PApplet.radians
 import processing.core.PConstants.PI
+import processing.core.PConstants.TWO_PI
 import processing.core.PVector
 
 /**
@@ -26,7 +30,12 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     enum class StrokeMode {
-        TAP, FREQ, STILL
+        TAP, FREQ, STILL, KICK
+    }
+
+    // TODO buttons
+    enum class PositionMode {
+        SCATTER, CENTER, RADIAL
     }
 
     companion object {
@@ -38,7 +47,7 @@ class OldSkoolSketch : BaseSketch() {
                 "J O H N E Y",
                 "K I D  K O D A M A",
                 "S E B A",
-                "SEMTV"
+                "A S T R A L"
         )
     }
 
@@ -49,20 +58,25 @@ class OldSkoolSketch : BaseSketch() {
     private val kontrol: KontrolF1 by inject()
     private val galaxy: Galaxy by inject()
     private val extrusionCache: ExtrusionCache by inject()
+    private val audioProcessor: AudioProcessor by inject()
+    private val preparationTool: VideoPreparationTool by inject()
 
-    private val flyingSpeedSlider = galaxy.createPot(12, 4, 0.2f, 4f, 1f)
-    private val deadZoneSlider = galaxy.createPot(12, 5, 0f, sketch.shorterDimension().toFloat(), sketch.shorterDimension().toFloat())
+    private val zMax = sketch.longerDimension() * 2f
+
+    private val flyingSpeedSlider = galaxy.createPot(12, 4, 0.2f, 15f, 1f)
+    private val deadZoneSlider = galaxy.createPot(12, 5, 0f, zMax / 2f, zMax / 4f)
     private val textAwareRotationZAccelSlider = galaxy.createPot(12, 6, -PI * 0.005f, PI * 0.005f, 0f)
     private val textAwareRotationResetBtn = galaxy.createPushButton(12, 7) {
         textAwareRotationZAccelSlider.reset()
     }
+    private val sceneRotationButton = galaxy.createToggleButton(12, 27, true)
 
-    private val expandModeButtons = galaxy.createButtonGroup(12, listOf(8, 9), listOf(8))
+    private val expandModeButtons = galaxy.createButtonGroup(12, listOf(8, 9), listOf(9))
     private val expandAffectedPercentageSlider = galaxy.createPot(12, 10, 0f, 1f, 0.5f)
     private val expandScalePot = galaxy.createPot(12, 11, 0f, 2f, 1f)
 
-    private val strokeModeButtons = galaxy.createButtonGroup(12, listOf(12, 13, 14), listOf(14))
-    private val strokeControlSlider = galaxy.createPot(12, 15, 0f, 4f, 1f)
+    private val strokeModeButtons = galaxy.createButtonGroup(12, listOf(12, 13, 14, 26), listOf(14))
+    private val strokeControlSlider = galaxy.createPot(12, 15, 0f, 4f, 2f)
     private val fillToggleButton = galaxy.createToggleButton(12, 16, false)
 
     private val textClearBtn = galaxy.createPushButton(12, 17) {
@@ -81,6 +95,7 @@ class OldSkoolSketch : BaseSketch() {
     private var strokeWeight = 2f
     private var strokeFreq = 1f
     private var strokeMode = StrokeMode.STILL
+    private var beatStrokeWeight = 2f
 
     private val flyingObjects = mutableListOf<FlyingObject>()
     private val lock = Any()
@@ -89,16 +104,16 @@ class OldSkoolSketch : BaseSketch() {
         val random = random(1f)
 
         return when {
-            random < 0.2f -> SemLogo(
+            random < 0.4f -> SemLogo(
                     cache = extrusionCache,
-                    position = newRandomPosition(allowCenter = false),
+                    position = newRandomPosition(PositionMode.RADIAL),
                     rotation = PVector(0f, 0f, 0f),
                     rotationVector = PVector(random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f)),
                     size = 0f,
                     targetSize = random(10f, 20f)
             )
             else -> Box(
-                    position = newRandomPosition(allowCenter = false),
+                    position = newRandomPosition(PositionMode.RADIAL),
                     rotation = PVector(0f, 0f, 0f),
                     rotationVector = PVector(random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f)),
                     size = 0f,
@@ -112,7 +127,7 @@ class OldSkoolSketch : BaseSketch() {
             flyingObjects += Text(
                     text = text,
                     cache = extrusionCache,
-                    position = newRandomPosition().apply {
+                    position = newRandomPosition(PositionMode.CENTER).apply {
                         x = 0f
                         y = 0f
                     },
@@ -130,26 +145,44 @@ class OldSkoolSketch : BaseSketch() {
         }
     }
 
-    private fun newRandomPosition(allowCenter: Boolean = true): PVector = with(sketch) {
-        if (allowCenter) {
-            return PVector.random3D().mult(random(longerDimension().toFloat()))
+    private fun newRandomPosition(mode: PositionMode = PositionMode.SCATTER): PVector = with(sketch) {
+        return when (mode) {
+            PositionMode.SCATTER -> {
+                var newPosition: PVector
+                do {
+                    newPosition = PVector.random3D().mult(zMax)
+                } while (newPosition.isInRadius(20f))
+
+                newPosition
+            }
+
+            PositionMode.CENTER -> {
+                PVector.random3D().mult(zMax).apply {
+                    x = 0f
+                    y = 0f
+                }
+            }
+
+            PositionMode.RADIAL -> {
+                val angle = random(TWO_PI)
+                val scatter = shorterDimension() / 6f
+                val radius = shorterDimension() / 4f + random(-scatter, scatter)
+                val z = random(zMax)
+                PVector.fromAngle(angle)
+                        .normalize()
+                        .mult(radius)
+                        .apply { this.z = z }
+            }
         }
-
-        var newPosition: PVector
-        do {
-            newPosition = PVector.random3D().mult(random(longerDimension().toFloat()))
-        } while (newPosition.isInRadius(20f))
-
-        return newPosition
     }
 
     private fun resetObject(flyingObject: FlyingObject) = with(sketch) {
         val newPosition: PVector = when (flyingObject) {
-            is Text -> newRandomPosition().apply {
+            is Text -> newRandomPosition(PositionMode.CENTER).apply {
                 x = 0f
                 y = 0f
             }
-            else -> newRandomPosition(allowCenter = false)
+            else -> newRandomPosition(PositionMode.RADIAL)
         }
 
         flyingObject.position = newPosition
@@ -202,11 +235,17 @@ class OldSkoolSketch : BaseSketch() {
             }
         }
 
+        beatCounter.addListener(OnKick, 1) {
+            beatStrokeWeight = strokeWeight * 6f
+        }
+
         beatCounter.addListener(OnKick, 24) {
-            if (random(1f) > 0.9f) {
-                targetSceneRotation = PVector(0f, 0f, random(-radians(90f), radians(90f)))
-            } else {
-                targetSceneRotation = PVector.random3D()
+            if (sceneRotationButton.isPressed) {
+                if (random(1f) > 0.9f) {
+                    targetSceneRotation = PVector(0f, 0f, random(-radians(90f), radians(90f)))
+                } else {
+                    targetSceneRotation = PVector.random3D()
+                }
             }
         }
 
@@ -222,10 +261,14 @@ class OldSkoolSketch : BaseSketch() {
         strokeMode = StrokeMode.values()[strokeModeButtons.activeButtonsIndices(true).first()]
         strokeWeight = strokeControlSlider.rawValue.midiRange(0f, 4f)
         strokeFreq = strokeControlSlider.rawValue.midiRange(0.1f, 30f)
+        beatStrokeWeight = lerp(beatStrokeWeight, strokeWeight, 0.4f)
+        if (sceneRotationButton.isPressed.not()) {
+            targetSceneRotation = PVector(0f, 0f, 0f)
+        }
+        sceneRotation = PVector.lerp(sceneRotation, targetSceneRotation, 0.001f)
 
         background(bgColor)
         translateCenter()
-        sceneRotation = PVector.lerp(sceneRotation, targetSceneRotation, 0.001f)
         rotate(sceneRotation)
         rotateZ(textAwareRotationZ)
 
@@ -239,6 +282,7 @@ class OldSkoolSketch : BaseSketch() {
                         stroke(fgColor)
                     }
                     else -> {
+                        it.size += audioProcessor.getRange(20f..200f) * 0.02f
                         if (fillToggleButton.isPressed) {
                             fill(bgColor)
                         } else {
@@ -254,6 +298,7 @@ class OldSkoolSketch : BaseSketch() {
                     StrokeMode.STILL -> strokeWeight
                     StrokeMode.FREQ -> saw(strokeFreq).mapp(0f, 4f)
                     StrokeMode.TAP -> saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight)
+                    StrokeMode.KICK -> beatStrokeWeight
                 }.constrain(low = 0.001f)
 
                 strokeWeight(strokeW)
