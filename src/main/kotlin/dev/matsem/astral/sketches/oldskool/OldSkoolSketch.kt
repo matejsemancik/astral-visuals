@@ -33,7 +33,6 @@ class OldSkoolSketch : BaseSketch() {
         TAP, FREQ, STILL, KICK
     }
 
-    // TODO buttons
     enum class PositionMode {
         SCATTER, CENTER, RADIAL
     }
@@ -79,6 +78,8 @@ class OldSkoolSketch : BaseSketch() {
     private val strokeControlSlider = galaxy.createPot(12, 15, 0f, 4f, 2f)
     private val fillToggleButton = galaxy.createToggleButton(12, 16, false)
 
+    private val positionModeButtons = galaxy.createButtonGroup(12, listOf(28, 29), listOf(28))
+
     private val textClearBtn = galaxy.createPushButton(12, 17) {
         clearText()
     }
@@ -96,6 +97,7 @@ class OldSkoolSketch : BaseSketch() {
     private var strokeFreq = 1f
     private var strokeMode = StrokeMode.STILL
     private var beatStrokeWeight = 2f
+    private var positionMode = PositionMode.SCATTER
 
     private val flyingObjects = mutableListOf<FlyingObject>()
     private val lock = Any()
@@ -106,14 +108,14 @@ class OldSkoolSketch : BaseSketch() {
         return when {
             random < 0.4f -> SemLogo(
                     cache = extrusionCache,
-                    position = newRandomPosition(PositionMode.RADIAL),
+                    position = newRandomPosition(positionMode),
                     rotation = PVector(0f, 0f, 0f),
                     rotationVector = PVector(random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f)),
                     size = 0f,
                     targetSize = random(10f, 20f)
             )
             else -> Box(
-                    position = newRandomPosition(PositionMode.RADIAL),
+                    position = newRandomPosition(positionMode),
                     rotation = PVector(0f, 0f, 0f),
                     rotationVector = PVector(random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f), random(-1e-2f, 1e-2f)),
                     size = 0f,
@@ -150,7 +152,9 @@ class OldSkoolSketch : BaseSketch() {
             PositionMode.SCATTER -> {
                 var newPosition: PVector
                 do {
-                    newPosition = PVector.random3D().mult(zMax)
+                    newPosition = PVector.random3D().mult(shorterDimension() / 2f).apply {
+                        z = random(zMax)
+                    }
                 } while (newPosition.isInRadius(20f))
 
                 newPosition
@@ -182,7 +186,7 @@ class OldSkoolSketch : BaseSketch() {
                 x = 0f
                 y = 0f
             }
-            else -> newRandomPosition(PositionMode.RADIAL)
+            else -> newRandomPosition(positionMode)
         }
 
         flyingObject.position = newPosition
@@ -259,6 +263,10 @@ class OldSkoolSketch : BaseSketch() {
         textAwareRotationZ += textAwareRotationZAccelSlider.value
         expandMode = ExpandMode.values()[expandModeButtons.activeButtonsIndices(true).first()]
         strokeMode = StrokeMode.values()[strokeModeButtons.activeButtonsIndices(true).first()]
+        positionMode = when(positionModeButtons.activeButtonsIndices(exclusive = true).first()) {
+            0 -> PositionMode.SCATTER
+            else -> PositionMode.RADIAL
+        }
         strokeWeight = strokeControlSlider.rawValue.midiRange(0f, 4f)
         strokeFreq = strokeControlSlider.rawValue.midiRange(0.1f, 30f)
         beatStrokeWeight = lerp(beatStrokeWeight, strokeWeight, 0.4f)
