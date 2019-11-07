@@ -65,34 +65,6 @@ class GameOfLifeSketch : BaseSketch() {
 
     override fun onBecameActive() = with(sketch) {
         rectMode(PConstants.CORNER)
-
-        // TODO extract to VideoPreparationTool
-//        // Record button
-//        kontrol.onTogglePad(1, 0, midiHue = 100) {
-//            if (it) {
-//                preparationTool.startRecording()
-//            } else {
-//                preparationTool.stopRecording()
-//            }
-//        }
-//
-//        // Play button
-//        kontrol.onTriggerPad(1, 1, midiHue = 65) {
-//            if (it) {
-//                if (preparationTool.isPlaying.not()) {
-//                    preparationTool.startReplay()
-//                } else {
-//                    preparationTool.stopReplay()
-//                }
-//            }
-//        }
-//
-//        // Save automation to file button
-//        kontrol.onTriggerPad(1, 2, midiHue = 65) {
-//            if (it) {
-//                preparationTool.saveIntoFile()
-//            }
-//        }
     }
 
     override fun setup() = with(sketch) {
@@ -221,11 +193,19 @@ class GameOfLifeSketch : BaseSketch() {
                     if (universe.cells[y][x] is AliveCell) 100f else 0f
                 }
 
-                val color = color(
-                        universe.heatMap[y][x].remap(1f, 0f, heatHueStartPot.value, heatHueEndPot.value),
-                        if (universe.cells[y][x] is AliveCell) 10f else heatMapSaturationSlider.value,
-                        brightness
-                )
+                val color = if (heatMapButton.isPressed) {
+                    color(
+                            universe.heatMap[y][x].remap(1f, 0f, heatHueStartPot.value, heatHueEndPot.value),
+                            if (universe.cells[y][x] is AliveCell) 10f else heatMapSaturationSlider.value,
+                            brightness
+                    )
+                } else {
+                    if (universe.cells[y][x] is AliveCell) {
+                        fgColor
+                    } else {
+                        bgColor
+                    }
+                }
 
                 noStroke()
                 fill(color)
