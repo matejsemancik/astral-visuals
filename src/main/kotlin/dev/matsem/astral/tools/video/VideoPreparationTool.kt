@@ -29,6 +29,9 @@ class VideoPreparationTool(
 
     init {
         sketch.registerMethod("draw", this)
+        midiFileParser.loadFile(Config.VideoExport.MIDI_AUTOMATION_FILE)?.let { automation ->
+            midiRecorder.preLoad(automation)
+        }
 
         kontrol.onTogglePad(0, 0, midiHue = 0, shift = true) {
             if (it) {

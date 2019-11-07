@@ -85,6 +85,11 @@ class MidiRecorder(private val sketch: PApplet) {
 //        messages.forEach { println(it) }
     }
 
+    fun preLoad(messages: List<MidiMessage>) {
+        this.messages.clear()
+        this.messages.addAll(messages)
+    }
+
     fun clear() = messages.clear()
 
     fun getMessages(excludedCCs: List<Int> = listOf()) = messages
