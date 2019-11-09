@@ -113,7 +113,8 @@ class SketchLoader : PApplet(), KoinComponent {
                 PConstants.HSB,
                 Config.Color.HUE_MAX,
                 Config.Color.SATURATION_MAX,
-                Config.Color.BRIGHTNESS_MAX
+                Config.Color.BRIGHTNESS_MAX,
+                Config.Color.ALPHA_MAX
         )
 
         galaxy.connect()

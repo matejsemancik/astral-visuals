@@ -1,5 +1,6 @@
 package dev.matsem.astral.sketches.attractor
 
+import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
@@ -7,8 +8,10 @@ import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.Pot
+import dev.matsem.astral.tools.kontrol.KontrolF1
 import org.koin.core.inject
 import processing.core.PApplet.*
+import processing.core.PConstants
 import processing.core.PVector
 
 class AttractorSketch : BaseSketch() {
@@ -21,6 +24,7 @@ class AttractorSketch : BaseSketch() {
     val audioProcessor: AudioProcessor by inject()
     val galaxy: Galaxy by inject()
     private val automator: MidiAutomator by inject()
+    private val kontrol: KontrolF1 by inject()
 
     private var rightmost = Float.MIN_VALUE
     private var leftmost = Float.MAX_VALUE
@@ -71,6 +75,7 @@ class AttractorSketch : BaseSketch() {
     )
 
     private val dotSizePot = galaxy.createPot(5, 44, 1f, 5f, 1f)
+    private val bgAlphaPot = galaxy.createPot(5, 49, 0f, Config.Color.ALPHA_MAX, Config.Color.ALPHA_MAX)
 
     override fun setup() {
         automator.setupWithGalaxy(
@@ -83,9 +88,15 @@ class AttractorSketch : BaseSketch() {
         )
     }
 
+    override fun onBecameActive() = with(sketch) {
+        rectMode(PConstants.CORNER)
+    }
+
     override fun draw() = with(sketch) {
         automator.update()
-        background(bgColor)
+        fill(bgColor, bgAlphaPot.value)
+        noStroke()
+        rect(0f, 0f, width.toFloat(), height.toFloat())
         strokeWeight(dotSizePot.value)
 
         if (audioProcessor.beatDetect.isKick) {
