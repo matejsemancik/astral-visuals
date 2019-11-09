@@ -57,7 +57,6 @@ class OldSkoolSketch : BaseSketch() {
     private val galaxy: Galaxy by inject()
     private val extrusionCache: ExtrusionCache by inject()
     private val audioProcessor: AudioProcessor by inject()
-    private val preparationTool: VideoPreparationTool by inject()
 
     private val zMax = sketch.longerDimension() * 2f
 

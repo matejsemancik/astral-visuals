@@ -6,7 +6,6 @@ import ddf.minim.Minim
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.attractor.AttractorSketch
-import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
@@ -82,7 +81,6 @@ val appModule = module {
     }
 
     // Sketches
-    factory { BlankSketch() }
     factory { PolygonalSketch() }
     factory { TerrainSketch() }
     factory { FibSphereSketch() }
