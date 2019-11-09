@@ -200,7 +200,6 @@ class SketchLoader : PApplet(), KoinComponent {
         galaxy.update()
 
         if (autoSwitchButton.isPressed) {
-            println("seconds to next switch: ${(millis() - lastAutoSwitchMs - autoSwitchIntervalPot.value.toInt()) / 1000f}")
             if (millis() > lastAutoSwitchMs + autoSwitchIntervalPot.value.toInt()) {
                 // Time to switch to random sketch
                 val activeButtons = autoSwitchSelectorButtons.activeButtonsIndices(exclusive = false)
