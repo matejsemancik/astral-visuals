@@ -7,7 +7,6 @@ import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.attractor.AttractorSketch
-import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
@@ -23,6 +22,7 @@ import dev.matsem.astral.sketches.video.VideoSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.BeatDetectData
 import dev.matsem.astral.tools.galaxy.Galaxy
+import dev.matsem.astral.tools.galaxy.controls.ButtonGroup
 import dev.matsem.astral.tools.galaxy.controls.Pot
 import dev.matsem.astral.tools.galaxy.controls.PushButton
 import dev.matsem.astral.tools.galaxy.controls.ToggleButton
@@ -72,13 +72,17 @@ class SketchLoader : PApplet(), KoinComponent {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
+    lateinit var autoSwitchButton: ToggleButton
+    lateinit var autoSwitchIntervalPot: Pot
+    lateinit var autoSwitchSelectorButtons: ButtonGroup
+    private var lastAutoSwitchMs = 0
+
     lateinit var reader: BufferedReader
 
     // endregion
 
     // region Sketches
 
-    private val blankSketch: BlankSketch by inject()
     private val polygonalSketch: PolygonalSketch by inject()
     private val terrainSketch: TerrainSketch by inject()
     private val fibSphereSketch: FibSphereSketch by inject()
@@ -139,8 +143,11 @@ class SketchLoader : PApplet(), KoinComponent {
         accentSatPot = galaxy.createPot(15, 74, 0f, Config.Color.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }.lerp(lerping)
         accentBriPot = galaxy.createPot(15, 75, 0f, Config.Color.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }.lerp(lerping)
 
+        autoSwitchButton = galaxy.createToggleButton(15, 77, false)
+        autoSwitchIntervalPot = galaxy.createPot(15, 78, 5000f, 5 * 60 * 1000f, 5000f) // interval in millis, 5s to 5m
+        autoSwitchSelectorButtons = galaxy.createButtonGroup(15, (79..94).toList(), (79..94).toList())
+
         sketches.apply {
-            put('0', blankSketch)
             put('1', polygonalSketch)
             put('2', terrainSketch)
             put('3', fibSphereSketch)
@@ -162,7 +169,6 @@ class SketchLoader : PApplet(), KoinComponent {
 
         activeSketch().onBecameActive()
 
-        galaxy.createPushButton(15, 1) {}
         galaxy.createPushButton(15, 1) { switchSketch('1') }
         galaxy.createPushButton(15, 2) { switchSketch('2') }
         galaxy.createPushButton(15, 3) { switchSketch('3') }
@@ -192,6 +198,24 @@ class SketchLoader : PApplet(), KoinComponent {
 
     override fun draw() {
         galaxy.update()
+
+        if (autoSwitchButton.isPressed) {
+            println("seconds to next switch: ${(millis() - lastAutoSwitchMs - autoSwitchIntervalPot.value.toInt()) / 1000f}")
+            if (millis() > lastAutoSwitchMs + autoSwitchIntervalPot.value.toInt()) {
+                // Time to switch to random sketch
+                val activeButtons = autoSwitchSelectorButtons.activeButtonsIndices(exclusive = false)
+                if (activeButtons.isEmpty().not()) {
+                    val randomSketchIndex = activeButtons.random()
+                    val currentSketchIndex = sketches.keys.toList().indexOf(selector)
+                    if (randomSketchIndex < sketches.keys.count() && randomSketchIndex != currentSketchIndex) {
+                        switchSketch(sketches.keys.toList()[randomSketchIndex])
+                        lastAutoSwitchMs = millis()
+                    }
+                }
+            }
+        } else {
+            lastAutoSwitchMs = millis()
+        }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE.not()) {
             audioProcessor.gain = gainPot.value
@@ -254,7 +278,7 @@ class SketchLoader : PApplet(), KoinComponent {
     }
 
     private fun activeSketch(): BaseSketch {
-        return sketches.getOrDefault(selector, blankSketch)
+        return sketches.getOrDefault(selector, sketches.values.first())
     }
 
     private fun switchSketch(num: Char) {
