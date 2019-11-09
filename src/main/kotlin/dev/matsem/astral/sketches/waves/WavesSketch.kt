@@ -24,7 +24,6 @@ class WavesSketch : PApplet(), KoinComponent {
     }
 
     override fun setup() {
-        colorMode(PConstants.HSB, 360f, 100f, 100f)
         kontrol.connect()
 
         kontrol.onTogglePad(0, 0, 100) {
