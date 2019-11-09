@@ -1,5 +1,6 @@
 package dev.matsem.astral.tools.video
 
+import ddf.minim.AudioListener
 import ddf.minim.AudioPlayer
 import ddf.minim.Minim
 import dev.matsem.astral.Config
@@ -54,6 +55,11 @@ class VideoPreparationTool(
         kontrol.onTriggerPad(0, 2, midiHue = 80, shift = true) {
             saveIntoFile()
         }
+
+        // Capture initial MIDI state from already recorded messages
+        kontrol.onTriggerPad(0, 3, midiHue = 80, shift = true) {
+            saveInitialStateIntoFile()
+        }
     }
 
     private val isPlaying: Boolean
@@ -62,6 +68,21 @@ class VideoPreparationTool(
     fun initWithGalaxy(musicFilePath: String) {
         plugInMidiDevice(galaxy)
         setMusicFile(musicFilePath)
+    }
+
+    fun initWithKontrol(musicFilePath: String) {
+        plugInMidiDevice(kontrol)
+        setMusicFile(musicFilePath)
+
+        setBlacklistedMessages(
+                listOf(
+                        kontrol.pad(0, 0, true),
+                        kontrol.pad(0, 1, true),
+                        kontrol.pad(0, 2, true),
+                        kontrol.pad(0, 3, true)
+                )
+                        .map { it.cc }
+        )
     }
 
     fun draw() {
@@ -76,7 +97,17 @@ class VideoPreparationTool(
     private fun setMusicFile(path: String) = apply {
         try {
             this.audioPlayer = minim.loadFile(path)
-            this.audioPlayer?.addListener(audioProcessor)
+            this.audioPlayer?.addListener(object : AudioListener {
+                override fun samples(p0: FloatArray?) {
+                    audioProcessor.fft.forward(audioPlayer?.mix)
+                    audioProcessor.beatDetect.detect(p0)
+                }
+
+                override fun samples(p0: FloatArray?, p1: FloatArray?) {
+                    audioProcessor.fft.forward(audioPlayer?.mix)
+                    audioProcessor.beatDetect.detect(p0)
+                }
+            })
         } catch (e: Throwable) {
             // ¯\_(ツ)_/¯
         }
@@ -114,4 +145,17 @@ class VideoPreparationTool(
 
     private fun saveIntoFile(fileName: String = Config.VideoExport.MIDI_AUTOMATION_FILE) =
             midiFileParser.saveFile(midiRecorder.getMessages(excludedCCs = blacklistedCCs), fileName)
+
+    private fun saveInitialStateIntoFile(fileName: String = Config.VideoExport.MIDI_AUTOMATION_FILE) {
+        val messages = midiRecorder.getMessages(excludedCCs = blacklistedCCs)
+                .sortedBy { it.millis }
+                .toMutableList()
+                .groupBy { it.control }
+                .entries
+                .map { it.value.takeLast(1) }
+                .flatMap { it }
+                .map { it.copy(millis = 0, frame = 0) }
+
+        midiFileParser.saveFile(messages, fileName)
+    }
 }

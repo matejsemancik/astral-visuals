@@ -12,7 +12,6 @@ import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.shapes.ExtrusionCache
 import dev.matsem.astral.tools.tapper.Tapper
-import dev.matsem.astral.tools.video.VideoPreparationTool
 import org.koin.core.inject
 import processing.core.PApplet.lerp
 import processing.core.PApplet.radians
