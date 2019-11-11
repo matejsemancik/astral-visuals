@@ -96,7 +96,6 @@ class GameOfLifeSketch : BaseSketch() {
             randomize(0.995f)
         }
 
-        // TODO tapper
         beatCounter.addListener(OnKick, 4) {
             targetZoom = random(1f, 1.2f)
         }

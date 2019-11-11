@@ -29,6 +29,7 @@ import dev.matsem.astral.tools.galaxy.controls.ToggleButton
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.midi.MidiFileParser
 import dev.matsem.astral.tools.midi.MidiPlayer
+import dev.matsem.astral.tools.tapper.Tapper
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -50,6 +51,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val videoExport: VideoExport by inject()
     private val midiPlayer: MidiPlayer by inject()
     private val midiFileParser: MidiFileParser by inject()
+    private val tapper: Tapper by inject()
 
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
@@ -76,6 +78,8 @@ class SketchLoader : PApplet(), KoinComponent {
     lateinit var autoSwitchIntervalPot: Pot
     lateinit var autoSwitchSelectorButtons: ButtonGroup
     private var lastAutoSwitchMs = 0
+
+    private lateinit var tapperButton: PushButton
 
     lateinit var reader: BufferedReader
 
@@ -147,6 +151,10 @@ class SketchLoader : PApplet(), KoinComponent {
         autoSwitchButton = galaxy.createToggleButton(15, 77, false)
         autoSwitchIntervalPot = galaxy.createPot(15, 78, 5000f, 5 * 60 * 1000f, 5000f) // interval in millis, 5s to 5m
         autoSwitchSelectorButtons = galaxy.createButtonGroup(15, (79..94).toList(), (79..94).toList())
+
+        tapperButton = galaxy.createPushButton(15, 95) {
+            tapper.tap()
+        }
 
         sketches.apply {
             put('1', polygonalSketch)
