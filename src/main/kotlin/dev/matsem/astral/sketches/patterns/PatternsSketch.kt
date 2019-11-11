@@ -3,10 +3,9 @@ package dev.matsem.astral.sketches.patterns
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.AudioProcessor
-import dev.matsem.astral.tools.extensions.centerX
-import dev.matsem.astral.tools.extensions.centerY
 import dev.matsem.astral.tools.extensions.longerDimension
 import dev.matsem.astral.tools.extensions.shorterDimension
+import dev.matsem.astral.tools.extensions.translateCenter
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
@@ -29,10 +28,9 @@ class PatternsSketch : BaseSketch() {
     private val randomOnBeatButton = galaxy.createToggleButton(4, 5, false)
     private val randomModeButton = galaxy.createPushButton(4, 6) { setRandomControls() }
     private val beatDividerButtons = galaxy.createButtonGroup(4, listOf(7, 8, 9, 10, 11), listOf(7))
+    private val bgAlphaSlider = galaxy.createPot(4, 12, 0f, 50f, 25f)
 
-    override fun setup() {
-
-    }
+    override fun setup() = Unit
 
     override fun onBecameActive() = with(sketch) {
         rectMode(PApplet.CENTER)
@@ -55,7 +53,10 @@ class PatternsSketch : BaseSketch() {
 
         bass = lerp(bass, audioProcessor.getRange((20f..100f)), 0.5f)
 
-        background(bgHue, bgSat, bgBrightness)
+        translateCenter()
+        noStroke()
+        fill(bgColor, bgAlphaSlider.value)
+        rect(0f, 0f, width.toFloat(), height.toFloat())
 
         noFill()
         stroke(fgHue, fgSat, fgBrightness)
@@ -63,7 +64,6 @@ class PatternsSketch : BaseSketch() {
         for (i in 0 until longerDimension() step longerDimension() / countEncoder.value) {
             pushMatrix()
 
-            translate(centerX(), centerY())
             val size = i.toFloat() + ((i) * bass * bassGainPot.value)
             rotateZ(radians(millis() * 0.0001f) * i * rotationSpeedPot.value)
             rect(0f, 0f, size + expansionPot.value, size)
