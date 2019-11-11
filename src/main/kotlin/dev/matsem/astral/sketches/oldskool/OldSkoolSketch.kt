@@ -8,8 +8,6 @@ import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
-import dev.matsem.astral.tools.kontrol.KontrolF1
-import dev.matsem.astral.tools.kontrol.onTriggerPad
 import dev.matsem.astral.tools.shapes.ExtrusionCache
 import dev.matsem.astral.tools.tapper.Tapper
 import org.koin.core.inject
@@ -53,7 +51,6 @@ class OldSkoolSketch : BaseSketch() {
     private val beatCounter: BeatCounter by inject()
     private val automator: MidiAutomator by inject()
     private val tapper: Tapper by inject()
-    private val kontrol: KontrolF1 by inject()
     private val galaxy: Galaxy by inject()
     private val extrusionCache: ExtrusionCache by inject()
     private val audioProcessor: AudioProcessor by inject()
@@ -236,10 +233,6 @@ class OldSkoolSketch : BaseSketch() {
                 clearButtonCC = 3,
                 channelFilter = null
         )
-
-        kontrol.onTriggerPad(0, 0, midiHue = 0) {
-            tapper.tap()
-        }
 
         tapper.doOnBeat {
             if (expandMode == ExpandMode.TAP) {
