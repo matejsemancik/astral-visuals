@@ -6,12 +6,12 @@ import ddf.minim.Minim
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.sketches.attractor.AttractorSketch
-import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
+import dev.matsem.astral.sketches.oldskool.OldSkoolSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.radialwaves.TunnelSketch
@@ -27,6 +27,8 @@ import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.midi.MidiFileParser
 import dev.matsem.astral.tools.midi.MidiPlayer
 import dev.matsem.astral.tools.midi.MidiRecorder
+import dev.matsem.astral.tools.shapes.ExtrusionCache
+import dev.matsem.astral.tools.tapper.Tapper
 import dev.matsem.astral.tools.video.VideoPreparationTool
 import org.jbox2d.common.Vec2
 import org.koin.dsl.bind
@@ -49,12 +51,19 @@ val appModule = module {
     factory { MidiAutomator(get(), get(), get()) }
 
     // Video tools
-    factory { VideoPreparationTool(get(), get(), get(), get(), get()) }
+    factory { VideoPreparationTool(get(), get(), get(), get(), get(), get(), get(), get()) }
 
     // Audio
     single { Minim(get() as PApplet) }
     single { AudioProcessor(get(), Config.VideoExport.IS_IN_RENDER_MODE) }
     factory { BeatCounter(get()) }
+
+    // BPM
+    single { Tapper(get()) }
+
+    // Shapes
+    single { extruder.extruder(get()) }
+    single { ExtrusionCache(get(), get()) }
 
     // Video Export
     single {
@@ -73,7 +82,6 @@ val appModule = module {
     }
 
     // Sketches
-    factory { BlankSketch() }
     factory { PolygonalSketch() }
     factory { TerrainSketch() }
     factory { FibSphereSketch() }
@@ -86,5 +94,6 @@ val appModule = module {
     factory { VideoSketch() }
     factory { GalaxySketch() }
     factory { GameOfLifeSketch() }
+    factory { OldSkoolSketch() }
     factory { TunnelSketch() }
 }

@@ -1,15 +1,17 @@
 package dev.matsem.astral.sketches.gameoflife
 
 import controlP5.ControlP5Constants.CENTER
+import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
-import dev.matsem.astral.tools.extensions.*
-import dev.matsem.astral.tools.kontrol.KontrolF1
-import dev.matsem.astral.tools.kontrol.onTogglePad
-import dev.matsem.astral.tools.kontrol.onTriggerPad
-import dev.matsem.astral.tools.video.VideoPreparationTool
+import dev.matsem.astral.tools.automator.MidiAutomator
+import dev.matsem.astral.tools.extensions.remap
+import dev.matsem.astral.tools.extensions.resizeRatioAware
+import dev.matsem.astral.tools.extensions.shorterDimension
+import dev.matsem.astral.tools.extensions.translateCenter
+import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet.constrain
 import processing.core.PApplet.lerp
@@ -20,15 +22,14 @@ import processing.core.PImage
 
 // ideas:
 // - color inversion
-// - Astral logo
 // - optimization: do not create new array for each new universe generation
 class GameOfLifeSketch : BaseSketch() {
 
     override val sketch: SketchLoader by inject()
 
-    private val kontrol: KontrolF1 by inject()
+    private val galaxy: Galaxy by inject()
     private val beatCounter: BeatCounter by inject()
-    private val preparationTool: VideoPreparationTool by inject()
+    private val automator: MidiAutomator by inject()
 
     private var cellSize = 5
     private var nextRound = 0
@@ -43,75 +44,38 @@ class GameOfLifeSketch : BaseSketch() {
     private var overlayText: String? = null
     private var overlayImage: PImage? = null
 
-    private var hueStart: Float = 221.1f
-    private var hueEnd: Float = 277.9f
-    private var heatMapEnabled: Boolean = true
-    private var randomizeThresh: Float = 1f
-    private var stepMillis = 60
-    private var coolingFactor = 0.10f
-    private var heatMapSaturation = 0f
-    private var outlineEnabled = true
     private var targetZoom = 1f
     private var actualZoom = 1f
 
-    private val blacklistButtons = listOf(14, 15, 16, 17) // record control buttons
+    private val heatMapButton = galaxy.createToggleButton(channel = 11, cc = 4, defaultValue = false)
+    private val heatHueStartPot = galaxy.createPot(channel = 11, cc = 5, min = 0f, max = Config.Color.HUE_MAX, initialValue = 221.1f)
+    private val heatHueEndPot = galaxy.createPot(channel = 11, cc = 6, min = 0f, max = Config.Color.HUE_MAX, initialValue = 277.9f)
+    private val heatCoolingFactorPot = galaxy.createPot(channel = 11, cc = 7, min = 0.1f, max = 0.99f, initialValue = 0.10f)
+
+    private val randomizeThresholdSlider = galaxy.createPot(channel = 11, cc = 8, min = 0f, max = 1f, initialValue = 0.5f)
+    private val simulationIntervalPot = galaxy.createPot(channel = 11, cc = 9, min = 40f, max = 120f, initialValue = 60f)
+    private val randomizeButton = galaxy.createPushButton(channel = 11, cc = 10) {
+        randomize(randomizeThresholdSlider.value)
+    }
+
+    private val heatMapSaturationSlider = galaxy.createPot(channel = 11, cc = 11, min = 0f, max = 100f, initialValue = 0f)
+    private val outlineEnabledButton = galaxy.createToggleButton(channel = 11, cc = 12, defaultValue = true)
+
+    private val overlayButtons = galaxy.createButtonGroup(11, listOf(13, 14, 15, 16, 17, 18, 19, 20, 21), listOf())
 
     override fun onBecameActive() = with(sketch) {
         rectMode(PConstants.CORNER)
-
-        kontrol.reset()
-        kontrol.onTriggerPad(0, 0, midiHue = 0) { if (it) randomize(randomizeThresh) }
-        kontrol.onTogglePad(0, 1, midiHue = 8) { heatMapEnabled = it }
-        kontrol.onTogglePad(0, 2, midiHue = 16) { outlineEnabled = !it }
-        kontrol.onTriggerPad(3, 0, midiHue = 48) {
-            overlayImage = if (it) astralLogo else null
-        }
-        kontrol.onTriggerPad(3, 1, midiHue = 48) { overlayText = if (it) "16/11" else null }
-        kontrol.onTriggerPad(3, 2, midiHue = 48) { overlayText = if (it) "SEBA" else null }
-        kontrol.onTriggerPad(3, 3, midiHue = 48) {
-            overlayImage = if (it) semLogo else null
-        }
-
-        // Record button
-        kontrol.onTogglePad(1, 0, midiHue = 100) {
-            if (it) {
-                preparationTool.startRecording()
-            } else {
-                preparationTool.stopRecording()
-            }
-        }
-
-        // Play button
-        kontrol.onTriggerPad(1, 1, midiHue = 65) {
-            if (it) {
-                if (preparationTool.isPlaying.not()) {
-                    preparationTool.startReplay()
-                } else {
-                    preparationTool.stopReplay()
-                }
-            }
-        }
-
-        // Save automation to file button
-        kontrol.onTriggerPad(1, 2, midiHue = 65) {
-            if (it) {
-                preparationTool.saveIntoFile()
-            }
-        }
     }
 
     override fun setup() = with(sketch) {
-        kontrol.knob1 = hueStart.toMidi(0f, 360f)
-        kontrol.knob2 = hueEnd.toMidi(0f, 360f)
-        kontrol.slider1 = randomizeThresh.toMidi(1f, 0f)
-        kontrol.knob3 = stepMillis.toMidi(40, 120)
-        kontrol.knob4 = coolingFactor.toMidi(0.10f, 0.99f)
-        kontrol.slider2 = heatMapSaturation.toMidi(0f, 100f)
-
-        preparationTool
-                .plugInMidiDevice(kontrol)
-                .setMusicFile("music/seba2.wav")
-                .setBlacklistedMessages(blacklistButtons)
+        automator.setupWithGalaxy(
+                channel = 11,
+                recordButtonCC = 0,
+                playButtonCC = 1,
+                loopButtonCC = 2,
+                clearButtonCC = 3,
+                channelFilter = null
+        )
 
         universe = Universe(
                 Array(height / cellSize) {
@@ -147,13 +111,30 @@ class GameOfLifeSketch : BaseSketch() {
         beginDraw()
         background(128f)
 
+        overlayText = when (overlayButtons.activeButtonsIndices(exclusive = false).firstOrNull()) {
+            0 -> "ATTEMPT"
+            1 -> "JOHNEY"
+            2 -> "KID\nKODAMA"
+            3 -> "MATSEM"
+            4 -> "ROUGH:\nRESULT"
+            5 -> "SBU"
+            6 -> "SEBA"
+            else -> null
+        }
+
+        overlayImage = when (overlayButtons.activeButtonsIndices(exclusive = false).firstOrNull()) {
+            7 -> semLogo
+            8 -> astralLogo
+            else -> null
+        }
+
         overlayText?.let { text ->
             textFont(pixelFont)
             textAlign(CENTER, CENTER)
             textSize(24f)
 
             // Text stroke hack
-            if (outlineEnabled) {
+            if (outlineEnabledButton.isPressed) {
                 for (xOff in -1..1) {
                     for (yOff in -1..1) {
                         fill(0f)
@@ -175,16 +156,9 @@ class GameOfLifeSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
-        preparationTool.update()
-
-        hueStart = kontrol.knob1.midiRange(0f, 360f)
-        hueEnd = kontrol.knob2.midiRange(0f, 360f)
-        randomizeThresh = kontrol.slider1.midiRange(1f, 0f)
-        stepMillis = kontrol.knob3.midiRange(40f, 120f).toInt()
-        coolingFactor = kontrol.knob4.midiRange(0.10f, 0.99f)
-        heatMapSaturation = kontrol.slider2.midiRange(0f, 100f)
-
+        automator.update()
         beatCounter.update()
+
         drawOverlay()
         background(0f, 0f, 10f)
         translateCenter()
@@ -192,8 +166,8 @@ class GameOfLifeSketch : BaseSketch() {
         scale(actualZoom)
 
         if (millis() > nextRound) {
-            nextRound = millis() + stepMillis
-            universe.coolingFactor = coolingFactor
+            nextRound = millis() + simulationIntervalPot.value.toInt()
+            universe.coolingFactor = heatCoolingFactorPot.value
             universe.nextGeneration()
         }
 
@@ -212,17 +186,25 @@ class GameOfLifeSketch : BaseSketch() {
         for (y in 0 until universe.height) {
             for (x in 0 until universe.width) {
 
-                val brightness = if (heatMapEnabled) {
+                val brightness = if (heatMapButton.isPressed) {
                     universe.heatMap[y][x].remap(0f, 1f, 10f, 100f)
                 } else {
                     if (universe.cells[y][x] is AliveCell) 100f else 0f
                 }
 
-                val color = color(
-                        universe.heatMap[y][x].remap(1f, 0f, hueStart, hueEnd),
-                        if (universe.cells[y][x] is AliveCell) 10f else heatMapSaturation,
-                        brightness
-                )
+                val color = if (heatMapButton.isPressed) {
+                    color(
+                            universe.heatMap[y][x].remap(1f, 0f, heatHueStartPot.value, heatHueEndPot.value),
+                            if (universe.cells[y][x] is AliveCell) 10f else heatMapSaturationSlider.value,
+                            brightness
+                    )
+                } else {
+                    if (universe.cells[y][x] is AliveCell) {
+                        fgColor
+                    } else {
+                        bgColor
+                    }
+                }
 
                 noStroke()
                 fill(color)

@@ -1,8 +1,12 @@
 version '1.0-SNAPSHOT'
 
 buildscript {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
     ext.kotlin_version = '1.3.50'
     ext.koin_version = '2.0.0-beta-1'
+    ext.lib_dir = properties.getProperty('libraries.dir')
 
     repositories {
         mavenCentral()
@@ -35,6 +39,8 @@ dependencies {
     compile fileTree(dir: 'library/videoexport/library', include: '*.jar')
     compile fileTree(dir: 'library/box2d_processing/library', include: '*.jar')
     compile fileTree(dir: 'library/video/library', include: '*.jar')
+    compile fileTree(dir: 'library/extruder/library', include: '*.jar')
+    compile fileTree(dir: "$lib_dir/geomerative/library", include: '*.jar')
 
     // DI
     implementation "org.koin:koin-core:$koin_version"

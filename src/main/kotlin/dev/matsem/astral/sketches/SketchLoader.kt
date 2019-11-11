@@ -7,12 +7,12 @@ import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.attractor.AttractorSketch
-import dev.matsem.astral.sketches.blank.BlankSketch
 import dev.matsem.astral.sketches.boxes.BoxesSketch
 import dev.matsem.astral.sketches.cubes.CubesSketch
 import dev.matsem.astral.sketches.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.sketches.galaxy.GalaxySketch
 import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
+import dev.matsem.astral.sketches.oldskool.OldSkoolSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
 import dev.matsem.astral.sketches.radialwaves.TunnelSketch
@@ -23,12 +23,14 @@ import dev.matsem.astral.sketches.video.VideoSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.BeatDetectData
 import dev.matsem.astral.tools.galaxy.Galaxy
+import dev.matsem.astral.tools.galaxy.controls.ButtonGroup
 import dev.matsem.astral.tools.galaxy.controls.Pot
 import dev.matsem.astral.tools.galaxy.controls.PushButton
 import dev.matsem.astral.tools.galaxy.controls.ToggleButton
 import dev.matsem.astral.tools.kontrol.KontrolF1
 import dev.matsem.astral.tools.midi.MidiFileParser
 import dev.matsem.astral.tools.midi.MidiPlayer
+import dev.matsem.astral.tools.tapper.Tapper
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -50,6 +52,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val videoExport: VideoExport by inject()
     private val midiPlayer: MidiPlayer by inject()
     private val midiFileParser: MidiFileParser by inject()
+    private val tapper: Tapper by inject()
 
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
@@ -57,7 +60,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var colorResetButton: PushButton
 
     private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(157f, 100f, 100f)
+    private val fgColor = PVector(150f, 0f, 100f)
     private val accentColor = PVector(0f, 0f, 100f)
 
     lateinit var bgHuePot: Pot
@@ -72,13 +75,19 @@ class SketchLoader : PApplet(), KoinComponent {
     lateinit var accentSatPot: Pot
     lateinit var accentBriPot: Pot
 
+    lateinit var autoSwitchButton: ToggleButton
+    lateinit var autoSwitchIntervalPot: Pot
+    lateinit var autoSwitchSelectorButtons: ButtonGroup
+    private var lastAutoSwitchMs = 0
+
+    private lateinit var tapperButton: PushButton
+
     lateinit var reader: BufferedReader
 
     // endregion
 
     // region Sketches
 
-    private val blankSketch: BlankSketch by inject()
     private val polygonalSketch: PolygonalSketch by inject()
     private val terrainSketch: TerrainSketch by inject()
     private val fibSphereSketch: FibSphereSketch by inject()
@@ -91,6 +100,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val videoSketch: VideoSketch by inject()
     private val galaxySketch: GalaxySketch by inject()
     private val gameOfLifeSketch: GameOfLifeSketch by inject()
+    private val oldSkoolSketch: OldSkoolSketch by inject()
     private val tunnelSketch: TunnelSketch by inject()
 
     // endregion
@@ -109,7 +119,8 @@ class SketchLoader : PApplet(), KoinComponent {
                 PConstants.HSB,
                 Config.Color.HUE_MAX,
                 Config.Color.SATURATION_MAX,
-                Config.Color.BRIGHTNESS_MAX
+                Config.Color.BRIGHTNESS_MAX,
+                Config.Color.ALPHA_MAX
         )
 
         galaxy.connect()
@@ -126,26 +137,33 @@ class SketchLoader : PApplet(), KoinComponent {
             colorPots.forEach { it.reset() }
         }
 
-        bgHuePot = galaxy.createPot(15, 67, 0f, Config.Color.HUE_MAX, bgColor.x).also { colorPots.add(it) }
-        bgSatPot = galaxy.createPot(15, 68, 0f, Config.Color.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }
-        bgBriPot = galaxy.createPot(15, 69, 0f, Config.Color.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }
+        val lerping = 0.08f
+        bgHuePot = galaxy.createPot(15, 67, 0f, Config.Color.HUE_MAX, bgColor.x).also { colorPots.add(it) }.lerp(lerping)
+        bgSatPot = galaxy.createPot(15, 68, 0f, Config.Color.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }.lerp(lerping)
+        bgBriPot = galaxy.createPot(15, 69, 0f, Config.Color.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }.lerp(lerping)
 
-        fgHuePot = galaxy.createPot(15, 70, 0f, Config.Color.HUE_MAX, fgColor.x).also { colorPots.add(it) }
-        fgSatPot = galaxy.createPot(15, 71, 0f, Config.Color.SATURATION_MAX, fgColor.y).also { colorPots.add(it) }
-        fgBriPot = galaxy.createPot(15, 72, 0f, Config.Color.BRIGHTNESS_MAX, fgColor.z).also { colorPots.add(it) }
+        fgHuePot = galaxy.createPot(15, 70, 0f, Config.Color.HUE_MAX, fgColor.x).also { colorPots.add(it) }.lerp(lerping)
+        fgSatPot = galaxy.createPot(15, 71, 0f, Config.Color.SATURATION_MAX, fgColor.y).also { colorPots.add(it) }.lerp(lerping)
+        fgBriPot = galaxy.createPot(15, 72, 0f, Config.Color.BRIGHTNESS_MAX, fgColor.z).also { colorPots.add(it) }.lerp(lerping)
 
-        accentHuePot = galaxy.createPot(15, 73, 0f, Config.Color.HUE_MAX, accentColor.x).also { colorPots.add(it) }
-        accentSatPot = galaxy.createPot(15, 74, 0f, Config.Color.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }
-        accentBriPot = galaxy.createPot(15, 75, 0f, Config.Color.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }
+        accentHuePot = galaxy.createPot(15, 73, 0f, Config.Color.HUE_MAX, accentColor.x).also { colorPots.add(it) }.lerp(lerping)
+        accentSatPot = galaxy.createPot(15, 74, 0f, Config.Color.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }.lerp(lerping)
+        accentBriPot = galaxy.createPot(15, 75, 0f, Config.Color.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }.lerp(lerping)
+
+        autoSwitchButton = galaxy.createToggleButton(15, 77, false)
+        autoSwitchIntervalPot = galaxy.createPot(15, 78, 5000f, 5 * 60 * 1000f, 5000f) // interval in millis, 5s to 5m
+        autoSwitchSelectorButtons = galaxy.createButtonGroup(15, (79..94).toList(), (79..94).toList())
+
+        tapperButton = galaxy.createPushButton(15, 95) {
+            tapper.tap()
+        }
 
         sketches.apply {
-            put('0', blankSketch)
             put('1', polygonalSketch)
             put('2', terrainSketch)
             put('3', fibSphereSketch)
             put('4', starGlitchSketch)
             put('5', patternsSketch)
-            put('6', blankSketch) // TODO free slot
             put('7', boxesSketch)
             put('8', attractorSketch)
             put('9', spikesSketch)
@@ -153,6 +171,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('m', videoSketch)
             put('s', galaxySketch)
             put('g', gameOfLifeSketch)
+            put('o', oldSkoolSketch)
             put('t', tunnelSketch)
         }
 
@@ -162,7 +181,6 @@ class SketchLoader : PApplet(), KoinComponent {
 
         activeSketch().onBecameActive()
 
-        galaxy.createPushButton(15, 1) {}
         galaxy.createPushButton(15, 1) { switchSketch('1') }
         galaxy.createPushButton(15, 2) { switchSketch('2') }
         galaxy.createPushButton(15, 3) { switchSketch('3') }
@@ -173,6 +191,9 @@ class SketchLoader : PApplet(), KoinComponent {
         galaxy.createPushButton(15, 8) { switchSketch('9') }
         galaxy.createPushButton(15, 9) { switchSketch('p') }
         galaxy.createPushButton(15, 10) { switchSketch('m') }
+        galaxy.createPushButton(15, 11) { switchSketch('s') }
+        galaxy.createPushButton(15, 12) { switchSketch('g') }
+        galaxy.createPushButton(15, 13) { switchSketch('o') }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)
@@ -189,6 +210,23 @@ class SketchLoader : PApplet(), KoinComponent {
 
     override fun draw() {
         galaxy.update()
+
+        if (autoSwitchButton.isPressed) {
+            if (millis() > lastAutoSwitchMs + autoSwitchIntervalPot.value.toInt()) {
+                // Time to switch to random sketch
+                val activeButtons = autoSwitchSelectorButtons.activeButtonsIndices(exclusive = false)
+                if (activeButtons.isEmpty().not()) {
+                    val randomSketchIndex = activeButtons.random()
+                    val currentSketchIndex = sketches.keys.toList().indexOf(selector)
+                    if (randomSketchIndex < sketches.keys.count() && randomSketchIndex != currentSketchIndex) {
+                        switchSketch(sketches.keys.toList()[randomSketchIndex])
+                        lastAutoSwitchMs = millis()
+                    }
+                }
+            }
+        } else {
+            lastAutoSwitchMs = millis()
+        }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE.not()) {
             audioProcessor.gain = gainPot.value
@@ -251,7 +289,7 @@ class SketchLoader : PApplet(), KoinComponent {
     }
 
     private fun activeSketch(): BaseSketch {
-        return sketches.getOrDefault(selector, blankSketch)
+        return sketches.getOrDefault(selector, sketches.values.first())
     }
 
     private fun switchSketch(num: Char) {
