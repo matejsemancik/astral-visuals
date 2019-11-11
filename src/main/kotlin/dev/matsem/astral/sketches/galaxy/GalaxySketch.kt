@@ -12,6 +12,7 @@ import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import processing.core.PApplet.lerp
 import processing.core.PApplet.sin
 import processing.core.PConstants
 import processing.core.PImage
@@ -21,6 +22,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
     data class Star(
             val vec: PVector,
+            var targetVec: PVector,
             var diameter: Float,
             val ySpeed: Float = 0f,
             val zSpeed: Float = 0f,
@@ -80,25 +82,37 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             ccFeedbackEnabled = 22
     )
 
-    private var rotationResetButton = galaxy.createPushButton(10, 23) {
+    private var rotationResetButton = galaxy.createPushButton(channel = 10, cc = 23) {
         rotX = 0f
         rotY = 0f
         rotZ = 0f
     }
 
+    private var pulseEnabledButton = galaxy.createToggleButton(channel = 10, cc = 35, defaultValue = false)
+    private var galaxyPulseZoomExtraSlider = galaxy.createPot(channel = 10, cc = 32, min = 0f, max = 1f, initialValue = 0.2f)
+    private var starfieldPulseZoomExtraSlider = galaxy.createPot(channel = 10, cc = 33, min = 0f, max = 1f, initialValue = 0.25f)
+    private var pulseSpeedSlider = galaxy.createPot(channel = 10, cc = 34, min = 1f, max = 10f, initialValue = 8f)
+
     private var zoomValue = 1f
+    private var targetZoomValue = 1f
+    private var galaxyPulseZoomExtra = 0f
+    private var starfieldPulseZoomExtra = 0f
+    private var pulsarStartAt = 0
     private var rotX = 0f
     private var rotY = 0f
     private var rotZ = 0f
+    private var highs = 0f
 
     private val randomDiametersButton = galaxy.createToggleButton(channel = 10, cc = 14, defaultValue = false)
     private val starDiameterSlider = galaxy.createPot(channel = 10, cc = 15, min = 0.5f, max = 1.5f, initialValue = 1f)
 
-    private val bassGainSlider = galaxy.createPot(channel = 10, cc = 16, min = 0f, max = 1f)
+    private val bassGainSlider = galaxy.createPot(channel = 10, cc = 16, min = 0f, max = 2f)
 
     // endregion
 
-    override fun onBecameActive() = Unit
+    override fun onBecameActive() = with(sketch) {
+        ellipseMode(PConstants.RADIUS)
+    }
 
     override fun setup() = with(sketch) {
         automator.setupWithGalaxy(
@@ -114,9 +128,11 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         createGalaxy(images[0])
 
         // Create starfield
-        repeat(2000) {
+        repeat(4000) {
+            val vec = PVector.random3D().mult(random(0f, 2500f))
             starField += Star(
-                    vec = PVector.random3D().mult(random(0f, 2500f)),
+                    vec = vec,
+                    targetVec = vec,
                     diameter = if (random(1f) > 0.99f) random(6f, 10f) else random(1f, 4f),
                     ySpeed = random(0.00002f, 0.00005f),
                     zSpeed = random(-0.00001f, 0.00001f),
@@ -133,8 +149,21 @@ class GalaxySketch : BaseSketch(), KoinComponent {
 
         beatCounter.addListener(OnKick, 4) {
             if (zoomOnBeatButton.isPressed) {
-                zoomValue = random(zoomMinSlider.value, zoomMaxSlider.value)
+                targetZoomValue = random(zoomMinSlider.value, zoomMaxSlider.value)
             }
+        }
+
+        beatCounter.addListener(OnKick, 2) {
+            if (pulseEnabledButton.isPressed) {
+                galaxyPulseZoomExtra = galaxyPulseZoomExtraSlider.value
+                starfieldPulseZoomExtra = starfieldPulseZoomExtraSlider.value
+                pulsarStartAt = millis()
+            }
+        }
+
+        beatCounter.addListener(OnSnare, 16) {
+            starField
+                    .forEach { it.targetVec = PVector.random3D().mult(random(0f, 2500f)) }
         }
     }
 
@@ -152,12 +181,14 @@ class GalaxySketch : BaseSketch(), KoinComponent {
                 for (y in 0 until galaxyImage.height step image.pixelStep) {
                     pixelBrightness = brightness(galaxyImage[x, y])
                     if (pixelBrightness > image.threshold) {
+                        val vec = PVector(
+                                x.toFloat() - galaxyImage.width / 2f,
+                                random(-4f, 4f),
+                                y.toFloat() - galaxyImage.height / 2f
+                        )
                         galaxyStars += Star(
-                                vec = PVector(
-                                        x.toFloat() - galaxyImage.width / 2f,
-                                        random(-4f, 4f),
-                                        y.toFloat() - galaxyImage.height / 2f
-                                ),
+                                vec = vec,
+                                targetVec = vec,
                                 diameter = generateDiameter(),
                                 ySpeed = random(PConstants.TWO_PI * 6e-6f, PConstants.TWO_PI * 8e-6f),
                                 birth = millis(),
@@ -180,6 +211,13 @@ class GalaxySketch : BaseSketch(), KoinComponent {
     }
 
     override fun draw() = with(sketch) {
+        highs += audioProcessor.getRange((4000f..8000f))
+        highs *= 0.5f
+        zoomValue = lerp(zoomValue, targetZoomValue, 0.2f)
+
+        galaxyPulseZoomExtra = lerp(galaxyPulseZoomExtra, 0f, 0.5f)
+        starfieldPulseZoomExtra = lerp(starfieldPulseZoomExtra, 0f, 0.5f)
+
         automator.update()
 
         val diameterFactor = starDiameterSlider.value
@@ -199,7 +237,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         stroke(fgColor)
 
         if (zoomQuantizeButton.isPressed) {
-            zoomValue = sin(angularTimeHz(zoomHzSlider.value))
+            targetZoomValue = sin(angularTimeHz(zoomHzSlider.value))
                     .mapSin(zoomMinSlider.value, zoomMaxSlider.value)
                     .quantize(zoomQuantSlider.value)
         }
@@ -208,7 +246,7 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         synchronized(lock) {
             galaxyStars.forEach {
                 pushMatrix()
-                scale(zoomValue)
+                scale(zoomValue + galaxyPulseZoomExtra)
 
                 it.rotationExtra += audioProcessor.getRange(1000f..4000f).remap(0f, 100f, 0f, 0.02f) * it.randomFactor
                 rotateX(-0.34f)
@@ -234,7 +272,8 @@ class GalaxySketch : BaseSketch(), KoinComponent {
                 )
                 .forEach {
                     pushMatrix()
-                    scale(zoomValue)
+                    scale(zoomValue - starfieldPulseZoomExtra)
+                    it.vec.lerp(it.targetVec, 0.04f)
                     it.rotationExtra += audioProcessor.getRange(2500f..16000f).remap(0f, 100f, 0f, 0.2f) * it.randomFactor
                     rotateY(millis() * it.ySpeed + it.rotationExtra)
                     rotateZ(millis() * it.zSpeed)
@@ -251,8 +290,30 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         fill(bgColor)
         ellipseMode(PConstants.CENTER)
         beginShape()
-        sphere(25f)
+        sphere(25f + highs)
         endShape()
+        popMatrix()
+
+        // Pulsar
+        pushMatrix()
+        scale(zoomValue)
+        noFill()
+        stroke(fgColor)
+
+        // Pulsar - ellipse
+        pushMatrix()
+        rotateX(PConstants.PI / 2f - 0.34f)
+        for (i in 0 until 3) {
+            val radius = ((millis() - pulsarStartAt) * pulseSpeedSlider.value) * i * 0.5f
+            val weight = radius
+                    .remap(0f, longerDimension().toFloat() * 2f, starDiameterSlider.value * 4f, 0f)
+                    .constrain(0f, starDiameterSlider.value * 4f)
+
+            strokeWeight(weight)
+            ellipse(0f, 0f, radius - i * 100f, radius - i * 100f)
+        }
+        popMatrix()
+
         popMatrix()
 
         // Debug
