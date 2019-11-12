@@ -60,7 +60,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
     private val bgColor = PVector(0f, 0f, 10f)
     private val fgColor = PVector(150f, 0f, 100f)
-    private val accentColor = PVector(0f, 0f, 100f)
+    private val accentColor = PVector(0f, 0f, 0f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
