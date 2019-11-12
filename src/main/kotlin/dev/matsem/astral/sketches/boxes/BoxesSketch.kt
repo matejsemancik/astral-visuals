@@ -9,8 +9,7 @@ import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
-import processing.core.PApplet.radians
-import processing.core.PApplet.sin
+import processing.core.PApplet.*
 import shiffman.box2d.Box2DProcessing
 
 class BoxesSketch : BaseSketch() {
@@ -54,6 +53,10 @@ class BoxesSketch : BaseSketch() {
     private val ampGainPot = galaxy.createPot(6, 27, 0.2f, 8f, 1f)
     private val startFreqPot = galaxy.createPot(6, 28, 100f, 1000f, 200f)
 
+    private val transButton = galaxy.createToggleButton(6, 33, false)
+    private val transXPeriodSlider = galaxy.createPot(6, 34, 15f, 120f, 30f).lerp(0.01f)
+    private val transYPeriodSlider = galaxy.createPot(6, 35, 15f, 120f, 30f).lerp(0.01f)
+
     private val starfield1 = Starfield(sketch, 300).apply { motion = starMotion }
     private val starfield2 = Starfield(sketch, 300).apply { motion = starMotion }
 
@@ -75,6 +78,9 @@ class BoxesSketch : BaseSketch() {
     var rotX = 0f
     var rotY = 0f
     var rotZ = 0f
+
+    private var transX = 0f
+    private var transY = 0f
 
     override fun onBecameActive() = with(sketch) {
         sphereDetail(sphereDetailPot.value.toInt())
@@ -159,9 +165,17 @@ class BoxesSketch : BaseSketch() {
         rotY += joystick.x * .04f
         rotZ += joystick.z * .04f
 
+        if (transButton.isPressed) {
+            transX = sin(angularTimeS(transXPeriodSlider.value)) * shorterDimension() / 3f
+            transY = cos(angularTimeS(transYPeriodSlider.value)) * shorterDimension() / 6f
+        } else {
+            transX = 0f
+            transY = 0f
+        }
+
         if (rotationAutoBtn.isPressed) {
             pushMatrix()
-            translate(centerX(), centerY())
+            translate(centerX() + transX, centerY() + transY)
             rotateY(angularTimeS(16f))
             pushMatrix()
             rotateX(PApplet.map(sin(angularTimeS(30f)), -1f, 1f, radians(-180f), radians(180f)))
@@ -169,7 +183,7 @@ class BoxesSketch : BaseSketch() {
             rotateZ(0f)
         } else {
             pushMatrix()
-            translate(centerX(), centerY())
+            translate(centerX() + transX, centerY() + transY)
             rotateY(rotY)
             pushMatrix()
             rotateX(rotX)
