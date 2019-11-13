@@ -177,10 +177,10 @@ class SketchLoader : PApplet(), KoinComponent {
         }
 
         fxRgbSplitButton = galaxy.createToggleButton(15, 96, false)
-        fxRgbSplitSlider = galaxy.createPot(15, 97, 0f, 100f, 25f)
+        fxRgbSplitSlider = galaxy.createPot(15, 97, 0f, 200f, 25f)
 
         fxPixelateButton = galaxy.createToggleButton(15, 98, false)
-        fxPixelateSlider = galaxy.createPot(15, 99, 0f, 1000f, 400f)
+        fxPixelateSlider = galaxy.createPot(15, 99, 0f, 500f, 400f)
 
         fxBloomButton = galaxy.createToggleButton(15, 100, false)
         fxBloomThresholdSlider = galaxy.createPot(15, 101, 0f, 1f, 0.5f)
