@@ -41,6 +41,7 @@ dependencies {
     compile fileTree(dir: 'library/video/library', include: '*.jar')
     compile fileTree(dir: 'library/extruder/library', include: '*.jar')
     compile fileTree(dir: "$lib_dir/geomerative/library", include: '*.jar')
+    compile fileTree(dir: "$lib_dir/PostFX/library", include: '*.jar')
 
     // DI
     implementation "org.koin:koin-core:$koin_version"

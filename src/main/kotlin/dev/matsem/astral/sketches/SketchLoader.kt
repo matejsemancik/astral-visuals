@@ -1,5 +1,6 @@
 package dev.matsem.astral.sketches
 
+import ch.bildspur.postfx.builder.PostFX
 import com.hamoid.VideoExport
 import ddf.minim.AudioSample
 import ddf.minim.Minim
@@ -83,6 +84,22 @@ class SketchLoader : PApplet(), KoinComponent {
 
     lateinit var reader: BufferedReader
 
+    // Effects will render with center offset if injected
+    private lateinit var fx: PostFX
+
+    private lateinit var fxRgbSplitButton: ToggleButton
+    private lateinit var fxRgbSplitSlider: Pot
+
+    private lateinit var fxPixelateButton: ToggleButton
+    private lateinit var fxPixelateSlider: Pot
+
+    private lateinit var fxBloomButton: ToggleButton
+    private lateinit var fxBloomThresholdSlider: Pot
+    private lateinit var fxBloomBlurSizeSlider: Pot
+    private lateinit var fxBloomSigmaSlider: Pot
+
+    private lateinit var fxChromaticAbberationButton: ToggleButton
+
     // endregion
 
     // region Sketches
@@ -121,6 +138,7 @@ class SketchLoader : PApplet(), KoinComponent {
                 Config.Color.ALPHA_MAX
         )
 
+        fx = PostFX(this)
         galaxy.connect()
         kontrolF1.connect()
 
@@ -155,6 +173,19 @@ class SketchLoader : PApplet(), KoinComponent {
         tapperButton = galaxy.createPushButton(15, 95) {
             tapper.tap()
         }
+
+        fxRgbSplitButton = galaxy.createToggleButton(15, 96, false)
+        fxRgbSplitSlider = galaxy.createPot(15, 97, 0f, 100f, 25f)
+
+        fxPixelateButton = galaxy.createToggleButton(15, 98, false)
+        fxPixelateSlider = galaxy.createPot(15, 99, 0f, 1000f, 400f)
+
+        fxBloomButton = galaxy.createToggleButton(15, 100, false)
+        fxBloomThresholdSlider = galaxy.createPot(15, 101, 0f, 1f, 0.5f)
+        fxBloomBlurSizeSlider = galaxy.createPot(15, 102, 0f, 80f, 40f)
+        fxBloomSigmaSlider = galaxy.createPot(15, 103, 0f, 30f, 20f)
+
+        fxChromaticAbberationButton = galaxy.createToggleButton(15, 104, false)
 
         sketches.apply {
             put('1', polygonalSketch)
@@ -283,7 +314,39 @@ class SketchLoader : PApplet(), KoinComponent {
                 }
             }
         }
+
+        if (isFxActivated()) {
+            fx.render().apply {
+                if (fxRgbSplitButton.isPressed) {
+                    rgbSplit(fxRgbSplitSlider.value)
+                }
+
+                if (fxPixelateButton.isPressed) {
+                    pixelate(fxPixelateSlider.value)
+                }
+
+                if (fxBloomButton.isPressed) {
+                    bloom(
+                            fxBloomThresholdSlider.value,
+                            fxBloomBlurSizeSlider.value.toInt(),
+                            fxBloomSigmaSlider.value
+                    )
+                }
+
+                if (fxChromaticAbberationButton.isPressed) {
+                    chromaticAberration()
+                }
+
+                compose()
+            }
+        }
     }
+
+    private fun isFxActivated(): Boolean =
+            fxRgbSplitButton.isPressed
+                    || fxPixelateButton.isPressed
+                    || fxBloomButton.isPressed
+                    || fxChromaticAbberationButton.isPressed
 
     private fun activeSketch(): BaseSketch {
         return sketches.getOrDefault(selector, sketches.values.first())
