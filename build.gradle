@@ -33,7 +33,6 @@ dependencies {
     // Processing libs
     compile fileTree(dir: 'library', include: '*.jar')
     compile fileTree(dir: 'library/minim/library', include: '*.jar')
-    compile fileTree(dir: 'library/serial/library', include: '*.jar')
     compile fileTree(dir: 'library/controlP5/library', include: '*.jar')
     compile fileTree(dir: 'library/themidibus/library', include: '*.jar')
     compile fileTree(dir: 'library/videoexport/library', include: '*.jar')
