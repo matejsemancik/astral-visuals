@@ -1,5 +1,6 @@
 package dev.matsem.astral.sketches
 
+import ch.bildspur.postfx.builder.PostFX
 import com.hamoid.VideoExport
 import ddf.minim.AudioSample
 import ddf.minim.Minim
@@ -21,6 +22,7 @@ import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.BeatDetectData
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.ButtonGroup
 import dev.matsem.astral.tools.galaxy.controls.Pot
@@ -52,6 +54,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val midiPlayer: MidiPlayer by inject()
     private val midiFileParser: MidiFileParser by inject()
     private val tapper: Tapper by inject()
+    private val automator: MidiAutomator by inject()
 
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
@@ -82,6 +85,22 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var tapperButton: PushButton
 
     lateinit var reader: BufferedReader
+
+    // Effects will render with center offset if injected
+    private lateinit var fx: PostFX
+
+    private lateinit var fxRgbSplitButton: ToggleButton
+    private lateinit var fxRgbSplitSlider: Pot
+
+    private lateinit var fxPixelateButton: ToggleButton
+    private lateinit var fxPixelateSlider: Pot
+
+    private lateinit var fxBloomButton: ToggleButton
+    private lateinit var fxBloomThresholdSlider: Pot
+    private lateinit var fxBloomBlurSizeSlider: Pot
+    private lateinit var fxBloomSigmaSlider: Pot
+
+    private lateinit var fxChromaticAbberationButton: ToggleButton
 
     // endregion
 
@@ -121,6 +140,7 @@ class SketchLoader : PApplet(), KoinComponent {
                 Config.Color.ALPHA_MAX
         )
 
+        fx = PostFX(this)
         galaxy.connect()
         kontrolF1.connect()
 
@@ -155,6 +175,28 @@ class SketchLoader : PApplet(), KoinComponent {
         tapperButton = galaxy.createPushButton(15, 95) {
             tapper.tap()
         }
+
+        fxRgbSplitButton = galaxy.createToggleButton(15, 96, false)
+        fxRgbSplitSlider = galaxy.createPot(15, 97, 0f, 200f, 25f)
+
+        fxPixelateButton = galaxy.createToggleButton(15, 98, false)
+        fxPixelateSlider = galaxy.createPot(15, 99, 0f, 500f, 400f)
+
+        fxBloomButton = galaxy.createToggleButton(15, 100, false)
+        fxBloomThresholdSlider = galaxy.createPot(15, 101, 0f, 1f, 0.5f)
+        fxBloomBlurSizeSlider = galaxy.createPot(15, 102, 0f, 80f, 40f)
+        fxBloomSigmaSlider = galaxy.createPot(15, 103, 0f, 30f, 20f)
+
+        fxChromaticAbberationButton = galaxy.createToggleButton(15, 104, false)
+
+        automator.setupWithGalaxy(
+                channel = 15,
+                recordButtonCC = 105,
+                playButtonCC = 106,
+                loopButtonCC = 107,
+                clearButtonCC = 108,
+                channelFilter = 15
+        )
 
         sketches.apply {
             put('1', polygonalSketch)
@@ -207,6 +249,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
     override fun draw() {
         galaxy.update()
+        automator.update()
 
         if (autoSwitchButton.isPressed) {
             if (millis() > lastAutoSwitchMs + autoSwitchIntervalPot.value.toInt()) {
@@ -283,7 +326,39 @@ class SketchLoader : PApplet(), KoinComponent {
                 }
             }
         }
+
+        if (isFxActivated()) {
+            fx.render().apply {
+                if (fxRgbSplitButton.isPressed) {
+                    rgbSplit(fxRgbSplitSlider.value)
+                }
+
+                if (fxPixelateButton.isPressed) {
+                    pixelate(fxPixelateSlider.value)
+                }
+
+                if (fxBloomButton.isPressed) {
+                    bloom(
+                            fxBloomThresholdSlider.value,
+                            fxBloomBlurSizeSlider.value.toInt(),
+                            fxBloomSigmaSlider.value
+                    )
+                }
+
+                if (fxChromaticAbberationButton.isPressed) {
+                    chromaticAberration()
+                }
+
+                compose()
+            }
+        }
     }
+
+    private fun isFxActivated(): Boolean =
+            fxRgbSplitButton.isPressed
+                    || fxPixelateButton.isPressed
+                    || fxBloomButton.isPressed
+                    || fxChromaticAbberationButton.isPressed
 
     private fun activeSketch(): BaseSketch {
         return sketches.getOrDefault(selector, sketches.values.first())
