@@ -22,6 +22,7 @@ import dev.matsem.astral.sketches.terrain.TerrainSketch
 import dev.matsem.astral.sketches.video.VideoSketch
 import dev.matsem.astral.tools.audio.AudioProcessor
 import dev.matsem.astral.tools.audio.BeatDetectData
+import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.galaxy.Galaxy
 import dev.matsem.astral.tools.galaxy.controls.ButtonGroup
 import dev.matsem.astral.tools.galaxy.controls.Pot
@@ -53,6 +54,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val midiPlayer: MidiPlayer by inject()
     private val midiFileParser: MidiFileParser by inject()
     private val tapper: Tapper by inject()
+    private val automator: MidiAutomator by inject()
 
     private lateinit var debugButton: ToggleButton
     private lateinit var gainPot: Pot
@@ -187,6 +189,15 @@ class SketchLoader : PApplet(), KoinComponent {
 
         fxChromaticAbberationButton = galaxy.createToggleButton(15, 104, false)
 
+        automator.setupWithGalaxy(
+                channel = 15,
+                recordButtonCC = 105,
+                playButtonCC = 106,
+                loopButtonCC = 107,
+                clearButtonCC = 108,
+                channelFilter = 15
+        )
+
         sketches.apply {
             put('1', polygonalSketch)
             put('2', terrainSketch)
@@ -238,6 +249,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
     override fun draw() {
         galaxy.update()
+        automator.update()
 
         if (autoSwitchButton.isPressed) {
             if (millis() > lastAutoSwitchMs + autoSwitchIntervalPot.value.toInt()) {
