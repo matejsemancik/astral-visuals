@@ -1,6 +1,5 @@
 package dev.matsem.astral.sketches.gameoflife
 
-import controlP5.ControlP5Constants.CENTER
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
@@ -16,6 +15,7 @@ import org.koin.core.inject
 import processing.core.PApplet.constrain
 import processing.core.PApplet.lerp
 import processing.core.PConstants
+import processing.core.PConstants.CENTER
 import processing.core.PFont
 import processing.core.PGraphics
 import processing.core.PImage
