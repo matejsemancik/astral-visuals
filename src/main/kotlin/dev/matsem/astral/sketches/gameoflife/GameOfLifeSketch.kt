@@ -1,21 +1,18 @@
 package dev.matsem.astral.sketches.gameoflife
 
-import controlP5.ControlP5Constants.CENTER
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.tools.automator.MidiAutomator
-import dev.matsem.astral.tools.extensions.remap
-import dev.matsem.astral.tools.extensions.resizeRatioAware
-import dev.matsem.astral.tools.extensions.shorterDimension
-import dev.matsem.astral.tools.extensions.translateCenter
+import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet.constrain
 import processing.core.PApplet.lerp
 import processing.core.PConstants
+import processing.core.PConstants.CENTER
 import processing.core.PFont
 import processing.core.PGraphics
 import processing.core.PImage
@@ -62,6 +59,7 @@ class GameOfLifeSketch : BaseSketch() {
     private val outlineEnabledButton = galaxy.createToggleButton(channel = 11, cc = 12, defaultValue = true)
 
     private val overlayButtons = galaxy.createButtonGroup(11, listOf(13, 14, 15, 16, 17, 18, 19, 20, 21), listOf())
+    private val overlaySizeSlider = galaxy.createPot(channel = 11, cc = 22, initialValue = 1f)
 
     override fun onBecameActive() = with(sketch) {
         rectMode(PConstants.CORNER)
@@ -131,7 +129,7 @@ class GameOfLifeSketch : BaseSketch() {
         overlayText?.let { text ->
             textFont(pixelFont)
             textAlign(CENTER, CENTER)
-            textSize(24f)
+            textSize(overlaySizeSlider.rawValue.midiRange(12f, 24f))
 
             // Text stroke hack
             if (outlineEnabledButton.isPressed) {
@@ -148,8 +146,11 @@ class GameOfLifeSketch : BaseSketch() {
         }
 
         overlayImage?.let { image ->
+            pushMatrix()
             translateCenter()
+            scale(overlaySizeSlider.rawValue.midiRange(0.8f, 1.4f))
             image(image, -image.width / 2f, -image.height / 2f)
+            popMatrix()
         }
 
         endDraw()

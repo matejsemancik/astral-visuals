@@ -15,9 +15,9 @@ class VideoSketch : BaseSketch() {
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
 
-    private val movie1 = Movie(sketch, "movies/astral03_BACKGROUND.mp4")
-    private val movie2 = Movie(sketch, "movies/astral04_BACKGROUND.mp4")
-    private val astralLogo = sketch.loadImage("images/astrallogo_clean.png").apply {
+    private val movie1 = Movie(sketch, sketch.dataPath("movies/astral03_BACKGROUND.mp4"))
+    private val movie2 = Movie(sketch, sketch.dataPath("movies/astral04_BACKGROUND.mp4"))
+    private val astralLogo = sketch.loadImage(sketch.dataPath("images/astrallogo_clean.png")).apply {
         resizeRatioAware(height = sketch.shorterDimension() / 2)
     }
 

@@ -40,6 +40,7 @@ import processing.core.PConstants
 import processing.core.PVector
 import processing.event.KeyEvent
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
 
@@ -441,7 +442,7 @@ class SketchLoader : PApplet(), KoinComponent {
             // The first L and R values in each row are low frequencies (bass)
             // and they go towards high frequency as we advance towards
             // the end of the line.
-            val msg = StringBuilder(PApplet.nf(chunkStartIndex / sampleRate, 0, 3).replace(',', '.'))
+            val msg = StringBuilder(nf(chunkStartIndex / sampleRate, 0, 3).replace(',', '.'))
             val beat = when {
                 beatDetect.isKick -> 1
                 beatDetect.isSnare -> 2
@@ -460,6 +461,22 @@ class SketchLoader : PApplet(), KoinComponent {
         track.close()
         output.flush()
         output.close()
-        PApplet.println("Sound analysis done")
+        println("Sound analysis done")
+    }
+
+    /**
+     * Sketch data path override. It's wrong when using local Processing installation core jars.
+     * Sketch folder path cannot be passed as an argument, does not play well with DI.
+     */
+    override fun dataPath(where: String): String {
+        return System.getProperty("user.dir") + "/data/" + where
+    }
+
+    /**
+     * Sketch data path override. It's wrong when using local Processing installation core jars.
+     * Sketch folder path cannot be passed as an argument, does not play well with DI.
+     */
+    override fun dataFile(where: String): File {
+        return File(System.getProperty("user.dir") + "/data/" + where)
     }
 }

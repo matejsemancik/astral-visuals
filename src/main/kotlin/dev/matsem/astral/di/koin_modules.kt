@@ -1,7 +1,6 @@
 package dev.matsem.astral.di
 
 import com.hamoid.VideoExport
-import controlP5.ControlP5
 import ddf.minim.Minim
 import dev.matsem.astral.Config
 import dev.matsem.astral.sketches.SketchLoader
@@ -42,7 +41,6 @@ val appModule = module {
     // Controllers
     single { KontrolF1() }
     single { Galaxy() }
-    single { ControlP5(get()).apply { isAutoDraw = false } }
 
     // Midi tools
     single { MidiFileParser(get()) }
