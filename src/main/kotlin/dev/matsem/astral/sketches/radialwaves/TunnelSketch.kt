@@ -63,30 +63,48 @@ class TunnelSketch : BaseSketch() {
     }
 
     private var speed: Float = 0f
+    private var stroke = 0f
+    private var amplitude = 0f
 
     override fun draw() = with(sketch) {
         automator.update()
 
-        val strokeNear = slider1.rawValue.midiRange(1f, 10f)
-        val targetSpeed = slider2.rawValue.midiRange(1 / 10f, 4f)
-        val step = slider3.rawValue.midiRange(100f, 200f).toInt()
+        amplitude += audioProcessor.getRange(100f..500f)
+        amplitude *= 0.5f
 
+        val targetStroke = slider1.rawValue.midiRange(1f, 10f)
+        val targetSpeed = slider2.rawValue.midiRange(1 / 10f, 4f)
+        val stepAplitudeMultiplier = slider6.rawValue.midiRange(0f, 1f)
+        val step = slider3.rawValue.midiRange(100f, 400f).toInt() +
+                amplitude.remap(0f, 100f, stepAplitudeMultiplier * -50f, stepAplitudeMultiplier * 50f).toInt()
+        val flickerThresh = slider4.rawValue.midiRange(0f, 1f)
+        val kickStrokeMultiplier = slider5.rawValue.midiRange(0f, 4f)
+
+        if (audioProcessor.beatDetect.isKick) {
+            stroke = targetStroke * kickStrokeMultiplier
+        }
+
+        stroke = lerp(stroke, targetStroke, 0.1f)
         speed = lerp(speed, targetSpeed, 0.1f)
 
         background(bgColor)
         noFill()
         stroke(fgColor)
-        translate(centerX(), centerY())
+        strokeWeight(stroke)
+        translateCenter()
+
+        polygon(amplitude, 6)
 
         for (z in 200 downTo -2200 step step) {
-            val stroke = z.remap(0f, -2000f, strokeNear, strokeNear / 4f)
+            val stroke = z.remap(0f, -2000f, stroke, stroke / 4f)
             val realZ = z + saw(speed).mapp(0f, step.toFloat())
-
-            strokeWeight(stroke)
-            pushMatrix()
-            translate(0f, 0f, realZ)
-            drawHexagon()
-            popMatrix()
+            if (random(0f, 1f) > flickerThresh) {
+                strokeWeight(stroke)
+                pushMatrix()
+                translate(0f, 0f, realZ)
+                drawHexagon()
+                popMatrix()
+            }
         }
     }
 
