@@ -238,6 +238,7 @@ class SketchLoader : PApplet(), KoinComponent {
         galaxy.createPushButton(15, 11) { switchSketch('s') }
         galaxy.createPushButton(15, 12) { switchSketch('g') }
         galaxy.createPushButton(15, 13) { switchSketch('o') }
+        galaxy.createPushButton(15, 14) { switchSketch('t') }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)
