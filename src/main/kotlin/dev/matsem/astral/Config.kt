@@ -3,7 +3,7 @@ package dev.matsem.astral
 object Config {
 
     object Sketch {
-        const val DEFAULT_SELECTOR = 'g'
+        const val DEFAULT_SELECTOR = 't'
     }
 
     object Color {

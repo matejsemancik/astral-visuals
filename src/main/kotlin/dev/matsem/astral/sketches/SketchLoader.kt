@@ -16,6 +16,7 @@ import dev.matsem.astral.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.sketches.oldskool.OldSkoolSketch
 import dev.matsem.astral.sketches.patterns.PatternsSketch
 import dev.matsem.astral.sketches.polygonal.PolygonalSketch
+import dev.matsem.astral.sketches.radialwaves.TunnelSketch
 import dev.matsem.astral.sketches.spikes.SpikesSketch
 import dev.matsem.astral.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.sketches.terrain.TerrainSketch
@@ -63,8 +64,8 @@ class SketchLoader : PApplet(), KoinComponent {
     private lateinit var colorResetButton: PushButton
 
     private val bgColor = PVector(0f, 0f, 10f)
-    private val fgColor = PVector(150f, 0f, 100f)
-    private val accentColor = PVector(0f, 0f, 0f)
+    private val fgColor = PVector(150f, 100f, 100f)
+    private val accentColor = PVector(0f, 0f, 10f)
 
     lateinit var bgHuePot: Pot
     lateinit var bgSatPot: Pot
@@ -120,6 +121,7 @@ class SketchLoader : PApplet(), KoinComponent {
     private val galaxySketch: GalaxySketch by inject()
     private val gameOfLifeSketch: GameOfLifeSketch by inject()
     private val oldSkoolSketch: OldSkoolSketch by inject()
+    private val tunnelSketch: TunnelSketch by inject()
 
     // endregion
 
@@ -129,7 +131,8 @@ class SketchLoader : PApplet(), KoinComponent {
     override fun settings() {
         size(1280, 720, PConstants.P3D)
         // fullScreen(P3D, 2) - use in live environment (projector extends desktop)
-        noSmooth()
+//        noSmooth()
+        smooth()
     }
 
     override fun setup() {
@@ -213,6 +216,7 @@ class SketchLoader : PApplet(), KoinComponent {
             put('s', galaxySketch)
             put('g', gameOfLifeSketch)
             put('o', oldSkoolSketch)
+            put('t', tunnelSketch)
         }
 
         sketches.forEach { key, sketch ->
@@ -234,6 +238,7 @@ class SketchLoader : PApplet(), KoinComponent {
         galaxy.createPushButton(15, 11) { switchSketch('s') }
         galaxy.createPushButton(15, 12) { switchSketch('g') }
         galaxy.createPushButton(15, 13) { switchSketch('o') }
+        galaxy.createPushButton(15, 14) { switchSketch('t') }
 
         if (Config.VideoExport.IS_IN_RENDER_MODE) {
             frameRate(1000f)
