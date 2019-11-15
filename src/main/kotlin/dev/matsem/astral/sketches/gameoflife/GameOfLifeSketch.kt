@@ -59,7 +59,7 @@ class GameOfLifeSketch : BaseSketch() {
     private val outlineEnabledButton = galaxy.createToggleButton(channel = 11, cc = 12, defaultValue = true)
 
     private val overlayButtons = galaxy.createButtonGroup(11, listOf(13, 14, 15, 16, 17, 18, 19, 20, 21), listOf())
-    private val overlaySizeSlider = galaxy.createPot(channel = 11, cc = 22)
+    private val overlaySizeSlider = galaxy.createPot(channel = 11, cc = 22, initialValue = 1f)
 
     override fun onBecameActive() = with(sketch) {
         rectMode(PConstants.CORNER)
