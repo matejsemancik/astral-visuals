@@ -51,7 +51,7 @@ You can run the project with Gradle `run` task.
 ./gradlew run
 ```
 
-Or you can set up some sort of Build & Run task in your IDE. (hint: In IntelliJ, open `Main.kt` and click the green run icon next to `main` function and select Run. You do this once, and IDE will set up the reusable run task for you in upper toolbar.
+Or you can set up some sort of Build & Run task in your IDE. (hint: In IntelliJ, open `Main.kt` and click the green run icon next to `main` function and select Run. You do this once, and IDE will set up the reusable run task for you in upper toolbar.)
 
 ## Remote control
 TBD TouchOSC, Traktor Kontrol F1
