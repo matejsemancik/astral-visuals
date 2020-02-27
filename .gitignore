@@ -7,3 +7,5 @@ local.properties
 data/midi
 data/movies
 data/music
+data/fonts/*.ttf
+data/fonts/*.otf
