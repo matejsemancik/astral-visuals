@@ -22,7 +22,7 @@ libraries.dir=/Users/username/Documents/Processing/libraries
 processing_core.dir=/Applications/Processing.app/Contents/Java/core/library
 ```
 
-The `build.gradle` buildscript will look for dependencies at these two paths. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `libraries.dir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
+The `build.gradle` buildscript will look for Processing dependencies at these two paths. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `libraries.dir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
 
 Current list of used libraries is
 
@@ -37,10 +37,21 @@ geomerative // for generating shapes from text
 PostFX for Processing // can apply post-processing shaders
 ```
 
-If you set up everything correctly, you should be able to build the project with `./gradlew build` command. (Use `gradlew.bat` on Windows, go figure.)
+If you set up everything correctly, you should be able to build the project using Gradle `build` task.
+
+```
+./gradlew build
+```
 
 ## How to run
 
-You can run the project with `./gradlew run` task. Or you can set up some sort of Build & Run task in your IDE. (hint: In IntelliJ, go to `Main.kt` and click the lil' green icon next to `main` function and select Run. You do this once, and IDE will set up the task for you (look for run icon in upper right corner of IDE)).
+You can run the project with Gradle `run` task.
 
-Now you've just run the project and nothing, right? Look at the console output. There's a font missing. It's called [FFF Forward](https://www.1001fonts.com/fff-forward-font.html). Download it to `data/fonts/` and name it `fffforward.ttf`. (I do not include fonts I use in repo, because of licences.)
+```
+./gradlew run
+```
+
+Or you can set up some sort of Build & Run task in your IDE. (hint: In IntelliJ, open `Main.kt` and click the green run icon next to `main` function and select Run. You do this once, and IDE will set up the reusable run task for you in upper toolbar.
+
+## Remote control
+TBD TouchOSC, Traktor Kontrol F1
