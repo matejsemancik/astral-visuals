@@ -7,6 +7,6 @@ object Files {
 
     object Font {
         private const val FONT_DIR = "fonts"
-        const val FFF_FORWARD = "$FONT_DIR/fffforward.ttf"
+        const val FFF_FORWARD = "$FONT_DIR/fff-forward.ttf"
     }
 }
