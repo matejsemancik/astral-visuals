@@ -1,6 +1,7 @@
 package dev.matsem.astral.sketches.gameoflife
 
 import dev.matsem.astral.Config
+import dev.matsem.astral.Files
 import dev.matsem.astral.sketches.BaseSketch
 import dev.matsem.astral.sketches.SketchLoader
 import dev.matsem.astral.tools.audio.beatcounter.BeatCounter
@@ -80,7 +81,7 @@ class GameOfLifeSketch : BaseSketch() {
                     Array<Cell>(width / cellSize) { DeadCell }
                 }
         )
-        pixelFont = createFont("fonts/fff-forward.ttf", 24f, false)
+        pixelFont = createFont(Files.Font.FFF_FORWARD, 24f, false)
         overlay = createGraphics(universe.width, universe.height, PConstants.P2D)
 
         semLogo = loadImage("images/semlogo.png").apply {
