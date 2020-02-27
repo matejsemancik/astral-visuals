@@ -1,3 +1,5 @@
+@file:JvmName("Main")
+
 package dev.matsem.astral
 
 import dev.matsem.astral.di.appModule

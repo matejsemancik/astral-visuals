@@ -7,3 +7,4 @@ local.properties
 data/midi
 data/movies
 data/music
+*.log
