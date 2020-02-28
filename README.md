@@ -30,7 +30,7 @@ Current list of library dependencies is
 Minim // audio processing
 The MidiBus // for remote control
 Video Export // I use this to export video teasers synced with external audio file
-Box2D for Processing // for physics, duh (Looks for BoxesSketch)
+Box2D for Processing // for physics (look for BoxesSketch)
 Video // video playback
 extruder // 2d shape -> 3d shape extrusion
 geomerative // for generating shapes from text
