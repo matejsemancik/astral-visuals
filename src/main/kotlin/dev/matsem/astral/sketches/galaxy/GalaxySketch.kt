@@ -9,7 +9,6 @@ import dev.matsem.astral.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.tools.automator.MidiAutomator
 import dev.matsem.astral.tools.extensions.*
 import dev.matsem.astral.tools.galaxy.Galaxy
-import dev.matsem.astral.tools.logging.SketchLogger
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet.lerp
@@ -30,11 +29,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             val birth: Int = 0,
             var rotationExtra: Float = 0f
     )
-
-    private val logger = SketchLogger.Builder()
-            .withResolution()
-            .withFps()
-            .build()
 
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
@@ -313,12 +307,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
             ellipse(0f, 0f, radius - i * 100f, radius - i * 100f)
         }
         popMatrix()
-
         popMatrix()
-
-        // Debug
-        if (isInDebugMode) {
-            logger.draw(this)
-        }
     }
 }

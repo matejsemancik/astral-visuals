@@ -1,5 +1,6 @@
 package dev.matsem.astral.tools.midi
 
+import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.list
