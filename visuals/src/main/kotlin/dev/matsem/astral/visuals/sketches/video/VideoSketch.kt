@@ -1,6 +1,10 @@
 package dev.matsem.astral.visuals.sketches.video
 
-import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.extensions.centerX
+import dev.matsem.astral.core.tools.extensions.centerY
+import dev.matsem.astral.core.tools.extensions.resizeRatioAware
+import dev.matsem.astral.core.tools.extensions.shorterDimension
+import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
 import dev.matsem.astral.visuals.tools.audio.AudioProcessor
@@ -72,11 +76,11 @@ class VideoSketch : BaseSketch() {
             translateCenter()
             scale(1 + audioProcessor.getRange(100f..200f) / 2000f)
             sketch.image(
-                    astralLogo,
-                    -astralLogo.width / 2f,
-                    -astralLogo.height / 2f,
-                    astralLogo.width.toFloat(),
-                    astralLogo.height.toFloat()
+                astralLogo,
+                -astralLogo.width / 2f,
+                -astralLogo.height / 2f,
+                astralLogo.width.toFloat(),
+                astralLogo.height.toFloat()
             )
             popMatrix()
         }

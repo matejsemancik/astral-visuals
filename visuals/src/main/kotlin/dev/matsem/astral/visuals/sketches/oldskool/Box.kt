@@ -6,11 +6,11 @@ import processing.core.PApplet
 import processing.core.PVector
 
 class Box(
-        position: PVector,
-        rotation: PVector,
-        rotationVector: PVector,
-        size: Float,
-        targetSize: Float
+    position: PVector,
+    rotation: PVector,
+    rotationVector: PVector,
+    size: Float,
+    targetSize: Float
 ) : FlyingObject(position, rotation, rotationVector, size, targetSize) {
 
     override fun draw(sketch: PApplet) = with(sketch) {

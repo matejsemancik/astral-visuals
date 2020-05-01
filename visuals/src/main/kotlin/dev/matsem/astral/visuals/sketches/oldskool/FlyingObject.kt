@@ -5,11 +5,11 @@ import processing.core.PApplet
 import processing.core.PVector
 
 abstract class FlyingObject(
-        var position: PVector,
-        var rotation: PVector,
-        var rotationVector: PVector,
-        var size: Float,
-        var targetSize: Float
+    var position: PVector,
+    var rotation: PVector,
+    var rotationVector: PVector,
+    var size: Float,
+    var targetSize: Float
 ) {
     fun update(speed: Float) {
         position += PVector(0f, 0f, speed)

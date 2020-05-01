@@ -2,7 +2,11 @@ package dev.matsem.astral.visuals.sketches.boxes
 
 import org.jbox2d.collision.shapes.ChainShape
 import org.jbox2d.common.Vec2
-import org.jbox2d.dynamics.*
+import org.jbox2d.dynamics.Body
+import org.jbox2d.dynamics.BodyDef
+import org.jbox2d.dynamics.BodyType
+import org.jbox2d.dynamics.Fixture
+import org.jbox2d.dynamics.FixtureDef
 import processing.core.PApplet
 import shiffman.box2d.Box2DProcessing
 
@@ -18,13 +22,13 @@ class Boundary(sketch: PApplet, box2d: Box2DProcessing) {
         body = box2d.createBody(bd)
         val shape = ChainShape()
         shape.createLoop(
-                arrayOf(
-                        Vec2(box2d.coordPixelsToWorld(0f, 0f)),
-                        Vec2(box2d.coordPixelsToWorld(sketch.width.toFloat(), 0f)),
-                        Vec2(box2d.coordPixelsToWorld(sketch.width.toFloat(), sketch.height.toFloat())),
-                        Vec2(box2d.coordPixelsToWorld(0f, sketch.height.toFloat()))
-                ),
-                4
+            arrayOf(
+                Vec2(box2d.coordPixelsToWorld(0f, 0f)),
+                Vec2(box2d.coordPixelsToWorld(sketch.width.toFloat(), 0f)),
+                Vec2(box2d.coordPixelsToWorld(sketch.width.toFloat(), sketch.height.toFloat())),
+                Vec2(box2d.coordPixelsToWorld(0f, sketch.height.toFloat()))
+            ),
+            4
         )
 
         val fd = FixtureDef().apply {

@@ -3,9 +3,11 @@ package dev.matsem.astral.visuals.sketches.polygonal
 import processing.core.PApplet
 import processing.core.PVector
 
-class AutoMouse(private val sketch: PApplet,
-                private val centerX: Float,
-                private val centerY: Float) {
+class AutoMouse(
+    private val sketch: PApplet,
+    private val centerX: Float,
+    private val centerY: Float
+) {
 
     private val baseVector: PVector = PVector(100f, 0f)
     private var multiplier = 1f

@@ -9,7 +9,9 @@ import dev.matsem.astral.visuals.tools.audio.AudioProcessor
 import dev.matsem.astral.visuals.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
-import processing.core.PApplet.*
+import processing.core.PApplet.lerp
+import processing.core.PApplet.pow
+import processing.core.PApplet.radians
 
 class PatternsSketch : BaseSketch() {
 
@@ -21,7 +23,8 @@ class PatternsSketch : BaseSketch() {
     private var numBeats = 0
 
     private val countEncoder = galaxy.createEncoder(4, 0, 10, 50, 10)
-    private val expansionPot = galaxy.createPot(4, 1, 0f, sketch.longerDimension().toFloat(), sketch.shorterDimension().toFloat()).lerp(0.5f)
+    private val expansionPot =
+        galaxy.createPot(4, 1, 0f, sketch.longerDimension().toFloat(), sketch.shorterDimension().toFloat()).lerp(0.5f)
     private val rotationSpeedPot = galaxy.createPot(4, 2, 0f, 1f).lerp(0.5f)
     private val bassGainPot = galaxy.createPot(4, 3, 0f, 0.01f, 0.001f).lerp(0.1f)
     private val strokeWeightPot = galaxy.createPot(4, 4, 1f, 5f, 2f)
@@ -46,7 +49,11 @@ class PatternsSketch : BaseSketch() {
     override fun draw() = with(sketch) {
         if (audioProcessor.beatDetect.isKick) {
             numBeats++
-            if (randomOnBeatButton.isPressed && numBeats % pow(2f, beatDividerButtons.activeButtonsIndices().first().toFloat()).toInt() == 0) {
+            if (randomOnBeatButton.isPressed && numBeats % pow(
+                    2f,
+                    beatDividerButtons.activeButtonsIndices().first().toFloat()
+                ).toInt() == 0
+            ) {
                 setRandomControls()
             }
         }

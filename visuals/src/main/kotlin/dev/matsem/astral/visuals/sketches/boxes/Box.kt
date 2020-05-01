@@ -4,17 +4,21 @@ import dev.matsem.astral.core.tools.extensions.toPVector
 import dev.matsem.astral.core.tools.extensions.toVec2
 import org.jbox2d.collision.shapes.PolygonShape
 import org.jbox2d.common.Vec2
-import org.jbox2d.dynamics.*
+import org.jbox2d.dynamics.Body
+import org.jbox2d.dynamics.BodyDef
+import org.jbox2d.dynamics.BodyType
+import org.jbox2d.dynamics.Fixture
+import org.jbox2d.dynamics.FixtureDef
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PConstants.TWO_PI
 import shiffman.box2d.Box2DProcessing
 
 class Box(
-        private val sketch: PApplet,
-        private val box2d: Box2DProcessing,
-        val x: Float,
-        val y: Float
+    private val sketch: PApplet,
+    private val box2d: Box2DProcessing,
+    val x: Float,
+    val y: Float
 ) {
 
     companion object {
@@ -42,8 +46,8 @@ class Box(
         body = box2d.createBody(bd)
         val shape = PolygonShape()
         shape.setAsBox(
-                box2d.scalarPixelsToWorld(size / 2f),
-                box2d.scalarPixelsToWorld(size / 2f)
+            box2d.scalarPixelsToWorld(size / 2f),
+            box2d.scalarPixelsToWorld(size / 2f)
         )
 
         val fd = FixtureDef().apply {

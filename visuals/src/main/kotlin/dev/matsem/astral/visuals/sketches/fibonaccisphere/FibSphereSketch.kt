@@ -10,7 +10,13 @@ import dev.matsem.astral.visuals.tools.automator.MidiAutomator
 import dev.matsem.astral.visuals.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
-import processing.core.PApplet.*
+import processing.core.PApplet.asin
+import processing.core.PApplet.floor
+import processing.core.PApplet.lerp
+import processing.core.PApplet.map
+import processing.core.PApplet.min
+import processing.core.PApplet.radians
+import processing.core.PApplet.sin
 import processing.core.PConstants
 
 /**

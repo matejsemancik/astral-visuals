@@ -1,6 +1,13 @@
 package dev.matsem.astral.visuals.tools.galaxy
 
-import dev.matsem.astral.visuals.tools.galaxy.controls.*
+import dev.matsem.astral.visuals.tools.galaxy.controls.ButtonGroup
+import dev.matsem.astral.visuals.tools.galaxy.controls.Encoder
+import dev.matsem.astral.visuals.tools.galaxy.controls.GalaxyControl
+import dev.matsem.astral.visuals.tools.galaxy.controls.Joystick
+import dev.matsem.astral.visuals.tools.galaxy.controls.Pot
+import dev.matsem.astral.visuals.tools.galaxy.controls.PushButton
+import dev.matsem.astral.visuals.tools.galaxy.controls.PushButtonGroup
+import dev.matsem.astral.visuals.tools.galaxy.controls.ToggleButton
 import dev.matsem.astral.visuals.tools.midi.MidiDevice
 import dev.matsem.astral.visuals.tools.midi.MidiListener
 import themidibus.MidiBus

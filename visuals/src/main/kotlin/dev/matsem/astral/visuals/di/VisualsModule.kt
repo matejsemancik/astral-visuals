@@ -13,10 +13,10 @@ import dev.matsem.astral.visuals.sketches.gameoflife.GameOfLifeSketch
 import dev.matsem.astral.visuals.sketches.oldskool.OldSkoolSketch
 import dev.matsem.astral.visuals.sketches.patterns.PatternsSketch
 import dev.matsem.astral.visuals.sketches.polygonal.PolygonalSketch
-import dev.matsem.astral.visuals.sketches.tunnel.TunnelSketch
 import dev.matsem.astral.visuals.sketches.spikes.SpikesSketch
 import dev.matsem.astral.visuals.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.visuals.sketches.terrain.TerrainSketch
+import dev.matsem.astral.visuals.sketches.tunnel.TunnelSketch
 import dev.matsem.astral.visuals.sketches.video.VideoSketch
 import dev.matsem.astral.visuals.tools.audio.AudioProcessor
 import dev.matsem.astral.visuals.tools.audio.beatcounter.BeatCounter

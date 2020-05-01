@@ -106,9 +106,9 @@ class CubesSketch : BaseSketch() {
             rotateZ(millis() * rotationZSpeed.value + PConstants.PI / rotationOffset.value * (i + 1))
 
             stroke(
-                    fgHue,
-                    PApplet.map(i.toFloat(), 0f, num.value, fgSat, bgSat),
-                    PApplet.map(i.toFloat(), 0f, num.value, fgBrightness, bgBrightness)
+                fgHue,
+                PApplet.map(i.toFloat(), 0f, num.value, fgSat, bgSat),
+                PApplet.map(i.toFloat(), 0f, num.value, fgBrightness, bgBrightness)
             )
 
             if (i == 0 && pillEnabled.isPressed) {
@@ -125,9 +125,9 @@ class CubesSketch : BaseSketch() {
             }
 
             box(
-                    50f + i * 100f + bass * bassGain.value,
-                    50f + i * 100f + mid * midGain.value,
-                    50f + i * 100f + snare * snareGain.value
+                50f + i * 100f + bass * bassGain.value,
+                50f + i * 100f + mid * midGain.value,
+                50f + i * 100f + snare * snareGain.value
             )
             popMatrix()
         }

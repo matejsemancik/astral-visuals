@@ -6,7 +6,11 @@ import processing.core.PConstants
 import processing.core.PShape
 import processing.core.PVector
 
-class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, private val audioProcessor: AudioProcessor) {
+class Asteroid(
+    private val sketch: PApplet,
+    centerAverage: Boolean = false,
+    private val audioProcessor: AudioProcessor
+) {
 
     private val skeletonVectors = mutableListOf<PVector>()
     private val group = sketch.createShape(PConstants.GROUP)
@@ -72,8 +76,8 @@ class Asteroid(private val sketch: PApplet, centerAverage: Boolean = false, priv
     fun draw() {
         // modify vectors
         val shapeVectors = skeletonVectors
-                .map { pVector -> pVector.copy() }
-                .toMutableList()
+            .map { pVector -> pVector.copy() }
+            .toMutableList()
 
         for (i in 0 until shapeVectors.size) {
             // scale by FFT

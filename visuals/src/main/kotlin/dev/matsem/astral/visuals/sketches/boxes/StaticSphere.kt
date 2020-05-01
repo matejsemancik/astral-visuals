@@ -1,7 +1,11 @@
 package dev.matsem.astral.visuals.sketches.boxes
 
 import org.jbox2d.collision.shapes.CircleShape
-import org.jbox2d.dynamics.*
+import org.jbox2d.dynamics.Body
+import org.jbox2d.dynamics.BodyDef
+import org.jbox2d.dynamics.BodyType
+import org.jbox2d.dynamics.Fixture
+import org.jbox2d.dynamics.FixtureDef
 import processing.core.PApplet
 import processing.core.PConstants
 import shiffman.box2d.Box2DProcessing

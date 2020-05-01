@@ -1,7 +1,7 @@
 package dev.matsem.astral.visuals.sketches.gameoflife
 
 class Universe(
-        var cells: Array<Array<Cell>>
+    var cells: Array<Array<Cell>>
 ) {
 
     val width: Int
@@ -66,15 +66,15 @@ class Universe(
 
     override fun toString(): String {
         return cells.joinToString(
-                separator = "\n",
-                transform = { row ->
-                    row.joinToString(
-                            separator = "",
-                            transform = { cell ->
-                                "${cell.character()}"
-                            }
-                    )
-                }
+            separator = "\n",
+            transform = { row ->
+                row.joinToString(
+                    separator = "",
+                    transform = { cell ->
+                        "${cell.character()}"
+                    }
+                )
+            }
         )
     }
 }

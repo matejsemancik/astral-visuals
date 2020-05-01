@@ -11,7 +11,7 @@ fun Int.midiRange(top: Float): Float {
 }
 
 fun Int.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
-        PApplet.map(this.toFloat(), start1, end1, start2, end2)
+    PApplet.map(this.toFloat(), start1, end1, start2, end2)
 
 fun Int.constrain(low: Int = Int.MIN_VALUE, high: Int = Int.MAX_VALUE): Int = PApplet.constrain(this, low, high)
 

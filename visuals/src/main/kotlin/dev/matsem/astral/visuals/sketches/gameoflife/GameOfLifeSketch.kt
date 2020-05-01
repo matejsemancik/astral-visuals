@@ -6,7 +6,6 @@ import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.resizeRatioAware
 import dev.matsem.astral.core.tools.extensions.shorterDimension
 import dev.matsem.astral.core.tools.extensions.translateCenter
-import dev.matsem.astral.visuals.Config
 import dev.matsem.astral.visuals.Files
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader

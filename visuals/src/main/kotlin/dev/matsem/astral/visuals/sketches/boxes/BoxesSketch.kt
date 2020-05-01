@@ -1,6 +1,10 @@
 package dev.matsem.astral.visuals.sketches.boxes
 
-import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.extensions.angularTimeS
+import dev.matsem.astral.core.tools.extensions.centerX
+import dev.matsem.astral.core.tools.extensions.centerY
+import dev.matsem.astral.core.tools.extensions.shorterDimension
+import dev.matsem.astral.core.tools.extensions.threshold
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
 import dev.matsem.astral.visuals.sketches.polygonal.star.Starfield
@@ -9,7 +13,9 @@ import dev.matsem.astral.visuals.tools.automator.MidiAutomator
 import dev.matsem.astral.visuals.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
-import processing.core.PApplet.*
+import processing.core.PApplet.cos
+import processing.core.PApplet.radians
+import processing.core.PApplet.sin
 import shiffman.box2d.Box2DProcessing
 
 class BoxesSketch : BaseSketch() {

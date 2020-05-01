@@ -1,6 +1,8 @@
 package dev.matsem.astral.visuals.sketches.terrain
 
-import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.extensions.centerX
+import dev.matsem.astral.core.tools.extensions.centerY
+import dev.matsem.astral.core.tools.extensions.newLine
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
 import dev.matsem.astral.visuals.tools.audio.AudioProcessor
@@ -25,9 +27,9 @@ class TerrainSketch : BaseSketch() {
         const val RENDER_MODE_LINES_Y = "RENDER_MODE_LINES_Y"
 
         val RENDER_MODES = mapOf(
-                0 to RENDER_MODE_TRIANGLE_STRIP,
-                1 to RENDER_MODE_LINES_Z,
-                2 to RENDER_MODE_LINES_Y
+            0 to RENDER_MODE_TRIANGLE_STRIP,
+            1 to RENDER_MODE_LINES_Z,
+            2 to RENDER_MODE_LINES_Y
         )
 
         const val TERRAIN_MODE_BASS_CORNER = "TERRAIN_MODE_BASS_CORNER"
@@ -36,10 +38,10 @@ class TerrainSketch : BaseSketch() {
         const val TERRAIN_MODE_BASS_RIGHT_ALIGNED = "TERRAIN_MODE_BASS_RIGHT_ALIGNED"
 
         val TERRAIN_MODES = mapOf(
-                0 to TERRAIN_MODE_BASS_CORNER,
-                1 to TERRAIN_MODE_BASS_CENTER,
-                2 to TERRAIN_MODE_BASS_LEFT_ALIGNED,
-                3 to TERRAIN_MODE_BASS_RIGHT_ALIGNED
+            0 to TERRAIN_MODE_BASS_CORNER,
+            1 to TERRAIN_MODE_BASS_CENTER,
+            2 to TERRAIN_MODE_BASS_LEFT_ALIGNED,
+            3 to TERRAIN_MODE_BASS_RIGHT_ALIGNED
         )
     }
 
@@ -89,12 +91,12 @@ class TerrainSketch : BaseSketch() {
     override fun setup() {
         fftLogger = FFTLogger(sketch, audioProcessor)
         automator.setupWithGalaxy(
-                channel = 1,
-                recordButtonCC = 21,
-                playButtonCC = 22,
-                loopButtonCC = 23,
-                clearButtonCC = 24,
-                channelFilter = null
+            channel = 1,
+            recordButtonCC = 21,
+            playButtonCC = 22,
+            loopButtonCC = 23,
+            clearButtonCC = 24,
+            channelFilter = null
         )
     }
 
@@ -219,11 +221,12 @@ class TerrainSketch : BaseSketch() {
             var xoff = 0f
             for (x in 0 until cols) {
                 terrain[y][x] = map(
-                        noise(xoff, yoff),
-                        0f,
-                        1f,
-                        -20f * perlinAmpPot.value,
-                        50f * perlinAmpPot.value) + musicTerrain[y][x] + audioProcessor.getRange(6000f..12000f) * perlinBoostPot.value
+                    noise(xoff, yoff),
+                    0f,
+                    1f,
+                    -20f * perlinAmpPot.value,
+                    50f * perlinAmpPot.value
+                ) + musicTerrain[y][x] + audioProcessor.getRange(6000f..12000f) * perlinBoostPot.value
 
                 xoff += perlinResPot.value
             }
@@ -235,11 +238,11 @@ class TerrainSketch : BaseSketch() {
     private fun debugWindow() = with(sketch) {
         // debug values
         val basicInfoStr = StringBuilder()
-                .append("resolution: ${width}x$height").newLine()
-                .append("frameRate: ${frameRate.toInt()}").newLine()
-                .append("mouseX: ${mouseX - width / 2}").newLine()
-                .append("mouseY: ${mouseY - height / 2}").newLine()
-                .toString()
+            .append("resolution: ${width}x$height").newLine()
+            .append("frameRate: ${frameRate.toInt()}").newLine()
+            .append("mouseX: ${mouseX - width / 2}").newLine()
+            .append("mouseY: ${mouseY - height / 2}").newLine()
+            .toString()
 
         noStroke()
         fill(0f, 255f, 100f)
@@ -251,10 +254,10 @@ class TerrainSketch : BaseSketch() {
 
         // menu
         val menuStr = StringBuilder()
-                .append("[d] toggle debug mode").newLine()
-                .append("[m] drawing mode: ${RENDER_MODES[renderMode]}").newLine()
-                .append("[t] terrain mode: ${TERRAIN_MODES[terrainMode]}")
-                .toString()
+            .append("[d] toggle debug mode").newLine()
+            .append("[m] drawing mode: ${RENDER_MODES[renderMode]}").newLine()
+            .append("[t] terrain mode: ${TERRAIN_MODES[terrainMode]}")
+            .toString()
 
         noStroke()
         fill(0f, 255f, 100f)
