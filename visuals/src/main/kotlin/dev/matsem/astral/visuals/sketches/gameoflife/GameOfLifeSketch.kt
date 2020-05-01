@@ -1,5 +1,6 @@
 package dev.matsem.astral.visuals.sketches.gameoflife
 
+import dev.matsem.astral.core.tools.ColorConfig
 import dev.matsem.astral.core.tools.extensions.midiRange
 import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.resizeRatioAware
@@ -51,9 +52,9 @@ class GameOfLifeSketch : BaseSketch() {
 
     private val heatMapButton = galaxy.createToggleButton(channel = 11, cc = 4, defaultValue = false)
     private val heatHueStartPot =
-        galaxy.createPot(channel = 11, cc = 5, min = 0f, max = Config.Color.HUE_MAX, initialValue = 221.1f)
+        galaxy.createPot(channel = 11, cc = 5, min = 0f, max = ColorConfig.HUE_MAX, initialValue = 221.1f)
     private val heatHueEndPot =
-        galaxy.createPot(channel = 11, cc = 6, min = 0f, max = Config.Color.HUE_MAX, initialValue = 277.9f)
+        galaxy.createPot(channel = 11, cc = 6, min = 0f, max = ColorConfig.HUE_MAX, initialValue = 277.9f)
     private val heatCoolingFactorPot =
         galaxy.createPot(channel = 11, cc = 7, min = 0.1f, max = 0.99f, initialValue = 0.10f)
 

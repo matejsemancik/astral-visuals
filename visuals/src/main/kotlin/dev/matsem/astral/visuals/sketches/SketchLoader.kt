@@ -6,6 +6,8 @@ import ddf.minim.AudioSample
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
+import dev.matsem.astral.core.tools.ColorConfig
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.visuals.Config
 import dev.matsem.astral.visuals.sketches.attractor.AttractorSketch
 import dev.matsem.astral.visuals.sketches.boxes.BoxesSketch
@@ -137,13 +139,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
     override fun setup() {
         surface.setTitle("Astral Visuals")
-        colorMode(
-            PConstants.HSB,
-            Config.Color.HUE_MAX,
-            Config.Color.SATURATION_MAX,
-            Config.Color.BRIGHTNESS_MAX,
-            Config.Color.ALPHA_MAX
-        )
+        colorModeHsb()
 
         fx = PostFX(this)
         galaxy.connect()
@@ -162,26 +158,26 @@ class SketchLoader : PApplet(), KoinComponent {
 
         val lerping = 0.08f
         bgHuePot =
-            galaxy.createPot(15, 67, 0f, Config.Color.HUE_MAX, bgColor.x).also { colorPots.add(it) }.lerp(lerping)
-        bgSatPot = galaxy.createPot(15, 68, 0f, Config.Color.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }
+            galaxy.createPot(15, 67, 0f, ColorConfig.HUE_MAX, bgColor.x).also { colorPots.add(it) }.lerp(lerping)
+        bgSatPot = galaxy.createPot(15, 68, 0f, ColorConfig.SATURATION_MAX, bgColor.y).also { colorPots.add(it) }
             .lerp(lerping)
-        bgBriPot = galaxy.createPot(15, 69, 0f, Config.Color.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }
+        bgBriPot = galaxy.createPot(15, 69, 0f, ColorConfig.BRIGHTNESS_MAX, bgColor.z).also { colorPots.add(it) }
             .lerp(lerping)
 
         fgHuePot =
-            galaxy.createPot(15, 70, 0f, Config.Color.HUE_MAX, fgColor.x).also { colorPots.add(it) }.lerp(lerping)
-        fgSatPot = galaxy.createPot(15, 71, 0f, Config.Color.SATURATION_MAX, fgColor.y).also { colorPots.add(it) }
+            galaxy.createPot(15, 70, 0f, ColorConfig.HUE_MAX, fgColor.x).also { colorPots.add(it) }.lerp(lerping)
+        fgSatPot = galaxy.createPot(15, 71, 0f, ColorConfig.SATURATION_MAX, fgColor.y).also { colorPots.add(it) }
             .lerp(lerping)
-        fgBriPot = galaxy.createPot(15, 72, 0f, Config.Color.BRIGHTNESS_MAX, fgColor.z).also { colorPots.add(it) }
+        fgBriPot = galaxy.createPot(15, 72, 0f, ColorConfig.BRIGHTNESS_MAX, fgColor.z).also { colorPots.add(it) }
             .lerp(lerping)
 
         accentHuePot =
-            galaxy.createPot(15, 73, 0f, Config.Color.HUE_MAX, accentColor.x).also { colorPots.add(it) }.lerp(lerping)
+            galaxy.createPot(15, 73, 0f, ColorConfig.HUE_MAX, accentColor.x).also { colorPots.add(it) }.lerp(lerping)
         accentSatPot =
-            galaxy.createPot(15, 74, 0f, Config.Color.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }
+            galaxy.createPot(15, 74, 0f, ColorConfig.SATURATION_MAX, accentColor.y).also { colorPots.add(it) }
                 .lerp(lerping)
         accentBriPot =
-            galaxy.createPot(15, 75, 0f, Config.Color.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }
+            galaxy.createPot(15, 75, 0f, ColorConfig.BRIGHTNESS_MAX, accentColor.z).also { colorPots.add(it) }
                 .lerp(lerping)
 
         autoSwitchButton = galaxy.createToggleButton(15, 77, false)

@@ -1,5 +1,6 @@
 package dev.matsem.astral.visuals.sketches.playground
 
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import org.koin.core.KoinComponent
 import processing.core.PApplet
 import processing.core.PConstants
@@ -12,7 +13,7 @@ class PlaygroundSketch : PApplet(), KoinComponent {
     }
 
     override fun setup() {
-        colorMode(PConstants.HSB, 360f, 100f, 100f)
+        colorModeHsb()
     }
 
     override fun draw() = Unit

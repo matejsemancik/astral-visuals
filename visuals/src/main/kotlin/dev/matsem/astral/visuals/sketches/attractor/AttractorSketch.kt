@@ -1,16 +1,23 @@
 package dev.matsem.astral.visuals.sketches.attractor
 
-import dev.matsem.astral.visuals.Config
+import dev.matsem.astral.core.tools.ColorConfig
+import dev.matsem.astral.core.tools.extensions.angularTimeS
+import dev.matsem.astral.core.tools.extensions.mapSin
+import dev.matsem.astral.core.tools.extensions.mapp
+import dev.matsem.astral.core.tools.extensions.remap
+import dev.matsem.astral.core.tools.extensions.saw
+import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
 import dev.matsem.astral.visuals.tools.audio.AudioProcessor
 import dev.matsem.astral.visuals.tools.automator.MidiAutomator
-import dev.matsem.astral.core.tools.extensions.*
 import dev.matsem.astral.visuals.tools.galaxy.Galaxy
 import dev.matsem.astral.visuals.tools.galaxy.controls.Pot
 import dev.matsem.astral.visuals.tools.kontrol.KontrolF1
 import org.koin.core.inject
-import processing.core.PApplet.*
+import processing.core.PApplet.cos
+import processing.core.PApplet.pow
+import processing.core.PApplet.sin
 import processing.core.PConstants
 import processing.core.PVector
 
@@ -75,7 +82,7 @@ class AttractorSketch : BaseSketch() {
     )
 
     private val dotSizePot = galaxy.createPot(5, 44, 1f, 5f, 1f)
-    private val bgAlphaPot = galaxy.createPot(5, 49, 0f, Config.Color.ALPHA_MAX, Config.Color.ALPHA_MAX)
+    private val bgAlphaPot = galaxy.createPot(5, 49, 0f, ColorConfig.ALPHA_MAX, ColorConfig.ALPHA_MAX)
 
     override fun setup() {
         automator.setupWithGalaxy(

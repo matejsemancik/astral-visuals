@@ -1,5 +1,6 @@
 package dev.matsem.astral.core.tools.extensions
 
+import dev.matsem.astral.core.tools.ColorConfig
 import processing.core.PApplet
 import processing.core.PApplet.max
 import processing.core.PApplet.min
@@ -32,3 +33,11 @@ fun PApplet.rotate(vector: PVector) {
     rotateY(vector.y)
     rotateZ(vector.z)
 }
+
+fun PApplet.colorModeHsb() = colorMode(
+    PConstants.HSB,
+    ColorConfig.HUE_MAX,
+    ColorConfig.SATURATION_MAX,
+    ColorConfig.BRIGHTNESS_MAX,
+    ColorConfig.ALPHA_MAX
+)
