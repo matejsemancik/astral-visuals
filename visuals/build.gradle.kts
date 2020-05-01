@@ -23,6 +23,7 @@ val processingLibs = listOf(
     "PostFX"
 )
 
+@Suppress("UnstableApiUsage")
 application {
     mainClassName = "dev.matsem.astral.visuals.Main"
 }
@@ -34,8 +35,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-    implementation("org.koin:koin-core:2.0.0-beta-1")
+    implementation(Dependencies.serializationRuntime)
+    implementation(Dependencies.koin)
 
     implementation(fileTree(mapOf("dir" to processingCoreDir, "include" to listOf("*.jar"))))
     processingLibs.forEach { libName ->

@@ -7,9 +7,8 @@ import org.koin.core.context.startKoin
 
 fun main(args: Array<String>) {
     startKoin {
-        logger()
         modules(VisualsComponent.visualsModule)
     }
 
-    AstralVisuals().run()
+    AstralVisuals().run(args)
 }

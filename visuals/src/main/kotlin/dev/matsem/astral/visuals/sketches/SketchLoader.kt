@@ -138,6 +138,7 @@ class SketchLoader : PApplet(), KoinComponent {
     }
 
     override fun setup() {
+        println("sketch data path: ${dataPath("")}")
         surface.setTitle("Astral Visuals")
         colorModeHsb()
 
@@ -471,21 +472,5 @@ class SketchLoader : PApplet(), KoinComponent {
         output.flush()
         output.close()
         println("Sound analysis done")
-    }
-
-    /**
-     * Sketch data path override. It's wrong when using local Processing installation core jars.
-     * Sketch folder path cannot be passed as an argument, does not play well with DI.
-     */
-    override fun dataPath(where: String): String {
-        return System.getProperty("user.dir") + "/data/" + where
-    }
-
-    /**
-     * Sketch data path override. It's wrong when using local Processing installation core jars.
-     * Sketch folder path cannot be passed as an argument, does not play well with DI.
-     */
-    override fun dataFile(where: String): File {
-        return File(System.getProperty("user.dir") + "/data/" + where)
     }
 }

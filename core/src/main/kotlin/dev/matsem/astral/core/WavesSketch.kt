@@ -1,11 +1,11 @@
-package dev.matsem.astral.playground
-
-import org.koin.core.KoinComponent
-import processing.core.PApplet
-
-// TODO to BaseSketch
-class WavesSketch : PApplet(), KoinComponent {
-
+//package dev.matsem.astral.core
+//
+//import org.koin.core.KoinComponent
+//import processing.core.PApplet
+//
+//// TODO to BaseSketch
+//class WavesSketch : PApplet(), KoinComponent {
+//
 //    val kontrol: KontrolF1 by inject()
 //    val audioProcessor: AudioProcessor by inject()
 //
@@ -58,4 +58,4 @@ class WavesSketch : PApplet(), KoinComponent {
 //        curveVertex(width.toFloat() + 20f, y)
 //        endShape()
 //    }
-}
+//}
