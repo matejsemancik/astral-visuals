@@ -1,0 +1,188 @@
+package dev.matsem.astral.visuals.sketches.spikes
+
+import dev.matsem.astral.core.tools.extensions.centerX
+import dev.matsem.astral.core.tools.extensions.centerY
+import dev.matsem.astral.core.tools.extensions.quantize
+import dev.matsem.astral.visuals.sketches.BaseSketch
+import dev.matsem.astral.visuals.sketches.SketchLoader
+import dev.matsem.astral.visuals.tools.audio.AudioProcessor
+import dev.matsem.astral.visuals.tools.automator.MidiAutomator
+import dev.matsem.astral.visuals.tools.galaxy.Galaxy
+import org.koin.core.inject
+import processing.core.PApplet
+import processing.core.PConstants
+import processing.core.PVector
+import kotlin.random.Random
+
+class SpikesSketch : BaseSketch() {
+
+    override val sketch: SketchLoader by inject()
+    val galaxy: Galaxy by inject()
+    val audioProcessor: AudioProcessor by inject()
+    private val automator: MidiAutomator by inject()
+
+    lateinit var positions: Array<Array<PVector>>
+    lateinit var fftMapping: Array<IntArray>
+
+    var numX = 45
+    var numY = 25
+    var paddX = 100f
+    var paddY = 100f
+
+    var rotationXEnabled = galaxy.createToggleButton(7, 0, false)
+    var rotationZEnabled = galaxy.createToggleButton(7, 1, false)
+    var rotationQuantize = galaxy.createEncoder(7, 2, 0, 500, 128)
+
+    var beatRegenEnabled = galaxy.createToggleButton(7, 3, false)
+    var forceRegen = galaxy.createPushButton(7, 4) { shouldRegen = true }
+    var shouldRegen = false
+    var beatRegenCounter = 0
+
+    var beatRandomize = galaxy.createToggleButton(7, 15, false)
+    var beatRandomizeCounter = 0
+    var beatRandomizeModulo = 8
+
+    var baseRotationBtns = galaxy.createButtonGroup(7, listOf(5, 6), listOf(5))
+    var baseRotations = floatArrayOf(
+        0f,
+        PConstants.PI / 2f
+    )
+
+    var dotSize = galaxy.createPot(7, 7, 0f, 10f, 2f)
+    var lineWeight = galaxy.createPot(7, 8, 0f, 10f, 4f)
+
+    var noiseGain = galaxy.createPot(7, 9, 0f, 200f, 50f)
+    var audioGain = galaxy.createPot(7, 10, 0f, 3f, 0.8f)
+
+    var noiseResX = galaxy.createPot(7, 11, 0f, 0.02f, 0f)
+    var noiseTravelX = galaxy.createPot(7, 12, -0.01f, 0.01f, 0f)
+    var noiseResY = galaxy.createPot(7, 13, 0f, 0.02f, 0f)
+    var noiseTravelY = galaxy.createPot(7, 14, -0.01f, 0.01f, 0f)
+
+    override fun setup() {
+        createArray(
+            numX = numX,
+            numY = numY,
+            paddHorizontal = paddX,
+            paddVertical = paddY
+        )
+
+        automator.setupWithGalaxy(
+            channel = 7,
+            recordButtonCC = 16,
+            playButtonCC = 17,
+            loopButtonCC = 18,
+            clearButtonCC = 19,
+            channelFilter = null
+        )
+    }
+
+    override fun draw() = with(sketch) {
+        automator.update()
+
+        if (beatRandomize.isPressed && audioProcessor.beatDetect.isKick) {
+            beatRandomizeCounter++
+
+            if (beatRandomizeCounter % beatRandomizeModulo == 0) {
+                beatRandomizeCounter = 0
+                beatRandomizeModulo = listOf(1, 2, 4, 8, 16).shuffled().first()
+
+                noiseGain.random()
+                noiseResX.random()
+                noiseResY.random()
+                noiseTravelX.random()
+                noiseTravelY.random()
+                shouldRegen = Random.nextBoolean()
+                dotSize.random()
+                lineWeight.random()
+            }
+        }
+
+        if (beatRegenEnabled.isPressed && audioProcessor.beatDetect.isKick) {
+            beatRegenCounter++
+            if (beatRegenCounter % 2 == 0) {
+                beatRegenCounter = 0
+                shouldRegen = true
+            }
+        }
+
+        if (shouldRegen) {
+            numX = sketch.random(20f, 50f).toInt()
+            numY = sketch.random(10f, 25f).toInt()
+            createArray(numX, numY, paddX, paddY)
+
+            shouldRegen = false
+        }
+
+        background(bgColor)
+        translate(centerX(), centerY())
+        if (rotationXEnabled.isPressed) {
+            rotateX((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize.value.toFloat()))
+        } else {
+            rotateX(baseRotations[baseRotationBtns.activeButtonsIndices().first()])
+        }
+
+        if (rotationZEnabled.isPressed) {
+            rotateZ((PConstants.TWO_PI * millis() / 1000f / 16f).quantize(PConstants.TWO_PI / rotationQuantize.value.toFloat()))
+        } else {
+            rotateZ(0f)
+        }
+
+        for (x in 0 until numX) {
+            for (y in 0 until numY) {
+                val pos = positions[x][y]
+
+                val audio = audioProcessor.getFftAvg(fftMapping[x][y]) * audioGain.value
+                val noise = noise(
+                    pos.x * noiseResX.value + millis() * noiseTravelX.value,
+                    pos.y * noiseResY.value + millis() * noiseTravelY.value
+                ) * noiseGain.value
+
+                val elevation = noise + audio
+
+                // Draw line
+                noFill()
+                stroke(fgColor)
+                strokeWeight(lineWeight.value)
+
+                sketch.line(pos.x, pos.y, noise, pos.x, pos.y, elevation)
+                sketch.line(pos.x, pos.y, -noise, pos.x, pos.y, -elevation)
+
+                // Draw dot
+                noStroke()
+                fill(fgColor)
+
+                pushMatrix()
+                translate(pos.x, pos.y, elevation)
+                sphere(dotSize.value)
+                popMatrix()
+
+                pushMatrix()
+                translate(pos.x, pos.y, -elevation)
+                sphere(dotSize.value)
+                popMatrix()
+            }
+        }
+    }
+
+    private fun createArray(
+        numX: Int,
+        numY: Int,
+        paddHorizontal: Float = 0f,
+        paddVertical: Float = 0f
+    ) = with(sketch) {
+
+        positions = Array(numX) { Array(numY) { PVector() } }
+        for (x in 0 until numX) {
+            for (y in 0 until numY) {
+                positions[x][y] = PVector(
+                    PApplet.map(x.toFloat(), 0f, numX - 1f, -centerX() + paddHorizontal, centerX() - paddHorizontal),
+                    PApplet.map(y.toFloat(), 0f, numY - 1f, -centerY() + paddVertical, centerY() - paddVertical),
+                    0f
+                )
+            }
+        }
+
+        fftMapping = Array(numX) { IntArray(numY) { sketch.random(audioProcessor.fft.avgSize().toFloat()).toInt() } }
+    }
+}

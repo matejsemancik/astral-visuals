@@ -2,7 +2,8 @@
 
 package dev.matsem.astral
 
-import dev.matsem.astral.di.appModule
+import dev.matsem.astral.visuals.AstralVisuals
+import dev.matsem.astral.visuals.di.VisualsComponent
 import org.koin.core.context.startKoin
 
 fun main(args: Array<String>) {
@@ -12,8 +13,8 @@ fun main(args: Array<String>) {
 
     startKoin {
         logger()
-        modules(appModule)
+        modules(VisualsComponent.visualsModule)
     }
 
-    App().run()
+    AstralVisuals().run()
 }

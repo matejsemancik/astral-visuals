@@ -1,1 +1,3 @@
-rootProject.name = "astral-visuals"
+rootProject.name = ProjectSettings.name
+include(Modules.core)
+include(Modules.visuals)
