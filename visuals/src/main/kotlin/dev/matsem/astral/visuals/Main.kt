@@ -1,8 +1,7 @@
 @file:JvmName("Main")
 
-package dev.matsem.astral
+package dev.matsem.astral.visuals
 
-import dev.matsem.astral.visuals.AstralVisuals
 import dev.matsem.astral.visuals.di.VisualsComponent
 import org.koin.core.context.startKoin
 

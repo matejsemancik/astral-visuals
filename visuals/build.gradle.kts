@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
+    application
 }
 
 group = ProjectSettings.group
@@ -21,6 +22,10 @@ val processingLibs = listOf(
     "geomerative",
     "PostFX"
 )
+
+application {
+    mainClassName = "dev.matsem.astral.visuals.Main"
+}
 
 repositories {
     mavenCentral()

@@ -4,7 +4,7 @@ build/
 out/
 *.iml
 local.properties
-data/midi
-data/movies
-data/music
+visuals/data/midi
+visuals/data/movies
+visuals/data/music
 *.log
