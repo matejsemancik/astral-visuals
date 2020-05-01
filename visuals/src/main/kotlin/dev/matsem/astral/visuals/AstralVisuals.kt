@@ -15,7 +15,6 @@ class AstralVisuals : KoinComponent {
      * @see https://processing.github.io/processing-javadocs/core/
      */
     fun run(processingArgs: Array<String>) {
-        println("processing args: ${processingArgs.joinToString { it }}")
         val args = processingArgs + arrayOf("SketchLoader")
         PApplet.runSketch(args, sketch)
     }

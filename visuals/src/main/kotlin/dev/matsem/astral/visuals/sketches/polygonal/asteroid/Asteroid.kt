@@ -1,6 +1,6 @@
 package dev.matsem.astral.visuals.sketches.polygonal.asteroid
 
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.audio.AudioProcessor
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PShape

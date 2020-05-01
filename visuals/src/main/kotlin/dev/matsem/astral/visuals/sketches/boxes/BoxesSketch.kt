@@ -8,9 +8,9 @@ import dev.matsem.astral.core.tools.extensions.threshold
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
 import dev.matsem.astral.visuals.sketches.polygonal.star.Starfield
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
-import dev.matsem.astral.visuals.tools.automator.MidiAutomator
-import dev.matsem.astral.visuals.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.midi.MidiAutomator
+import dev.matsem.astral.core.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PApplet.cos

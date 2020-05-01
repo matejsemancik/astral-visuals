@@ -1,6 +1,6 @@
 package dev.matsem.astral.visuals.sketches.gameoflife
 
-import dev.matsem.astral.core.tools.ColorConfig
+import dev.matsem.astral.core.ColorConfig
 import dev.matsem.astral.core.tools.extensions.midiRange
 import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.resizeRatioAware
@@ -9,10 +9,10 @@ import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.visuals.Files
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
-import dev.matsem.astral.visuals.tools.audio.beatcounter.BeatCounter
-import dev.matsem.astral.visuals.tools.audio.beatcounter.OnKick
-import dev.matsem.astral.visuals.tools.automator.MidiAutomator
-import dev.matsem.astral.visuals.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.core.tools.midi.MidiAutomator
+import dev.matsem.astral.core.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet.constrain
 import processing.core.PApplet.lerp

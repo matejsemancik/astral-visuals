@@ -1,6 +1,6 @@
 package dev.matsem.astral.visuals.tools.logging
 
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.audio.AudioProcessor
 import processing.core.PApplet
 
 class FFTLogger(private val sketch: PApplet, private val audioProcessor: AudioProcessor) {

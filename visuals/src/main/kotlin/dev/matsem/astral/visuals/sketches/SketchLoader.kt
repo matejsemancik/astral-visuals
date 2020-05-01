@@ -6,9 +6,20 @@ import ddf.minim.AudioSample
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import dev.matsem.astral.core.tools.ColorConfig
+import dev.matsem.astral.core.ColorConfig
+import dev.matsem.astral.core.VideoExportConfig
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.audio.BeatDetectData
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.visuals.Config
+import dev.matsem.astral.core.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.galaxy.controls.ButtonGroup
+import dev.matsem.astral.core.tools.galaxy.controls.Pot
+import dev.matsem.astral.core.tools.galaxy.controls.PushButton
+import dev.matsem.astral.core.tools.galaxy.controls.ToggleButton
+import dev.matsem.astral.core.tools.kontrol.KontrolF1
+import dev.matsem.astral.core.tools.midi.MidiAutomator
+import dev.matsem.astral.core.tools.midi.MidiFileParser
+import dev.matsem.astral.core.tools.midi.MidiPlayer
 import dev.matsem.astral.visuals.sketches.attractor.AttractorSketch
 import dev.matsem.astral.visuals.sketches.boxes.BoxesSketch
 import dev.matsem.astral.visuals.sketches.cubes.CubesSketch
@@ -23,17 +34,6 @@ import dev.matsem.astral.visuals.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.visuals.sketches.terrain.TerrainSketch
 import dev.matsem.astral.visuals.sketches.tunnel.TunnelSketch
 import dev.matsem.astral.visuals.sketches.video.VideoSketch
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
-import dev.matsem.astral.visuals.tools.audio.BeatDetectData
-import dev.matsem.astral.visuals.tools.automator.MidiAutomator
-import dev.matsem.astral.visuals.tools.galaxy.Galaxy
-import dev.matsem.astral.visuals.tools.galaxy.controls.ButtonGroup
-import dev.matsem.astral.visuals.tools.galaxy.controls.Pot
-import dev.matsem.astral.visuals.tools.galaxy.controls.PushButton
-import dev.matsem.astral.visuals.tools.galaxy.controls.ToggleButton
-import dev.matsem.astral.visuals.tools.kontrol.KontrolF1
-import dev.matsem.astral.visuals.tools.midi.MidiFileParser
-import dev.matsem.astral.visuals.tools.midi.MidiPlayer
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -42,7 +42,6 @@ import processing.core.PConstants
 import processing.core.PVector
 import processing.event.KeyEvent
 import java.io.BufferedReader
-import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
 
@@ -127,7 +126,7 @@ class SketchLoader : PApplet(), KoinComponent {
 
     // endregion
 
-    var selector = Config.Sketch.DEFAULT_SELECTOR
+    var selector = 't'
     val sketches = mutableMapOf<Char, BaseSketch>()
 
     override fun settings() {
@@ -249,11 +248,11 @@ class SketchLoader : PApplet(), KoinComponent {
         galaxy.createPushButton(15, 13) { switchSketch('o') }
         galaxy.createPushButton(15, 14) { switchSketch('t') }
 
-        if (Config.VideoExport.IS_IN_RENDER_MODE) {
+        if (VideoExportConfig.IS_IN_RENDER_MODE) {
             frameRate(1000f)
-            audioToTextFile(Config.VideoExport.AUDIO_FILE_PATH)
-            reader = createReader("${Config.VideoExport.AUDIO_FILE_PATH}.txt")
-            midiFileParser.loadFile(Config.VideoExport.MIDI_AUTOMATION_FILE)?.let {
+            audioToTextFile(VideoExportConfig.AUDIO_FILE_PATH)
+            reader = createReader("${VideoExportConfig.AUDIO_FILE_PATH}.txt")
+            midiFileParser.loadFile(VideoExportConfig.MIDI_AUTOMATION_FILE)?.let {
                 midiPlayer.plugIn(kontrolF1)
                 midiPlayer.enqueue(it)
                 midiPlayer.play()
@@ -283,7 +282,7 @@ class SketchLoader : PApplet(), KoinComponent {
             lastAutoSwitchMs = millis()
         }
 
-        if (Config.VideoExport.IS_IN_RENDER_MODE.not()) {
+        if (VideoExportConfig.IS_IN_RENDER_MODE.not()) {
             audioProcessor.gain = gainPot.value
             activeSketch().isInDebugMode = debugButton.isPressed
             activeSketch().draw()
@@ -304,7 +303,7 @@ class SketchLoader : PApplet(), KoinComponent {
                 videoExport.endMovie()
                 exit()
             } else {
-                val p = split(line, Config.VideoExport.SEP)
+                val p = split(line, VideoExportConfig.SEP)
                 val soundTime = parseFloat(p[0])
 
                 // Our movie will have 30 frames per second.
@@ -319,7 +318,7 @@ class SketchLoader : PApplet(), KoinComponent {
                 // but I'm not sure if it's useful nor what
                 // would be the ideal value. Please experiment :)
 
-                while (videoExport.currentTime < soundTime + Config.VideoExport.FRAME_DURATION * 0.5) {
+                while (videoExport.currentTime < soundTime + VideoExportConfig.FRAME_DURATION * 0.5) {
                     val channelLeft = mutableListOf<Float>()
                     val channelRight = mutableListOf<Float>()
                     val beat = parseInt(p[1])
@@ -460,10 +459,10 @@ class SketchLoader : PApplet(), KoinComponent {
                 else -> 0
             }
 
-            msg.append(Config.VideoExport.SEP + beat.toString())
+            msg.append(VideoExportConfig.SEP + beat.toString())
             for (i in 0 until fftSlices) {
-                msg.append(Config.VideoExport.SEP + nf(fftL.getAvg(i), 0, 4).replace(',', '.'))
-                msg.append(Config.VideoExport.SEP + nf(fftR.getAvg(i), 0, 4).replace(',', '.'))
+                msg.append(VideoExportConfig.SEP + nf(fftL.getAvg(i), 0, 4).replace(',', '.'))
+                msg.append(VideoExportConfig.SEP + nf(fftR.getAvg(i), 0, 4).replace(',', '.'))
             }
             output.println(msg.toString())
         }

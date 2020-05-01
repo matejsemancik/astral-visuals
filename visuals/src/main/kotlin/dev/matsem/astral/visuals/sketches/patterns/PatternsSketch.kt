@@ -5,8 +5,8 @@ import dev.matsem.astral.core.tools.extensions.shorterDimension
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
-import dev.matsem.astral.visuals.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PApplet.lerp

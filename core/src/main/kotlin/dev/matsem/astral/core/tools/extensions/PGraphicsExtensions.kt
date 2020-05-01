@@ -1,6 +1,6 @@
 package dev.matsem.astral.core.tools.extensions
 
-import dev.matsem.astral.core.tools.ColorConfig
+import dev.matsem.astral.core.ColorConfig
 import processing.core.PApplet.max
 import processing.core.PApplet.min
 import processing.core.PConstants

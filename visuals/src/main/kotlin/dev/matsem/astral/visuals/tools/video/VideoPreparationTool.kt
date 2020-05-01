@@ -3,17 +3,17 @@ package dev.matsem.astral.visuals.tools.video
 import ddf.minim.AudioListener
 import ddf.minim.AudioPlayer
 import ddf.minim.Minim
-import dev.matsem.astral.visuals.Config
+import dev.matsem.astral.core.VideoExportConfig
 import dev.matsem.astral.visuals.sketches.SketchLoader
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
-import dev.matsem.astral.visuals.tools.galaxy.Galaxy
-import dev.matsem.astral.visuals.tools.kontrol.KontrolF1
-import dev.matsem.astral.visuals.tools.kontrol.onTogglePad
-import dev.matsem.astral.visuals.tools.kontrol.onTriggerPad
-import dev.matsem.astral.visuals.tools.midi.MidiDevice
-import dev.matsem.astral.visuals.tools.midi.MidiFileParser
-import dev.matsem.astral.visuals.tools.midi.MidiPlayer
-import dev.matsem.astral.visuals.tools.midi.MidiRecorder
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.kontrol.KontrolF1
+import dev.matsem.astral.core.tools.kontrol.onTogglePad
+import dev.matsem.astral.core.tools.kontrol.onTriggerPad
+import dev.matsem.astral.core.tools.midi.MidiDevice
+import dev.matsem.astral.core.tools.midi.MidiFileParser
+import dev.matsem.astral.core.tools.midi.MidiPlayer
+import dev.matsem.astral.core.tools.midi.MidiRecorder
 
 class VideoPreparationTool(
     private val sketch: SketchLoader,
@@ -30,7 +30,7 @@ class VideoPreparationTool(
 
     init {
         sketch.registerMethod("draw", this)
-        midiFileParser.loadFile(Config.VideoExport.MIDI_AUTOMATION_FILE)?.let { automation ->
+        midiFileParser.loadFile(VideoExportConfig.MIDI_AUTOMATION_FILE)?.let { automation ->
             midiRecorder.preLoad(automation)
         }
 
@@ -143,10 +143,10 @@ class VideoPreparationTool(
         audioPlayer?.rewind()
     }
 
-    private fun saveIntoFile(fileName: String = Config.VideoExport.MIDI_AUTOMATION_FILE) =
+    private fun saveIntoFile(fileName: String = VideoExportConfig.MIDI_AUTOMATION_FILE) =
         midiFileParser.saveFile(midiRecorder.getMessages(excludedCCs = blacklistedCCs), fileName)
 
-    private fun saveInitialStateIntoFile(fileName: String = Config.VideoExport.MIDI_AUTOMATION_FILE) {
+    private fun saveInitialStateIntoFile(fileName: String = VideoExportConfig.MIDI_AUTOMATION_FILE) {
         val messages = midiRecorder.getMessages(excludedCCs = blacklistedCCs)
             .sortedBy { it.millis }
             .toMutableList()

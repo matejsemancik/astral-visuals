@@ -1,6 +1,6 @@
 package dev.matsem.astral.visuals.sketches.attractor
 
-import dev.matsem.astral.core.tools.ColorConfig
+import dev.matsem.astral.core.ColorConfig
 import dev.matsem.astral.core.tools.extensions.angularTimeS
 import dev.matsem.astral.core.tools.extensions.mapSin
 import dev.matsem.astral.core.tools.extensions.mapp
@@ -9,11 +9,11 @@ import dev.matsem.astral.core.tools.extensions.saw
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
-import dev.matsem.astral.visuals.tools.automator.MidiAutomator
-import dev.matsem.astral.visuals.tools.galaxy.Galaxy
-import dev.matsem.astral.visuals.tools.galaxy.controls.Pot
-import dev.matsem.astral.visuals.tools.kontrol.KontrolF1
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.midi.MidiAutomator
+import dev.matsem.astral.core.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.galaxy.controls.Pot
+import dev.matsem.astral.core.tools.kontrol.KontrolF1
 import org.koin.core.inject
 import processing.core.PApplet.cos
 import processing.core.PApplet.pow

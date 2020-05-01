@@ -4,11 +4,11 @@ import dev.matsem.astral.core.tools.extensions.centerX
 import dev.matsem.astral.core.tools.extensions.centerY
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
-import dev.matsem.astral.visuals.tools.audio.AudioProcessor
-import dev.matsem.astral.visuals.tools.audio.beatcounter.BeatCounter
-import dev.matsem.astral.visuals.tools.audio.beatcounter.OnKick
-import dev.matsem.astral.visuals.tools.audio.beatcounter.OnSnare
-import dev.matsem.astral.visuals.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.core.tools.audio.beatcounter.OnSnare
+import dev.matsem.astral.core.tools.galaxy.Galaxy
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PConstants
