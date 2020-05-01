@@ -3,6 +3,7 @@ package dev.matsem.astral.visuals.sketches.polygonal
 import dev.matsem.astral.core.tools.extensions.centerX
 import dev.matsem.astral.core.tools.extensions.centerY
 import dev.matsem.astral.core.tools.extensions.newLine
+import dev.matsem.astral.core.tools.extensions.rotate
 import dev.matsem.astral.core.tools.extensions.threshold
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
@@ -158,9 +159,11 @@ class PolygonalSketch : BaseSketch() {
         starfield2.draw()
 
         for ((index, triangloid) in triangloids.withIndex()) {
-            triangloid.getShape().rotateY(0f + map(bassSum, 0f, 50f, 0f, 0.05f) + vx)
-            triangloid.getShape().rotateX(0.005f * (index + 1) + vy)
-            triangloid.getShape().rotateZ(0.010f + vz)
+            triangloid.getShape().rotate(
+                angleX = 0f + map(bassSum, 0f, 50f, 0f, 0.05f) + vx,
+                angleY = 0.005f * (index + 1) + vy,
+                angleZ = 0.010f + vz
+            )
 
             if (wiggleButton.isPressed) {
                 triangloid.wiggle(wiggleMultiplierPot.value)

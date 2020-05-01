@@ -136,6 +136,7 @@ class SketchLoader : PApplet(), KoinComponent {
     }
 
     override fun setup() {
+        surface.setTitle("Astral Visuals")
         colorMode(
             PConstants.HSB,
             Config.Color.HUE_MAX,
