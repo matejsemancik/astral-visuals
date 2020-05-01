@@ -15,14 +15,14 @@ val props = org.jetbrains.kotlin.konan.properties.Properties().apply {
 val processingCoreDir = props["processingCoreDir"]
 val processingLibsDir = props["processingLibsDir"]
 val processingLibs = listOf(
-        "minim",
-        "themidibus",
-        "VideoExport",
-        "box2d_processing",
-        "video",
-        "extruder",
-        "geomerative",
-        "PostFX"
+    "minim",
+    "themidibus",
+    "VideoExport",
+    "box2d_processing",
+    "video",
+    "extruder",
+    "geomerative",
+    "PostFX"
 )
 
 application {
