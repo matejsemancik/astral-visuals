@@ -1,4 +1,4 @@
-@file:JvmName("Main")
+@file:JvmName("VisualsMain")
 
 package dev.matsem.astral.visuals
 

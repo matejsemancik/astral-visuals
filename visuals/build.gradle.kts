@@ -25,7 +25,7 @@ val processingLibs = listOf(
 
 @Suppress("UnstableApiUsage")
 application {
-    mainClassName = "dev.matsem.astral.visuals.Main"
+    mainClassName = "dev.matsem.astral.visuals.VisualsMain"
 }
 
 repositories {
