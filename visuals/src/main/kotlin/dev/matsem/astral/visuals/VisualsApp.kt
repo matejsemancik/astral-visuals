@@ -5,12 +5,12 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
 
-class AstralVisuals : KoinComponent {
+class VisualsApp : KoinComponent {
 
     private val sketch: SketchLoader by inject()
 
     /**
-     * Creates PApplet with specified arguments. Be sure to include --sketch-location argument for proper data
+     * Launches PApplet with specified arguments. Be sure to include --sketch-location argument for proper data
      * folder resolution (dir containing your data/ folder),
      * @see https://processing.github.io/processing-javadocs/core/
      */

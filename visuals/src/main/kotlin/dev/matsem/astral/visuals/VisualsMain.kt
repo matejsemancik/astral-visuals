@@ -11,5 +11,5 @@ fun main(args: Array<String>) {
         modules(visualsModule + coreModule)
     }
 
-    AstralVisuals().run(args)
+    VisualsApp().run(args)
 }

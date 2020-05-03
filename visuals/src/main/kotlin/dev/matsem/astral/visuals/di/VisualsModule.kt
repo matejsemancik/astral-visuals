@@ -23,7 +23,7 @@ import org.koin.dsl.module
 import processing.core.PApplet
 
 val visualsModule = module {
-    single { SketchLoader() } bind PApplet::class // TODO how to handle multiple PApplets with dependencies?
+    single { SketchLoader() } bind PApplet::class
 
     factory { VideoPreparationTool(get(), get(), get(), get(), get(), get(), get(), get()) }
 
