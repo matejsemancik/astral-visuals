@@ -6,7 +6,7 @@ Follow [Soul Ex Machina crew](https://www.facebook.com/SoulExMachinaDnB) to see 
 
 ![](demo-gif.gif)
 
-## How to build
+## TODO v2 How to build
 
 This project depends on local [Processing](https://processing.org) installation, so go ahead and install it if you haven't already. Then create a `local.properties` file in project's root directory and configure the core library and contributed libraries' paths:
 
@@ -43,7 +43,7 @@ If you set up everything correctly, you should be able to build the project usin
 ./gradlew build
 ```
 
-## How to run
+## TODO v2 How to run
 
 You can run the project with Gradle `run` task.
 
