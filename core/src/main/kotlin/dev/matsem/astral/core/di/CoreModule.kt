@@ -30,6 +30,7 @@ val coreModule = module {
     // Audio
     single { Minim(get() as PApplet) }
     single { (get() as Minim).lineOut }
+    single { (get() as Minim).lineIn }
     single { Sink().apply { patch(get() as AudioOutput) } }
     single { AudioProcessor(get(), VideoExportConfig.IS_IN_RENDER_MODE) }
     factory { BeatCounter(get()) }

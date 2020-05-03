@@ -2,14 +2,11 @@ package dev.matsem.astral.core.tools.audio
 
 import ddf.minim.AudioInput
 import ddf.minim.AudioListener
-import ddf.minim.AudioOutput
-import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
-import ddf.minim.ugens.Sink
 
 class AudioProcessor constructor(
-    private val minim: Minim,
+    private val lineIn: AudioInput,
     private val isInRenderMode: Boolean
 ) : AudioListener {
 
@@ -27,11 +24,11 @@ class AudioProcessor constructor(
         beatDetect.detect(p0)
     }
 
-    val lineIn: AudioInput = minim.lineIn.apply {
-        if (!isInRenderMode) addListener(this@AudioProcessor)
+    init {
+        if (!isInRenderMode) {
+            lineIn.addListener(this)
+        }
     }
-    val lineOut: AudioOutput = minim.lineOut
-    val sink = Sink().apply { patch(lineOut) }
 
     var gain = 1f
 
@@ -78,8 +75,6 @@ class AudioProcessor constructor(
             fft.getAvg(i) * gain
         }
     }
-
-    fun loadFile(file: String) = minim.loadFile(file)
 
     fun mockFft(left: List<Float>, right: List<Float>) {
         mockLeft = ArrayList(left)

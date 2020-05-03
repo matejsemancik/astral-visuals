@@ -1,17 +1,18 @@
 package dev.matsem.astral.visuals.sketches.polygonal
 
+import ddf.minim.AudioInput
+import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.extensions.centerX
 import dev.matsem.astral.core.tools.extensions.centerY
 import dev.matsem.astral.core.tools.extensions.newLine
 import dev.matsem.astral.core.tools.extensions.rotate
 import dev.matsem.astral.core.tools.extensions.threshold
+import dev.matsem.astral.core.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.visuals.sketches.BaseSketch
 import dev.matsem.astral.visuals.sketches.SketchLoader
 import dev.matsem.astral.visuals.sketches.polygonal.asteroid.Asteroid
 import dev.matsem.astral.visuals.sketches.polygonal.star.Starfield
-import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.midi.MidiAutomator
-import dev.matsem.astral.core.tools.galaxy.Galaxy
 import dev.matsem.astral.visuals.tools.logging.FFTLogger
 import org.koin.core.inject
 import processing.core.PApplet.map
@@ -27,6 +28,7 @@ class PolygonalSketch : BaseSketch() {
 
     override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
+    private val lineIn: AudioInput by inject()
     private val galaxy: Galaxy by inject()
     private val automator: MidiAutomator by inject()
 
@@ -121,7 +123,7 @@ class PolygonalSketch : BaseSketch() {
         vy *= 0.95f
         vz *= 0.95f
 
-        rmsSum += audioProcessor.lineIn.mix.level()
+        rmsSum += lineIn.mix.level()
         rmsSum *= 0.2f
 
         bassSum += audioProcessor.getRange(0f..50f)
