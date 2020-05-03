@@ -19,6 +19,7 @@ val processingLibs = listOf(
     "video",
     "extruder",
     "geomerative",
+    "peasycam",
     "PostFX"
 )
 

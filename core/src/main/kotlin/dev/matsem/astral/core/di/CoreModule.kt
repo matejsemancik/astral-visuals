@@ -1,7 +1,9 @@
 package dev.matsem.astral.core.di
 
 import com.hamoid.VideoExport
+import ddf.minim.AudioOutput
 import ddf.minim.Minim
+import ddf.minim.ugens.Sink
 import dev.matsem.astral.core.VideoExportConfig
 import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
@@ -25,7 +27,10 @@ val coreModule = module {
     factory { MidiPlayer(get()) }
     factory { MidiAutomator(get(), get(), get()) }
 
+    // Audio
     single { Minim(get() as PApplet) }
+    single { (get() as Minim).lineOut }
+    single { Sink().apply { patch(get() as AudioOutput) } }
     single { AudioProcessor(get(), VideoExportConfig.IS_IN_RENDER_MODE) }
     factory { BeatCounter(get()) }
 

@@ -14,11 +14,9 @@ val processingLibsDir = props["processingLibsDir"]
 val processingLibs = listOf(
     "minim",
     "themidibus",
-    "VideoExport",
-    "box2d_processing",
-    "video",
-    "extruder",
-    "geomerative",
+    "ControlP5",
+    "blobDetection",
+    "peasycam",
     "PostFX"
 )
 
@@ -35,6 +33,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(Dependencies.koin)
+    implementation(Dependencies.coroutines)
 
     implementation(fileTree(mapOf("dir" to processingCoreDir, "include" to listOf("*.jar"))))
     processingLibs.forEach { libName ->

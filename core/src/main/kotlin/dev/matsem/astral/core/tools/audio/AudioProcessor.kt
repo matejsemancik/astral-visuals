@@ -2,9 +2,11 @@ package dev.matsem.astral.core.tools.audio
 
 import ddf.minim.AudioInput
 import ddf.minim.AudioListener
+import ddf.minim.AudioOutput
 import ddf.minim.Minim
 import ddf.minim.analysis.BeatDetect
 import ddf.minim.analysis.FFT
+import ddf.minim.ugens.Sink
 
 class AudioProcessor constructor(
     private val minim: Minim,
@@ -16,25 +18,28 @@ class AudioProcessor constructor(
     private var beatDetectMock = BeatDetectData(false, false, false)
 
     override fun samples(p0: FloatArray?) {
-        fft.forward(audioInput.mix)
+        fft.forward(lineIn.mix)
         beatDetect.detect(p0)
     }
 
     override fun samples(p0: FloatArray?, p1: FloatArray?) {
-        fft.forward(audioInput.mix)
+        fft.forward(lineIn.mix)
         beatDetect.detect(p0)
     }
 
-    val audioInput: AudioInput = minim.lineIn.apply {
+    val lineIn: AudioInput = minim.lineIn.apply {
         if (!isInRenderMode) addListener(this@AudioProcessor)
     }
+    val lineOut: AudioOutput = minim.lineOut
+    val sink = Sink().apply { patch(lineOut) }
+
     var gain = 1f
 
-    val fft = FFT(audioInput.bufferSize(), audioInput.sampleRate()).apply {
+    val fft = FFT(lineIn.bufferSize(), lineIn.sampleRate()).apply {
         logAverages(22, 3)
     }
 
-    val beatDetect = BeatDetect(audioInput.bufferSize(), audioInput.sampleRate()).apply {
+    val beatDetect = BeatDetect(lineIn.bufferSize(), lineIn.sampleRate()).apply {
         setSensitivity(150)
     }
 

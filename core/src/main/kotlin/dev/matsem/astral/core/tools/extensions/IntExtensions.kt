@@ -16,3 +16,11 @@ fun Int.remap(start1: Float, end1: Float, start2: Float, end2: Float): Float =
 fun Int.constrain(low: Int = Int.MIN_VALUE, high: Int = Int.MAX_VALUE): Int = PApplet.constrain(this, low, high)
 
 fun Int.toMidi(low: Int, high: Int): Int = PApplet.map(this.toFloat(), low.toFloat(), high.toFloat(), 0f, 127f).toInt()
+
+inline val Int.rgbRed get() = this shr 16 and 0xff
+
+inline val Int.rgbGreen get() = this shr 8 and 0xff
+
+inline val Int.rgbBlue get() = this and 0xff
+
+fun Int.withAlpha(alpha: Int = 255) = this or (alpha shl 24)

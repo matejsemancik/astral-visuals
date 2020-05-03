@@ -1,10 +1,11 @@
 package dev.matsem.astral.playground
 
 import dev.matsem.astral.core.di.coreModule
-import dev.matsem.astral.playground.sketches.WavesSketch
+import dev.matsem.astral.playground.sketches.BlobDetectionSketch
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.inject
+import org.koin.core.logger.Level
 import processing.core.PApplet
 
 class PlaygroundApp : KoinComponent {
@@ -25,7 +26,8 @@ class PlaygroundApp : KoinComponent {
      */
     fun run(processingArgs: Array<String>) {
         startKoin {
-            modules(coreModule + playgroundModule { WavesSketch() })
+            printLogger(Level.ERROR)
+            modules(coreModule + playgroundModule { BlobDetectionSketch() })
         }
 
         PApplet.runSketch(processingArgs + arrayOf("ProcessingPlayground"), sketch)

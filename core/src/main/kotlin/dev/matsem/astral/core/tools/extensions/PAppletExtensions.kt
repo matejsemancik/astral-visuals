@@ -34,6 +34,12 @@ fun PApplet.rotate(vector: PVector) {
     rotateZ(vector.z)
 }
 
+fun PApplet.pushPop(block: PApplet.() -> Unit) {
+    push()
+    this.block()
+    pop()
+}
+
 fun PApplet.colorModeHsb() = colorMode(
     PConstants.HSB,
     ColorConfig.HUE_MAX,

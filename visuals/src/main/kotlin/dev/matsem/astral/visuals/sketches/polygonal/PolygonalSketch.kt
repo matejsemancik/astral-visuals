@@ -121,7 +121,7 @@ class PolygonalSketch : BaseSketch() {
         vy *= 0.95f
         vz *= 0.95f
 
-        rmsSum += audioProcessor.audioInput.mix.level()
+        rmsSum += audioProcessor.lineIn.mix.level()
         rmsSum *= 0.2f
 
         bassSum += audioProcessor.getRange(0f..50f)
