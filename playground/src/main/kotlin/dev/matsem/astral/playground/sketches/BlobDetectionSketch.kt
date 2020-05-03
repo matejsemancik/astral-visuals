@@ -47,7 +47,7 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
     private lateinit var map: PGraphics
 
     private lateinit var blobDetectors: Array<BlobDetection>
-    private lateinit var oscil: Oscil
+    private val oscil: Oscil = Oscil(1f / 10f, 1f, Waves.TRIANGLE)
     private lateinit var fx: PostFX
 
     override fun settings() {
@@ -55,6 +55,7 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
     }
 
     override fun setup() {
+        oscil.patch(sink)
         surface.setResizable(true)
         colorModeHsb()
 
@@ -62,7 +63,6 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
         cam.wheelScale = 0.01
         cam.lookAt(width / 2.0, height / 2.0, 0.0)
 
-        oscil = Oscil(1f / 10f, 1f, Waves.TRIANGLE).apply { patch(sink) }
         map = createGraphics(width / 10, height / 5, PConstants.P2D)
         blobDetectors =
             Array(levels) {
