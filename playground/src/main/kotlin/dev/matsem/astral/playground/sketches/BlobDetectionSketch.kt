@@ -47,7 +47,9 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
     private lateinit var map: PGraphics
 
     private lateinit var blobDetectors: Array<BlobDetection>
-    private val oscil: Oscil = Oscil(1f / 10f, 1f, Waves.TRIANGLE)
+    private val oscil: Oscil by lazy {
+        Oscil(1f / 10f, 1f, Waves.TRIANGLE).apply { patch(sink) }
+    }
     private lateinit var fx: PostFX
 
     override fun settings() {
@@ -55,7 +57,6 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
     }
 
     override fun setup() {
-        oscil.patch(sink)
         surface.setResizable(true)
         colorModeHsb()
 
