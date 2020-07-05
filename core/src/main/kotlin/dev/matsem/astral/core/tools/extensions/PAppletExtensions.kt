@@ -40,6 +40,12 @@ fun PApplet.pushPop(block: PApplet.() -> Unit) {
     pop()
 }
 
+fun PApplet.drawShape(closeMode: Int, block: PApplet.() -> Unit) {
+    beginShape()
+    this.block()
+    endShape(closeMode)
+}
+
 fun PApplet.colorModeHsb() = colorMode(
     PConstants.HSB,
     ColorConfig.HUE_MAX,
