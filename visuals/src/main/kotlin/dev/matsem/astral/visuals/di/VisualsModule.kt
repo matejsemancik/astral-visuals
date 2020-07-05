@@ -42,7 +42,6 @@ val visualsModule = module {
     factory { AttractorSketch() }
     factory { SpikesSketch() }
     factory { CubesSketch() }
-    factory { VideoSketch() }
     factory { GalaxySketch() }
     factory { GameOfLifeSketch() }
     factory { OldSkoolSketch() }
