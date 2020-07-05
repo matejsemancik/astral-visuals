@@ -11,15 +11,15 @@ Follow [Soul Ex Machina crew](https://www.facebook.com/SoulExMachinaDnB) to see 
 This project depends on local [Processing](https://processing.org) installation, so go ahead and install it if you haven't already. Then create a `local.properties` file in project's root directory and configure the core library and contributed libraries' paths:
 
 ```
-libraries.dir=/path/to/your/processing/libraries/dir
-processing_core.dir=/path/to/core/processing/libraries
+processingLibsDir=/path/to/your/processing/libraries/dir
+processingCoreDir=/path/to/core/processing/libraries
 ```
 
 On macOS it might look like this:
 
 ```
-libraries.dir=/Users/username/Documents/Processing/libraries
-processing_core.dir=/Applications/Processing.app/Contents/Java/core/library
+processingLibsDir=/Users/username/Documents/Processing/libraries
+processingCoreDir=/Applications/Processing.app/Contents/Java/core/library
 ```
 
 The `build.gradle` buildscript will look for Processing dependencies at these two paths. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `libraries.dir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
@@ -37,7 +37,7 @@ geomerative // for generating shapes from text
 PostFX for Processing // can apply post-processing shaders
 ```
 
-If you set up everything correctly, you should be able to build the project using Gradle `build` task.
+If you've set up everything correctly, you should be able to build the project using Gradle `build` task.
 
 ```
 ./gradlew build
@@ -48,7 +48,8 @@ If you set up everything correctly, you should be able to build the project usin
 You can run the project with Gradle `run` task.
 
 ```
-./gradlew run
+./gradlew playground:run
+./gradlew visuals:run
 ```
 
 Or you can set up some sort of Build & Run task in your IDE. (hint: In IntelliJ, open `Main.kt` and click the green run icon next to `main` function and select Run. You do this once, and IDE will set up the reusable run task for you in upper toolbar.)
