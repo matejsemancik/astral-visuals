@@ -21,11 +21,12 @@ class VisualsApp : KoinComponent {
     private val sketch: SketchLoader by inject()
 
     /**
-     * Launches PApplet with specified arguments. Be sure to include --sketch-location argument for proper data
+     * Launches PApplet with specified arguments. Be sure to include --sketch-path argument for proper data
      * folder resolution (dir containing your Processing data folder),
      * @see https://processing.github.io/processing-javadocs/core/
      */
     fun run(processingArgs: Array<String>) {
+        println(processingArgs.joinToString(separator = "\n") { it })
         startKoin {
             printLogger(Level.ERROR)
             modules(visualsModule + coreModule)

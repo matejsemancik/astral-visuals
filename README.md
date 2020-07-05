@@ -45,11 +45,11 @@ If you've set up everything correctly, you should be able to build the project u
 
 ## TODO v2 How to run
 
-You can run the project with Gradle `run` task.
+You can run the project with Gradle `run` task. Be sure to include the `--sketch-path` argument so sketches can properly resolve the data folder with resources.
 
 ```
-./gradlew playground:run
-./gradlew visuals:run
+./gradlew playground:run --args='--sketch-path=/path/to/project/'
+./gradlew visuals:run --args='--sketch-path=/path/to/project/'
 ```
 
 Or you can set up some sort of Build & Run task in your IDE. (hint: In IntelliJ, open `Main.kt` and click the green run icon next to `main` function and select Run. You do this once, and IDE will set up the reusable run task for you in upper toolbar.)

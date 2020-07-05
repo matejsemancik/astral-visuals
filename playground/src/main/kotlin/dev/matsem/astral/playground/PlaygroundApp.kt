@@ -20,7 +20,7 @@ class PlaygroundApp : KoinComponent {
     private val sketch: PApplet by inject()
 
     /**
-     * Launches PApplet with specified arguments. Be sure to include --sketch-location argument for proper data
+     * Launches PApplet with specified arguments. Be sure to include --sketch-path argument for proper data
      * folder resolution (dir containing your Processing data folder),
      * @see https://processing.github.io/processing-javadocs/core/
      */
