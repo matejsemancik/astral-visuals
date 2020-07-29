@@ -1,6 +1,7 @@
-package dev.matsem.astral.visuals.tools.shapes
+package dev.matsem.astral.core.tools.shapes
 
-import dev.matsem.astral.visuals.Files
+
+import dev.matsem.astral.core.Files
 import extruder.extruder
 import geomerative.RG
 import processing.core.PApplet

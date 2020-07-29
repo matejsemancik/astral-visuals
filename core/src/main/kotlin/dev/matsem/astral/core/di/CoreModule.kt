@@ -13,6 +13,7 @@ import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.midi.MidiFileParser
 import dev.matsem.astral.core.tools.midi.MidiPlayer
 import dev.matsem.astral.core.tools.midi.MidiRecorder
+import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.jbox2d.common.Vec2
 import org.koin.dsl.module
 import processing.core.PApplet
@@ -34,6 +35,10 @@ val coreModule = module {
     single { Sink().apply { patch(get() as AudioOutput) } }
     single { AudioProcessor(get(), VideoExportConfig.IS_IN_RENDER_MODE) }
     factory { BeatCounter(get()) }
+
+    // Extrusion
+    single { extruder.extruder(get()) }
+    single { ExtrusionCache(get(), get()) }
 
     single {
         VideoExport(get()).apply {

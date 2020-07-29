@@ -16,7 +16,7 @@ import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.galaxy.Galaxy
-import dev.matsem.astral.visuals.tools.shapes.ExtrusionCache
+import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import org.koin.core.inject
 import processing.core.PApplet.lerp

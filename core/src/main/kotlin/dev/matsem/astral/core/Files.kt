@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals
+package dev.matsem.astral.core
 
 /**
  * Paths to various files stored in <project-dir>/data/ directory

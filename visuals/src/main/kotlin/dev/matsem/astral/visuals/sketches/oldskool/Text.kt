@@ -2,7 +2,7 @@ package dev.matsem.astral.visuals.sketches.oldskool
 
 import dev.matsem.astral.core.tools.extensions.rotate
 import dev.matsem.astral.core.tools.extensions.translate
-import dev.matsem.astral.visuals.tools.shapes.ExtrusionCache
+import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import processing.core.PApplet
 import processing.core.PVector
 

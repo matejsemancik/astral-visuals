@@ -14,8 +14,7 @@ import dev.matsem.astral.visuals.sketches.spikes.SpikesSketch
 import dev.matsem.astral.visuals.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.visuals.sketches.terrain.TerrainSketch
 import dev.matsem.astral.visuals.sketches.tunnel.TunnelSketch
-import dev.matsem.astral.visuals.sketches.video.VideoSketch
-import dev.matsem.astral.visuals.tools.shapes.ExtrusionCache
+import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import dev.matsem.astral.visuals.tools.video.VideoPreparationTool
 import org.koin.dsl.bind
@@ -29,9 +28,6 @@ val visualsModule = module {
 
     // BPM
     single { Tapper(get()) }
-
-    single { extruder.extruder(get()) }
-    single { ExtrusionCache(get(), get()) }
 
     factory { PolygonalSketch() }
     factory { TerrainSketch() }
