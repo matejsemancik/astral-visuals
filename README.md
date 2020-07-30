@@ -22,7 +22,7 @@ processingLibsDir=/Users/username/Documents/Processing/libraries
 processingCoreDir=/Applications/Processing.app/Contents/Java/core/library
 ```
 
-The `build.gradle` buildscript will look for Processing dependencies at these two paths. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `libraries.dir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
+The `build.gradle` buildscript will look for Processing dependencies at these two paths. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `processingLibsDir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
 
 Current list of library dependencies is
 
