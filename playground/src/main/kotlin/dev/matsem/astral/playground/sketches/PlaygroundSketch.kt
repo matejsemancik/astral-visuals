@@ -1,9 +1,10 @@
 package dev.matsem.astral.playground.sketches
 
 import ch.bildspur.postfx.builder.PostFX
-import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.core.tools.extensions.pushPop
-import dev.matsem.astral.core.tools.extensions.withAlpha
+import ddf.minim.ugens.Oscil
+import ddf.minim.ugens.Sink
+import ddf.minim.ugens.Waves
+import dev.matsem.astral.core.tools.extensions.*
 import dev.matsem.astral.core.tools.kontrol.KontrolF1
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.koin.core.KoinComponent
@@ -20,43 +21,78 @@ class PlaygroundSketch : PApplet(), KoinComponent {
 
     private val kontrol: KontrolF1 by inject()
     private val ec: ExtrusionCache by inject()
-    private lateinit var fx: PostFX
+    private val sink: Sink by inject()
 
-    val numX = 4
-    val numY = 4
+    private lateinit var fx: PostFX
+    private lateinit var oscil: Oscil
+
+    val numX = 5
+    val numY = 7
+
+    data class Rotator(
+        val velocity: PVector,
+        val speed: Float,
+        val offsetX: Float,
+        val offsetY: Float,
+        val scale: Float
+    )
+
+    val rotators = Array(numX) {
+        Array(numY) {
+            Rotator(
+                velocity = PVector(random(1f), random(1f), random(1f)),
+                speed = random(-0.0002f, 0.0002f),
+                offsetX = random(-20f, 20f),
+                offsetY = random(-20f, 20f),
+                scale = random(0.4f, 0.7f)
+            )
+        }
+    }
 
     override fun settings() {
-        size(720, 720, PConstants.P3D)
+        size(720, 1280, PConstants.P3D)
     }
 
     override fun setup() {
+        surface.setResizable(true)
         fx = PostFX(this)
         colorModeHsb()
         kontrol.connect()
         ortho()
+        frameRate(30f)
+
+        oscil = Oscil(1 / 15f, 1f, Waves.SAW).apply { patch(sink) }
+
         noLoop()
     }
 
     override fun draw() {
         val bgColor = 0x0f0f0f.withAlpha()
-//        val fgColor = 0xebab34.withAlpha()
-        val fgColor = 0xffffff.withAlpha()
+        val fgColor = 0xfca503.withAlpha()
         background(bgColor)
         fill(bgColor)
         stroke(fgColor)
         strokeWeight(random(2f, 3f))
 
-        for (x in 0 until width step width / numX) {
-            for (y in 0 until height step height / numY) {
+        translateCenter()
+        scale(oscil.value.mapSin(1f, 0.9f))
+
+        for (x in 0 until numX) {
+            for (y in 0 until numY) {
                 pushPop {
-                    val randomOffsetX = random(-1f, 1f)
-                    val randomOffsetY = random(-1f, 1f)
+                    val centerX = x * width / numX + rotators[x][y].offsetX - width / 2f
+                    val centerY = y * height / numY + rotators[x][y].offsetY - height / 2f
                     translate(
-                        x.toFloat() + width / (numX * 2) + randomOffsetX,
-                        y.toFloat() + height / (numY * 2 + randomOffsetY)
+                        centerX + width / (numX * 2f),
+                        centerY + height / (numY * 2f)
                     )
-                    scale(random(0.6f, 0.65f))
-                    rotate(random(PConstants.PI * 2f), random(1f), random(1f), random(1f))
+                    scale(rotators[x][y].scale)
+                    rotate(
+                        PConstants.PI * rotators[x][y].speed * millis(),
+                        rotators[x][y].velocity.x,
+                        rotators[x][y].velocity.y,
+                        rotators[x][y].velocity.z
+                    )
                     for (shape in ec.semLogo) {
                         shape.disableStyle()
                         shape(shape)
@@ -66,15 +102,16 @@ class PlaygroundSketch : PApplet(), KoinComponent {
         }
 
         fx.render()
-            .bloom(0.5f, 20, 40f)
-            .rgbSplit(random(50f))
-            .compose()
-
-//        saveFrame("data/output/semlogo-###.png")
+            .apply {
+                bloom(0.5f, 40, 40f)
+                if (frameCount % 120 in (0..10)) {
+                    rgbSplit(random(50f))
+                }
+            }.compose()
     }
 
     override fun mouseClicked(event: MouseEvent?) {
-        when(event?.button) {
+        when (event?.button) {
             PConstants.LEFT -> redraw()
         }
     }
