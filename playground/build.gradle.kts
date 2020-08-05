@@ -17,7 +17,8 @@ val processingLibs = listOf(
     "ControlP5",
     "blobDetection",
     "peasycam",
-    "PostFX"
+    "PostFX",
+    "oscP5"
 )
 
 @Suppress("UnstableApiUsage")

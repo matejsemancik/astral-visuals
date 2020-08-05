@@ -20,7 +20,8 @@ val processingLibs = listOf(
     "extruder",
     "geomerative",
     "peasycam",
-    "PostFX"
+    "PostFX",
+    "oscP5"
 )
 
 repositories {

@@ -5,7 +5,9 @@ import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
 import dev.matsem.astral.core.tools.extensions.*
-import dev.matsem.astral.core.tools.kontrol.KontrolF1
+import dev.matsem.astral.core.tools.osc.OscHandler
+import dev.matsem.astral.core.tools.osc.OscManager
+import dev.matsem.astral.core.tools.osc.oscFader
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -14,17 +16,21 @@ import processing.core.PConstants
 import processing.core.PVector
 import processing.event.MouseEvent
 
-/**
- * Thing from http://piterpasma.nl/articles/rotating
- */
-class PlaygroundSketch : PApplet(), KoinComponent {
+class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
 
-    private val kontrol: KontrolF1 by inject()
     private val ec: ExtrusionCache by inject()
     private val sink: Sink by inject()
 
     private lateinit var fx: PostFX
     private lateinit var oscil: Oscil
+    override val oscManager: OscManager by lazy {
+        OscManager(sketch = this, inputPort = 7001, outputIp = "192.168.1.11", outputPort = 7001)
+    }
+
+    private var fader1: Float by oscFader("/1/fader1", defaultValue = 0.5f)
+    private var fader2: Float by oscFader("/1/fader2")
+    private var knob1: Float by oscFader("/1/rotary1")
+    private var knob2: Float by oscFader("/1/rotary2", defaultValue = 0.5f)
 
     val numX = 5
     val numY = 7
@@ -57,13 +63,10 @@ class PlaygroundSketch : PApplet(), KoinComponent {
         surface.setResizable(true)
         fx = PostFX(this)
         colorModeHsb()
-        kontrol.connect()
         ortho()
         frameRate(30f)
 
         oscil = Oscil(1 / 15f, 1f, Waves.SAW).apply { patch(sink) }
-
-        noLoop()
     }
 
     override fun draw() {

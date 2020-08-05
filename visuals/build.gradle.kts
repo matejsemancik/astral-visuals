@@ -20,7 +20,8 @@ val processingLibs = listOf(
     "video",
     "extruder",
     "geomerative",
-    "PostFX"
+    "PostFX",
+    "oscP5"
 )
 
 @Suppress("UnstableApiUsage")
