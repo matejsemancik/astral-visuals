@@ -29,6 +29,10 @@ class OscFaderDelegate(
     override fun getValue(thisRef: OscHandler, property: KProperty<*>): Float = latestValue
 
     override fun setValue(thisRef: OscHandler, property: KProperty<*>, value: Float) {
+        if (latestValue == value) {
+            return
+        }
+
         latestValue = value
         oscManager.sendMessage(OscMessage(address).add(value))
     }

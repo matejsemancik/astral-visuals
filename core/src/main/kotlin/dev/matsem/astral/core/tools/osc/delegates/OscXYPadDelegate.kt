@@ -31,6 +31,10 @@ class OscXYPadDelegate(
     override fun getValue(thisRef: OscHandler, property: KProperty<*>): PVector = latestValue
 
     override fun setValue(thisRef: OscHandler, property: KProperty<*>, value: PVector) {
+        if (latestValue == value) {
+            return
+        }
+
         latestValue = value
         oscManager.sendMessage(OscMessage(address).add(value.x).add(value.y))
     }
