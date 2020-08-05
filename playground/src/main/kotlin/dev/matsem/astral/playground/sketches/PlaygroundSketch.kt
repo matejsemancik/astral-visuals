@@ -5,10 +5,7 @@ import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
 import dev.matsem.astral.core.tools.extensions.*
-import dev.matsem.astral.core.tools.osc.OscHandler
-import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
-import dev.matsem.astral.core.tools.osc.oscToggleButton
+import dev.matsem.astral.core.tools.osc.*
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -33,6 +30,9 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     private var knob1: Float by oscFader("/1/rotary1")
     private var knob2: Float by oscFader("/1/rotary2", defaultValue = 0.5f)
     private var toggle1: Boolean by oscToggleButton("/1/toggle1", defaultValue = false)
+    private val push1: Boolean by oscPushButton("/1/push1") {
+        println("Trigger!")
+    }
 
     val numX = 5
     val numY = 7
@@ -72,6 +72,7 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     }
 
     override fun draw() {
+        println(push1)
         val bgColor = 0x0f0f0f.withAlpha()
         val fgColor = 0xfca503.withAlpha()
         background(bgColor)
