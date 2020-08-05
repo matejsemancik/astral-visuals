@@ -11,6 +11,12 @@ fun OscHandler.oscFader(address: String, defaultValue: Float = 0f) =
     OscFaderDelegate(this.oscManager, address, defaultValue)
 
 /**
+ * Just an alias of [oscFader] for different naming convention.
+ */
+fun OscHandler.oscKnob(address: String, defaultValue: Float = 0f) =
+    OscFaderDelegate(this.oscManager, address, defaultValue)
+
+/**
  * Fancy constructor for [OscToggleButtonDelegate] that can be used if sketch implements [OscHandler] interface.
  */
 fun OscHandler.oscToggleButton(address: String, defaultValue: Boolean = false) =

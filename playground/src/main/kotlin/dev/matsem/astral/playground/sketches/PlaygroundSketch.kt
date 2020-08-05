@@ -27,8 +27,8 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
 
     private var fader1: Float by oscFader("/1/fader1", defaultValue = 0.5f)
     private var fader2: Float by oscFader("/1/fader2")
-    private var knob1: Float by oscFader("/1/rotary1")
-    private var knob2: Float by oscFader("/1/rotary2", defaultValue = 0.5f)
+    private var knob1: Float by oscKnob("/1/rotary1")
+    private var knob2: Float by oscKnob("/1/rotary2", defaultValue = 0.5f)
     private var toggle1: Boolean by oscToggleButton("/1/toggle1", defaultValue = false)
     private val push1: Boolean by oscPushButton("/1/push1") {
         println("Trigger!")
