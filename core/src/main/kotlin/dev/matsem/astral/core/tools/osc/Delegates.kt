@@ -38,3 +38,9 @@ fun OscHandler.oscXyPad(address: String, defaultValue: PVector = PVector(0f, 0f)
  */
 fun OscHandler.oscLedIndicator(address: String, defaultValue: Float = 0f) =
     OscLedIndicatorDelegate(this.oscManager, address, defaultValue)
+
+/**
+ * Fancy constructor for [OscLabelIndicatorDelegate] that can be used if sketch implements [OscHandler] interface.
+ */
+fun OscHandler.oscLabelIndicator(address: String, defaultValue: String = "---") =
+    OscLabelIndicatorDelegate(this.oscManager, address, defaultValue)
