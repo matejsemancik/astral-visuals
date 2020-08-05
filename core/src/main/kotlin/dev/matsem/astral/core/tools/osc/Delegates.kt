@@ -1,9 +1,6 @@
 package dev.matsem.astral.core.tools.osc
 
-import dev.matsem.astral.core.tools.osc.delegates.OscFaderDelegate
-import dev.matsem.astral.core.tools.osc.delegates.OscPushButtonDelegate
-import dev.matsem.astral.core.tools.osc.delegates.OscToggleButtonDelegate
-import dev.matsem.astral.core.tools.osc.delegates.OscXYPadDelegate
+import dev.matsem.astral.core.tools.osc.delegates.*
 import processing.core.PVector
 
 /**
@@ -35,3 +32,9 @@ fun OscHandler.oscPushButton(address: String, trigger: () -> Unit) =
  */
 fun OscHandler.oscXyPad(address: String, defaultValue: PVector = PVector(0f, 0f)) =
     OscXYPadDelegate(this.oscManager, address, defaultValue)
+
+/**
+ * Fancy constructor for [OscLedIndicatorDelegate] that can be used if sketch implements [OscHandler] interface.
+ */
+fun OscHandler.oscLedIndicator(address: String, defaultValue: Float = 0f) =
+    OscLedIndicatorDelegate(this.oscManager, address, defaultValue)

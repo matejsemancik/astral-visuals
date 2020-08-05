@@ -34,6 +34,7 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
         println("Trigger!")
     }
     private var xy1: PVector by oscXyPad("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
+    private var led1 by oscLedIndicator("/1/led1")
 
     val numX = 5
     val numY = 7
@@ -73,9 +74,7 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     }
 
     override fun draw() {
-        if(frameCount % 30 == 0) {
-            xy1 = PVector.random2D()
-        }
+        led1 = fader2
 
         val bgColor = 0x0f0f0f.withAlpha()
         val fgColor = 0xfca503.withAlpha()
