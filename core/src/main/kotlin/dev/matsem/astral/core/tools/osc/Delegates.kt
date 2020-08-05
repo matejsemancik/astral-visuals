@@ -44,3 +44,14 @@ fun OscHandler.oscLedIndicator(address: String, defaultValue: Float = 0f) =
  */
 fun OscHandler.oscLabelIndicator(address: String, defaultValue: String = "---") =
     OscLabelIndicatorDelegate(this.oscManager, address, defaultValue)
+
+/**
+ * Fancy constructor for [OscEncoderDelegate] that can be used if sketch implements [OscHandler] interface.
+ */
+fun OscHandler.oscEncoder(
+    address: String,
+    defaultValue: Float = 0f,
+    increment: Float = 1f,
+    cw: ((Float) -> Unit)? = null,
+    ccw: ((Float) -> Unit)? = null
+) = OscEncoderDelegate(this.oscManager, address, defaultValue, increment, cw, ccw)

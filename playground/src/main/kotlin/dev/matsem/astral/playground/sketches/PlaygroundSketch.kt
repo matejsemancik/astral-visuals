@@ -36,6 +36,12 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     private var xy1: PVector by oscXyPad("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
     private var led1 by oscLedIndicator("/1/led1")
     private var label1 by oscLabelIndicator("/1/label1")
+    private val encoder1 by oscEncoder(
+        "/1/encoder1",
+        defaultValue = 100f,
+        increment = 1f,
+        cw = { println("-> $it") },
+        ccw = { println("<- $it") })
 
     val numX = 5
     val numY = 7
