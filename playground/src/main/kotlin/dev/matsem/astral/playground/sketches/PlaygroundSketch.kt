@@ -33,6 +33,7 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     private val push1: Boolean by oscPushButton("/1/push1") {
         println("Trigger!")
     }
+    private var xy1: PVector by oscXyPad("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
 
     val numX = 5
     val numY = 7
@@ -72,7 +73,10 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     }
 
     override fun draw() {
-        println(push1)
+        if(frameCount % 30 == 0) {
+            xy1 = PVector.random2D()
+        }
+
         val bgColor = 0x0f0f0f.withAlpha()
         val fgColor = 0xfca503.withAlpha()
         background(bgColor)

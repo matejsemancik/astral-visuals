@@ -3,6 +3,8 @@ package dev.matsem.astral.core.tools.osc
 import dev.matsem.astral.core.tools.osc.delegates.OscFaderDelegate
 import dev.matsem.astral.core.tools.osc.delegates.OscPushButtonDelegate
 import dev.matsem.astral.core.tools.osc.delegates.OscToggleButtonDelegate
+import dev.matsem.astral.core.tools.osc.delegates.OscXYPadDelegate
+import processing.core.PVector
 
 /**
  * Fancy constructor for [OscFaderDelegate] that can be used if sketch implements [OscHandler] interface.
@@ -23,7 +25,13 @@ fun OscHandler.oscToggleButton(address: String, defaultValue: Boolean = false) =
     OscToggleButtonDelegate(this.oscManager, address, defaultValue)
 
 /**
- * Fancy constructor for [OscPushButtonDelegate] that can be used if sketch iplements [OscHandler] interface.
+ * Fancy constructor for [OscPushButtonDelegate] that can be used if sketch implements [OscHandler] interface.
  */
 fun OscHandler.oscPushButton(address: String, trigger: () -> Unit) =
     OscPushButtonDelegate(this.oscManager, address, trigger)
+
+/**
+ * Fancy constructor for [OscXYPadDelegate] that can be used if sketch implements [OscHandler] interface.
+ */
+fun OscHandler.oscXyPad(address: String, defaultValue: PVector = PVector(0f, 0f)) =
+    OscXYPadDelegate(this.oscManager, address, defaultValue)
