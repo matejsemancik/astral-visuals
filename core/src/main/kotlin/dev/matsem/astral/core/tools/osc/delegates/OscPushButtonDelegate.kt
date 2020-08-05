@@ -12,7 +12,7 @@ import kotlin.reflect.KProperty
  * Also, current push button status is stored in this Boolean property.
  */
 class OscPushButtonDelegate(
-    private val oscManager: OscManager,
+    oscManager: OscManager,
     private val address: String,
     private val trigger: () -> Unit
 ) : ReadOnlyProperty<OscHandler, Boolean> {
