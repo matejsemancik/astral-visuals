@@ -7,7 +7,7 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- * Delegated property that connects to OSC control represented by a single Float value.
+ * Delegated Float property that connects to OSC control represented by a single Float value.
  */
 class OscFaderDelegate(
     private val oscManager: OscManager,

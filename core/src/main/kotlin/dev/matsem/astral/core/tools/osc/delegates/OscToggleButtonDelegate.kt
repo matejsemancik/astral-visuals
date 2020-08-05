@@ -7,7 +7,7 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- * Delegated property for OSC toggle button represented with a single Float value, where 0f is turned off
+ * Delegated Boolean property for OSC toggle button represented with a single Float value, where 0f is turned off
  * and 1f is turned on.
  */
 class OscToggleButtonDelegate(
