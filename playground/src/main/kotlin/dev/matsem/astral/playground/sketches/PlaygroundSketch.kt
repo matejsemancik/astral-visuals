@@ -8,6 +8,7 @@ import dev.matsem.astral.core.tools.extensions.*
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.osc.oscFader
+import dev.matsem.astral.core.tools.osc.oscToggleButton
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -31,6 +32,7 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     private var fader2: Float by oscFader("/1/fader2")
     private var knob1: Float by oscFader("/1/rotary1")
     private var knob2: Float by oscFader("/1/rotary2", defaultValue = 0.5f)
+    private var toggle1: Boolean by oscToggleButton("/1/toggle1", defaultValue = false)
 
     val numX = 5
     val numY = 7
