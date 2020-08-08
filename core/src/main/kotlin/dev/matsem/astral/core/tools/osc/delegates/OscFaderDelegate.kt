@@ -15,6 +15,7 @@ class OscFaderDelegate(
     defaultValue: Float
 ) : ReadWriteProperty<OscHandler, Float> {
 
+    private var labelInitialized = false
     private var latestValue = defaultValue
 
     init {
@@ -26,14 +27,25 @@ class OscFaderDelegate(
         }
     }
 
-    override fun getValue(thisRef: OscHandler, property: KProperty<*>): Float = latestValue
+    override fun getValue(thisRef: OscHandler, property: KProperty<*>): Float {
+        updateLabel(property.name)
+        return latestValue
+    }
 
     override fun setValue(thisRef: OscHandler, property: KProperty<*>, value: Float) {
+        updateLabel(property.name)
         if (latestValue == value) {
             return
         }
 
         latestValue = value
         oscManager.sendMessage(OscMessage(address).add(value))
+    }
+
+    private fun updateLabel(name: String) {
+        if (labelInitialized.not()) {
+            oscManager.sendMessage(OscMessage("$address/label").add(name))
+            labelInitialized = true
+        }
     }
 }
