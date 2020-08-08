@@ -8,21 +8,12 @@ import ch.bildspur.postfx.pass.PixelatePass
 import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
-import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.core.tools.extensions.draw
-import dev.matsem.astral.core.tools.extensions.drawHUD
-import dev.matsem.astral.core.tools.extensions.mapSin
-import dev.matsem.astral.core.tools.extensions.midiRange
-import dev.matsem.astral.core.tools.extensions.pushPop
-import dev.matsem.astral.core.tools.extensions.translateCenter
-import dev.matsem.astral.core.tools.extensions.value
-import dev.matsem.astral.core.tools.extensions.withAlpha
-import dev.matsem.astral.core.tools.kontrol.KontrolF1
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.osc.OscHandler
+import dev.matsem.astral.core.tools.osc.OscManager
+import dev.matsem.astral.core.tools.osc.oscFader
+import dev.matsem.astral.core.tools.osc.oscKnob
+import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import peasy.PeasyCam
@@ -32,23 +23,33 @@ import processing.core.PGraphics
 import java.io.File
 import kotlin.math.absoluteValue
 
-class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
+class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope, OscHandler {
 
     override val coroutineContext = Dispatchers.Default
+    override val oscManager: OscManager by lazy {
+        OscManager(this, 7001, "192.168.1.11", 7001)
+    }
 
-    private val kontrol: KontrolF1 by inject()
     private val sink: Sink by inject()
-
     private lateinit var cam: PeasyCam
 
-    private var levels = 25
+    private var oscilFreq by oscKnob("/play/fader1", 0.5f)
+    private var elevScale by oscKnob("/play/fader2", 0.5f)
+    private var noiseScl by oscKnob("/play/fader3", 0.5f)
+    private var flicker by oscKnob("/play/fader4", 0.5f)
+    private var speed by oscKnob("/play/fader5", 0.5f)
+    private var bloomThresh by oscFader("/play/fader6", 0.5f)
+    private var bloomSize by oscFader("/play/fader7", 0.2f)
+    private var bloomSigma by oscFader("/play/fader8", 0.4f)
+
+    private val levels = 25
     private var elevation = 200f
     private var noiseScale = 0f
     private lateinit var map: PGraphics
 
     private lateinit var blobDetectors: Array<BlobDetection>
     private val oscil: Oscil by lazy {
-        Oscil(1f / 10f, 1f, Waves.TRIANGLE).apply { patch(sink) }
+        Oscil(1f / 10f, 1f, Waves.SINE).apply { patch(sink) }
     }
     private lateinit var fx: PostFX
 
@@ -72,7 +73,6 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
                 }
             }
 
-        kontrol.connect()
         prepareFx()
     }
 
@@ -83,8 +83,8 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
     }
 
     override fun draw() {
-        oscil.frequency.lastValue = kontrol.knob1.midiRange(0f, 3f)
-        elevation = oscil.value.mapSin(0f, 1f) * kontrol.knob2.midiRange(0f, 300f)
+        oscil.frequency.lastValue = oscilFreq.mapp(0f, 0.5f)
+        elevation = oscil.value.mapSin(0f, 1f) * elevScale.mapp(0f, 300f)
         generateMap()
         computeBlobs()
         background(0x18214d.withAlpha())
@@ -107,7 +107,11 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
         }
 
         cam.drawHUD {
-            fx.render().bloom(0.5f, 20, 40f).compose()
+            fx.render().bloom(
+                bloomThresh,
+                (bloomSize * 100).toInt(),
+                bloomSigma * 100f
+            ).compose()
             pushPop {
                 text("$frameRate", 10f, 20f)
                 image(map, 10f, 30f)
@@ -124,7 +128,7 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
             if (blob.edgeNb > 3) {
                 val firstEdge = blob.getEdgeVertexA(0)
                 val lastEdge = blob.getEdgeVertexB(blob.edgeNb - 1)
-                val threshold = kontrol.knob4.midiRange(10f)
+                val threshold = flicker.mapp(0f, 1f)
                 if ((firstEdge.x - lastEdge.x).absoluteValue > threshold || (firstEdge.y - lastEdge.y).absoluteValue > threshold) {
                     return
                 }
@@ -145,7 +149,7 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
     }
 
     private fun generateMap() = with(map) {
-        noiseScale = kontrol.knob3.midiRange(0.1f, 0.00001f)
+        noiseScale = noiseScl.mapp(0.1f, 0.00001f)
         draw {
             colorModeHsb()
             clear()
@@ -157,7 +161,7 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope {
                         0f,
                         noise(
                             x * noiseScale,
-                            y * noiseScale - millis() * kontrol.slider1.midiRange(0f, 0.001f),
+                            y * noiseScale - millis() * speed.mapp(0f, 0.001f),
                             0f
                         ) * 100f
                     )
