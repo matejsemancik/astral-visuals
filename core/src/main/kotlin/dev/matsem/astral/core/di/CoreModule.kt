@@ -13,6 +13,7 @@ import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.midi.MidiFileParser
 import dev.matsem.astral.core.tools.midi.MidiPlayer
 import dev.matsem.astral.core.tools.midi.MidiRecorder
+import dev.matsem.astral.core.tools.pixelsort.PixelSorter
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.jbox2d.common.Vec2
 import org.koin.dsl.module
@@ -39,6 +40,9 @@ val coreModule = module {
     // Extrusion
     single { extruder.extruder(get()) }
     single { ExtrusionCache(get(), get()) }
+
+    // Effects
+    single { PixelSorter() }
 
     single {
         VideoExport(get()).apply {
