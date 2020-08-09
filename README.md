@@ -62,8 +62,8 @@ You can run the project with Gradle `run` task. Be sure to include the `--sketch
 Currently, the project supports 3 remote control options:
 
 - If you own Traktor Kontrol F1, the `KontrolF1` class is for you - I use it for quick prototyping. It handles most of KontrolF1's hardware features, like pad buttons (with colors feature), encoder, knobs and faders.
-- If you'd like to try the `:visuals` module, go ahead and get yourself the [TouchOSC](https://hexler.net/products/touchosc) app and load it with `Astral.touchosc` layout that can be found in the `touchosc` folder. This layout uses MIDI protocol and there is a `Galaxy` class that handles most of TouchOSC MIDI controls.
-- The most convinient way, though, is to use the [OSC](http://opensoundcontrol.org/introduction-osc) (Open Sound Control) with Delegated Properties
+- If you'd like to try the `:visuals` module, go ahead and get yourself the [TouchOSC](https://hexler.net/products/touchosc) app and load it with `Astral.touchosc` layout that can be found in the `touchosc` folder. This layout uses MIDI protocol and there is a `Galaxy` class that handles most of TouchOSC MIDI controls. For future, I plan on to get rid of `Galaxy` and migrate everyhing to OSC protocol, which leads us to the last option
+- OSC - The most convinient way, though, is to use the [OSC](http://opensoundcontrol.org/introduction-osc) (Open Sound Control) with Delegated Properties
 
 ### Osc Delegated Properties
 First, make your sketch implement the `OscHandler` interface, which makes you provide the `OscManager` class.
