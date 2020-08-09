@@ -6,7 +6,13 @@ Follow [Soul Ex Machina crew](https://www.facebook.com/SoulExMachinaDnB) to see 
 
 ![](demo-gif.gif)
 
-## TODO v2 How to build
+The project is divided into 3 modules, `:core` module cointains the core stuff (duh) like audio processing, tools, remote control handlers, extensions, etc. Then there are two application modules - the `:playground` and `:visuals` module.
+
+The `:playground` module serves as, well... playground. You can quickly create a new sketch and play around. I'm using the [Koin](https://insert-koin.io/) DI framework, so you can inject here whatever is defined in the `CoreModule`. Have a look around.
+
+The `:visuals` module is meant to be used in live environment at the parties. There is an abstraction layer in form of `BaseSketch` which allows me to switch between multiple sketches on demand. Also, have a look around.
+
+## How to build
 
 This project depends on local [Processing](https://processing.org) installation, so go ahead and install it if you haven't already. Then create a `local.properties` file in project's root directory and configure the core library and contributed libraries' paths:
 
@@ -43,7 +49,7 @@ If you've set up everything correctly, you should be able to build the project u
 ./gradlew build
 ```
 
-## TODO v2 How to run
+## How to run
 
 You can run the project with Gradle `run` task. Be sure to include the `--sketch-path` argument so sketches can properly resolve the data folder with resources.
 
@@ -52,7 +58,49 @@ You can run the project with Gradle `run` task. Be sure to include the `--sketch
 ./gradlew visuals:run --args='--sketch-path=/path/to/project/'
 ```
 
-Or you can set up some sort of Build & Run task in your IDE. (hint: In IntelliJ, open `Main.kt` and click the green run icon next to `main` function and select Run. You do this once, and IDE will set up the reusable run task for you in upper toolbar.)
-
 ## Remote control
-TBD TouchOSC, Traktor Kontrol F1
+Currently, the project supports 3 remote control options:
+
+- If you own Traktor Kontrol F1, the `KontrolF1` class is for you - I use it for quick prototyping. It handles most of KontrolF1's hardware features, like pad buttons (with colors feature), encoder, knobs and faders.
+- If you'd like to try the `:visuals` module, go ahead and get yourself the [TouchOSC](`https://hexler.net/products/touchosc`) app and load it with `Astral.touchosc` layout that can be found in the `touchosc` folder. This layout uses MIDI protocol and there is a `Galaxy` class that handles most of TouchOSC MIDI controls.
+- The most convinient way, though, is to use the [OSC](http://opensoundcontrol.org/introduction-osc) (Open Sound Control) with Delegated Properties
+
+### Osc Delegated Properties
+First, make your sketch implement the `OscHandler` interface, which makes you provide the `OscManager` class.
+
+```kotlin
+class OscHandlerExample : PApplet(), OscHandler {
+
+    override val oscManager: OscManager by lazy {
+        OscManager(
+            sketch = this,
+            inputPort = 7001, // Port that this computer is listening on
+            outputIp = "192.168.1.11", // IP of phone running TOuchOSC
+            outputPort = 7001 // Port, the TouchOSC app is listening on
+        )
+    }
+}
+```
+
+Then, you can create all sorts of properties tied to various OSC controls, like buttons, faders, labels, LED indicators, etc. Check out the `dev.matsem.astral.core.tools.osc.delegates` package for full list.
+
+```kotlin
+    private var fader1: Float by oscFader("/1/fader1", defaultValue = 0.5f)
+    private var knob1: Float by oscKnob("/1/rotary1")
+    private var toggle1: Boolean by oscToggleButton("/1/toggle1", defaultValue = false)
+    private val push1: Boolean by oscPushButton("/1/push1") { 
+        println("Trigger!") // Called when button pushed
+    }
+    private var xy1: PVector by oscXyPad("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
+    private var led1: Float by oscLedIndicator("/1/led1")
+    private var label1: String by oscLabelIndicator("/1/label1")
+    private val encoder1: Float by oscEncoder(
+        address = "/1/encoder1",
+        defaultValue = 100f,
+        increment = 1f,
+        cw = { println("-> $it") },
+        ccw = { println("<- $it") }
+    )
+```
+
+Most of the delegated properties support writing, so, if for example you create the fader variable and at some point in time you assing the value into it, the corresponding control in TouchOSC app will reflect that change.
