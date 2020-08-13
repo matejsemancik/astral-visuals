@@ -9,3 +9,8 @@ repositories {
 kotlinDslPluginOptions {
     experimentalWarning.set(false)
 }
+
+dependencies {
+    implementation(gradleApi())
+    implementation(localGroovy())
+}
