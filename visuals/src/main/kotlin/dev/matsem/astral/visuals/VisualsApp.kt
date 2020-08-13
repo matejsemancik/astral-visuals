@@ -26,7 +26,6 @@ class VisualsApp : KoinComponent {
      * @see https://processing.github.io/processing-javadocs/core/
      */
     fun run(processingArgs: Array<String>) {
-        println(processingArgs.joinToString(separator = "\n") { it })
         startKoin {
             printLogger(Level.ERROR)
             modules(visualsModule + coreModule)
