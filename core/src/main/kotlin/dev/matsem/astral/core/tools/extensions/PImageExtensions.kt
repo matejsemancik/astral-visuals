@@ -15,3 +15,5 @@ fun PImage.resizeRatioAware(width: Int? = null, height: Int? = null) {
         else -> System.err.println("PImage resize: dimensions not specified")
     }
 }
+
+fun PImage.pixelAt(x: Int, y: Int) = pixels[y * width + x]
