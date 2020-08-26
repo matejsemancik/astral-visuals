@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation(Dependencies.serializationRuntime)
+    implementation(Dependencies.serializationCore)
 }
 
 group = ProjectSettings.group

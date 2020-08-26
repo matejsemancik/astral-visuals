@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(Modules.core))
+    implementation(project(":core"))
 }
 
 group = ProjectSettings.group

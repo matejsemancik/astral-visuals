@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization")
     application
 }
 
@@ -17,8 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation(Dependencies.serializationRuntime)
-    implementation(project(Modules.core))
+    implementation(project(":core"))
 }
 
 group = ProjectSettings.group
