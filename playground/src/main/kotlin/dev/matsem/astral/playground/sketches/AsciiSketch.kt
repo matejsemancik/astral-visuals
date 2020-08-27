@@ -21,6 +21,18 @@ class AsciiSketch : PApplet(), KoinComponent {
     val colorStart by lazy { color(20f, 0f, 100f) }
     val colorEnd by lazy { color(20f, 0f, 80f) }
 
+    val starfield by lazy {
+        Array(canvas.height) {
+            Array(canvas.width) {
+                if (random(1f) > 0.95f) {
+                    random(0f, 1f)
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
     override fun settings() {
         size(720, 720, P2D)
     }
@@ -45,17 +57,22 @@ class AsciiSketch : PApplet(), KoinComponent {
             sin(frameCount / 300f).mapSin(-1f, 0f)
         )
 
-//        val mx = mouseX.remap(0f, this@AsciiSketch.width.toFloat(), 1f, -1f)
-//        val my = mouseY.remap(0f, this@AsciiSketch.height.toFloat(), 1f, -1f)
-//
-//        directionalLight(
-//            0f,
-//            0f,
-//            100f,
-//            mx,
-//            my,
-//            -0.2f
-//        )
+        // Stars
+        pushPop {
+            translate(0f, 0f)
+            translate(frameCount / 800f, 0f)
+            for (y in 0 until height) {
+                for (x in 0 until width) {
+                    val diameter = starfield[y][x]
+                    diameter?.let {
+                        noFill()
+                        stroke(0xffffff.withAlpha())
+                        strokeWeight(it)
+                        point(x.toFloat(), y.toFloat())
+                    }
+                }
+            }
+        }
 
         // Planet
         pushPop {
@@ -99,9 +116,9 @@ class AsciiSketch : PApplet(), KoinComponent {
             }
         }
 
-        saveFrame("data/output/planet-moon-#####.png")
-        if (frameCount >= 1800) {
-            exit()
-        }
+//        saveFrame("data/output/planet-moon-#####.png")
+//        if (frameCount >= 1800) {
+//            exit()
+//        }
     }
 }
