@@ -4,7 +4,7 @@ import dev.matsem.astral.core.tools.extensions.*
 import org.koin.core.KoinComponent
 import processing.core.PApplet
 
-class AsciiSketch : PApplet(), KoinComponent {
+class PlanetMoon : PApplet(), KoinComponent {
 
     private val resolution = 8
     private val characters = " .:-=+*#%@"
