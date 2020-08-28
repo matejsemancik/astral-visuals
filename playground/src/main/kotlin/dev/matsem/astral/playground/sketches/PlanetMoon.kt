@@ -17,11 +17,11 @@ class PlanetMoon : PApplet(), KoinComponent {
             (0 + index * step..(step * index + step).coerceAtMost(100f)) to char
         }
 
-    val canvas by lazy { createGraphics(width / resolution, height / resolution, P3D) }
-    val colorStart by lazy { color(20f, 0f, 100f) }
-    val colorEnd by lazy { color(20f, 0f, 80f) }
+    private val canvas by lazy { createGraphics(width / resolution, height / resolution, P3D) }
+    private val colorStart by lazy { color(20f, 0f, 100f) }
+    private val colorEnd by lazy { color(20f, 0f, 80f) }
 
-    val starfield by lazy {
+    private val starfield by lazy {
         Array(canvas.height) {
             Array(canvas.width) {
                 if (random(1f) > 0.95f) {
