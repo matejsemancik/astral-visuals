@@ -1,7 +1,9 @@
 package dev.matsem.astral.playground.sketches
 
 import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import processing.core.PApplet
 
 class PlanetMoon : PApplet(), KoinComponent {
@@ -18,8 +20,8 @@ class PlanetMoon : PApplet(), KoinComponent {
         }
 
     private val canvas by lazy { createGraphics(width / resolution, height / resolution, P3D) }
-    private val colorStart by lazy { color(20f, 0f, 100f) }
-    private val colorEnd by lazy { color(20f, 0f, 80f) }
+    private val colorStart by lazy { color(0f, 0f, 100f) }
+    private val colorEnd by lazy { color(0f, 0f, 80f) }
 
     private val starfield by lazy {
         Array(canvas.height) {
@@ -34,7 +36,7 @@ class PlanetMoon : PApplet(), KoinComponent {
     }
 
     override fun settings() {
-        size(720, 720, P2D)
+        size(1280, 720, P2D)
     }
 
     override fun setup() {
@@ -60,7 +62,7 @@ class PlanetMoon : PApplet(), KoinComponent {
         // Stars
         pushPop {
             translate(0f, 0f)
-            translate(frameCount / 800f, 0f)
+            translate((frameCount / 800f) % 10f, 0f)
             for (y in 0 until height) {
                 for (x in 0 until width) {
                     val diameter = starfield[y][x]
