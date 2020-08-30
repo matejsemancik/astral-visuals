@@ -15,7 +15,7 @@ import processing.core.PConstants
 
 class AsciiTerrainSketch : PApplet(), KoinComponent {
 
-    private val resolution = 12
+    private val resolution = 8
     private val charPool = "SOULEXMACHINASYMBOL".toList()
 
     private val sink: Sink by inject()
@@ -27,7 +27,7 @@ class AsciiTerrainSketch : PApplet(), KoinComponent {
     }
 
     override fun settings() {
-        size(1280, 920, PConstants.P2D)
+        size(1920, 1080, PConstants.P2D)
     }
 
     override fun setup() {

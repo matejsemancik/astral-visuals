@@ -1,9 +1,7 @@
 package dev.matsem.astral.playground.sketches
 
 import dev.matsem.astral.core.tools.extensions.*
-import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import processing.core.PApplet
 
 class PlanetMoon : PApplet(), KoinComponent {
@@ -117,10 +115,5 @@ class PlanetMoon : PApplet(), KoinComponent {
                 }
             }
         }
-
-//        saveFrame("data/output/planet-moon-#####.png")
-//        if (frameCount >= 1800) {
-//            exit()
-//        }
     }
 }
