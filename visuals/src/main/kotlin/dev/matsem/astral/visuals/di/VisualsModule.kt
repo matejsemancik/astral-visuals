@@ -41,4 +41,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { GameOfLifeSketch() }
     factory { OldSkoolSketch() }
     factory { TunnelSketch() }
+
+    factory { Countdown() }
 }
