@@ -1,6 +1,6 @@
 package dev.matsem.astral.visuals.di
 
-import dev.matsem.astral.visuals.sketches.SketchLoader
+import dev.matsem.astral.visuals.layers.Countdown
 import dev.matsem.astral.visuals.sketches.attractor.AttractorSketch
 import dev.matsem.astral.visuals.sketches.boxes.BoxesSketch
 import dev.matsem.astral.visuals.sketches.cubes.CubesSketch
@@ -14,15 +14,14 @@ import dev.matsem.astral.visuals.sketches.spikes.SpikesSketch
 import dev.matsem.astral.visuals.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.visuals.sketches.terrain.TerrainSketch
 import dev.matsem.astral.visuals.sketches.tunnel.TunnelSketch
-import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import dev.matsem.astral.visuals.tools.video.VideoPreparationTool
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import processing.core.PApplet
 
-val visualsModule = module {
-    single { SketchLoader() } bind PApplet::class
+fun visualsModule(provideSketch: () -> PApplet) = module {
+    single { provideSketch() } bind PApplet::class
 
     factory { VideoPreparationTool(get(), get(), get(), get(), get(), get(), get(), get()) }
 
