@@ -2,17 +2,15 @@ package dev.matsem.astral.visuals.layers
 
 import dev.matsem.astral.core.Files
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.visuals.Layer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
-import processing.core.PConstants
 import processing.core.PGraphics
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import kotlin.math.absoluteValue
 
 class TextOverlay : Layer(), KoinComponent {
@@ -40,6 +38,7 @@ class TextOverlay : Layer(), KoinComponent {
         )
 
         val text = when {
+            duration.seconds in (0L..60L) -> "$countdownText YEABOIIIIIIIII"
             duration.isNegative -> "$countdownText: T-$durationString @ ${parent.frameRate} FPS"
             else -> "$countdownText: T+$durationString @ ${parent.frameRate} FPS"
         }
@@ -55,6 +54,14 @@ class TextOverlay : Layer(), KoinComponent {
         noStroke()
         fill(0xffffff.withAlpha())
 
-        text(text, textX, textY)
+        if (duration.seconds in (0L..20L)) {
+            text(
+                "$countdownText YEABOIIIIIIIII",
+                textX + parent.random(1f).mapp(-5f, 5f),
+                textY + parent.random(1f).mapp(-5f, 5f)
+            )
+        } else {
+            text(text, textX, textY)
+        }
     }
 }
