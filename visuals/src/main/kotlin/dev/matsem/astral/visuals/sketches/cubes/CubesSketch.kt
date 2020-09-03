@@ -83,7 +83,6 @@ class CubesSketch : BaseSketch() {
 
     override fun draw() = with(sketch) {
         if (frameCount % sweepModulo == 0) sweep++
-        beatCounter.update()
 
         bass += audioProcessor.getRange(20f..60f)
         bass *= 0.5f

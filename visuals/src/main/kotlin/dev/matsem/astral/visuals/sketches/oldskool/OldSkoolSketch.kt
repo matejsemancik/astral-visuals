@@ -278,7 +278,6 @@ class OldSkoolSketch : BaseSketch() {
     }
 
     override fun draw() = with(sketch) {
-        beatCounter.update()
         automator.update()
 
         textAwareRotationZ += textAwareRotationZAccelSlider.value

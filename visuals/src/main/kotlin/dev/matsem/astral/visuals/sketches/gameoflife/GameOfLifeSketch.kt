@@ -169,7 +169,6 @@ class GameOfLifeSketch : BaseSketch() {
 
     override fun draw() = with(sketch) {
         automator.update()
-        beatCounter.update()
 
         drawOverlay()
         background(0f, 0f, 10f)

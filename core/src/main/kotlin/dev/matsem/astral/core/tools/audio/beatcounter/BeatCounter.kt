@@ -20,7 +20,7 @@ class BeatCounter(
 
     fun draw() = update()
 
-    fun update() {
+    private fun update() {
         if (audioProcessor.beatDetectData.isKick) kicksCount++
         if (audioProcessor.beatDetectData.isSnare) snaresCount++
         if (audioProcessor.beatDetectData.isHat) hatsCount++

@@ -229,7 +229,6 @@ class GalaxySketch : BaseSketch(), KoinComponent {
         rotY += joystick.y * 0.01f
         rotZ += joystick.z * 0.01f
 
-        beatCounter.update()
         background(bgColor)
 
         translateCenter()
