@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlin.math.absoluteValue
 
-class Countdown : Layer(), KoinComponent {
+class TextOverlay : Layer(), KoinComponent {
 
     override val parent: PApplet by inject()
 
@@ -43,6 +43,6 @@ class Countdown : Layer(), KoinComponent {
             duration.isNegative -> "$countdownText: T-$durationString"
             else -> "$countdownText: T+$durationString"
         }
-        text(text, 10f, height - 10f)
+        text("$text @ ${parent.frameRate} FPS", 10f, height - 10f)
     }
 }

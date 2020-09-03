@@ -1,6 +1,7 @@
 package dev.matsem.astral.visuals.di
 
-import dev.matsem.astral.visuals.layers.Countdown
+import dev.matsem.astral.visuals.layers.BlobDetectionTerrain
+import dev.matsem.astral.visuals.layers.TextOverlay
 import dev.matsem.astral.visuals.sketches.attractor.AttractorSketch
 import dev.matsem.astral.visuals.sketches.boxes.BoxesSketch
 import dev.matsem.astral.visuals.sketches.cubes.CubesSketch
@@ -42,5 +43,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { OldSkoolSketch() }
     factory { TunnelSketch() }
 
-    factory { Countdown() }
+    factory { TextOverlay() }
+    factory { BlobDetectionTerrain() }
 }
