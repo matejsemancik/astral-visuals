@@ -2,6 +2,7 @@ package dev.matsem.astral.visuals.layers
 
 import dev.matsem.astral.core.Files
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.visuals.Layer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -27,7 +28,6 @@ class TextOverlay : Layer(), KoinComponent {
         colorModeHsb()
         textFont(jetbrainsMonoFont)
         textSize(24f)
-        textAlign(PConstants.LEFT, PConstants.BOTTOM)
 
         val now = LocalDateTime.now()
         val duration = Duration.between(deadline, now)
@@ -40,9 +40,21 @@ class TextOverlay : Layer(), KoinComponent {
         )
 
         val text = when {
-            duration.isNegative -> "$countdownText: T-$durationString"
-            else -> "$countdownText: T+$durationString"
+            duration.isNegative -> "$countdownText: T-$durationString @ ${parent.frameRate} FPS"
+            else -> "$countdownText: T+$durationString @ ${parent.frameRate} FPS"
         }
-        text("$text @ ${parent.frameRate} FPS", 10f, height - 10f)
+
+        val textX = 10f
+        val textY = height - 10f
+
+        noStroke()
+        fill(0x000000.withAlpha())
+        rectMode(PApplet.CORNER)
+        rect(textX, textY - textSize, textWidth(text), textSize + 4)
+
+        noStroke()
+        fill(0xffffff.withAlpha())
+
+        text(text, textX, textY)
     }
 }

@@ -41,5 +41,15 @@ class Mixer : PApplet(), KoinComponent {
 
         image(blobDetection.canvas, 0f, 0f)
         image(krestOverlay.canvas, 0f, 0f)
+
+        fx.render()
+            .rgbSplit(20f)
+            .noise(0.2f, 0.1f)
+            .bloom(
+                0.5f,
+                (0.2f * 100).toInt(),
+                0.4f * 100f
+            )
+            .compose()
     }
 }

@@ -1,14 +1,24 @@
 package dev.matsem.astral.core.tools.audio.beatcounter
 
 import dev.matsem.astral.core.tools.audio.AudioProcessor
+import processing.core.PApplet
 
-class BeatCounter(private val audioProcessor: AudioProcessor) {
+class BeatCounter(
+    private val parent: PApplet,
+    private val audioProcessor: AudioProcessor
+) {
 
     private var kicksCount = 0
     private var snaresCount = 0
     private var hatsCount = 0
 
     private var listeners = mutableMapOf<BeatListener, () -> Unit>()
+
+    init {
+        parent.registerMethod("draw", this)
+    }
+
+    fun draw() = update()
 
     fun update() {
         if (audioProcessor.beatDetectData.isKick) kicksCount++

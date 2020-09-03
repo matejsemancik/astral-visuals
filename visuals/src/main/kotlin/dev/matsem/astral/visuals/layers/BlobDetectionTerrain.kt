@@ -5,11 +5,12 @@ import blobDetection.EdgeVertex
 import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
+import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.core.tools.audio.beatcounter.OnHat
+import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.core.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.core.tools.extensions.*
-import dev.matsem.astral.core.tools.osc.OscHandler
-import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
-import dev.matsem.astral.core.tools.osc.oscKnob
+import dev.matsem.astral.core.tools.osc.*
 import dev.matsem.astral.visuals.Layer
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
@@ -22,15 +23,23 @@ import kotlin.math.absoluteValue
 
 class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler {
 
-    override val parent: PApplet by inject()
     override val renderer: String = PConstants.P3D
 
-    override val coroutineContext = Dispatchers.Default
-    override val oscManager: OscManager by lazy {
-        OscManager(parent, 7001, "192.168.1.11", 7001) // TODO inject
-    }
-
+    override val parent: PApplet by inject()
+    override val oscManager: OscManager by inject()
     private val sink: Sink by inject()
+    private val beatCounter: BeatCounter by inject()
+
+    override val coroutineContext = Dispatchers.Default
+    val camRotations = arrayOf(
+        doubleArrayOf(-0.797263, 0.5013783, -0.4376617, 984.4043796914573),
+        doubleArrayOf(-2.7533004, 0.42473003, -2.9553256, 1028.1625192272145),
+        doubleArrayOf(-0.09054168, -0.00491144, -3.0944278, 1028.1625192272145),
+        doubleArrayOf(-2.8729408, -1.2027321, 1.8468192, 260.5817143545596),
+        doubleArrayOf(-0.43025014, -0.078433305, -2.7281766, 546.8965049754636),
+        doubleArrayOf(-1.959376, 7.200048E-4, -3.132293, 922.4871887350347)
+    )
+
     private val cam = PeasyCam(parent, canvas, 720.0).apply {
         wheelScale = 0.01
         lookAt(canvas.width / 2.0, canvas.height / 2.0, 0.0)
@@ -41,13 +50,10 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler 
     private var noiseScl by oscKnob("/play/fader3", 0.5f)
     private var flicker by oscKnob("/play/fader4", 0.5f)
     private var speed by oscKnob("/play/fader5", 0.5f)
-    private var bloomThresh by oscFader("/play/fader6", 0.5f)
-    private var bloomSize by oscFader("/play/fader7", 0.2f)
-    private var bloomSigma by oscFader("/play/fader8", 0.4f)
 
     private val levels = 25
     private var elevation = 200f
-    private var noiseScale = 0f
+    private var noiseScale = 0.1f
     private val map = parent.createGraphics(canvas.width / 10, canvas.height / 10, PConstants.P2D)
 
     private val blobDetectors: Array<BlobDetection> =
@@ -61,14 +67,30 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler 
         Oscil(1f / 10f, 1f, Waves.SINE).apply { patch(sink) }
     }
 
+    init {
+        beatCounter.addListener(OnKick, 32) {
+            cam.setRotations(camRotations.random()[0], camRotations.random()[1], camRotations.random()[2])
+            cam.setDistance(camRotations.random()[3], 1000L)
+        }
+
+        beatCounter.addListener(OnKick, 8) {
+            noiseScl = parent.random(0f, 0.8f)
+            flicker = parent.random(0.2f, 0.8f)
+        }
+    }
+
     override fun PGraphics.draw() {
+        clear()
         colorModeHsb()
+        if (parent.frameCount == 100) {
+            cam.setRotations(camRotations[0][0], camRotations[0][1], camRotations[0][2])
+            cam.setDistance(camRotations[0][3], 1000L)
+        }
 
         oscil.frequency.lastValue = oscilFreq.mapp(0f, 0.5f)
-        elevation = oscil.value.mapSin(0f, 1f) * elevScale.mapp(0f, 300f)
+        elevation = oscil.value.mapSin(0.4f, 1f) * elevScale.mapp(0f, 600f)
         generateMap()
         computeBlobs()
-        background(0)
         pushPop {
             translateCenter()
             blobDetectors.forEachIndexed { i, detector ->
