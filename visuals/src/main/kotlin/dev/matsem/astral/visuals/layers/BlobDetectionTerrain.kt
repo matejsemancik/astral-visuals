@@ -6,11 +6,11 @@ import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
 import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
-import dev.matsem.astral.core.tools.audio.beatcounter.OnHat
 import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
-import dev.matsem.astral.core.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.core.tools.extensions.*
-import dev.matsem.astral.core.tools.osc.*
+import dev.matsem.astral.core.tools.osc.OscHandler
+import dev.matsem.astral.core.tools.osc.OscManager
+import dev.matsem.astral.core.tools.osc.oscKnob
 import dev.matsem.astral.visuals.Layer
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
@@ -32,6 +32,7 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler 
 
     override val coroutineContext = Dispatchers.Default
     val camRotations = arrayOf(
+        doubleArrayOf(-0.0, 0.0, -0.0, 800.0),
         doubleArrayOf(-0.797263, 0.5013783, -0.4376617, 984.4043796914573),
         doubleArrayOf(-2.7533004, 0.42473003, -2.9553256, 1028.1625192272145),
         doubleArrayOf(-0.09054168, -0.00491144, -3.0944278, 1028.1625192272145),
@@ -45,14 +46,14 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler 
         lookAt(canvas.width / 2.0, canvas.height / 2.0, 0.0)
     }
 
-    private var oscilFreq by oscKnob("/play/fader1", 0.5f)
-    private var elevScale by oscKnob("/play/fader2", 0.5f)
+    private var oscilFreq by oscKnob("/play/fader1", 0.0f)
+    private var elevScale by oscKnob("/play/fader2", 1f)
     private var noiseScl by oscKnob("/play/fader3", 0.5f)
     private var flicker by oscKnob("/play/fader4", 0.5f)
     private var speed by oscKnob("/play/fader5", 0.5f)
 
     private val levels = 25
-    private var elevation = 200f
+    private var elevation = 600f
     private var noiseScale = 0.1f
     private val map = parent.createGraphics(canvas.width / 10, canvas.height / 10, PConstants.P2D)
 
@@ -68,8 +69,9 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler 
     }
 
     init {
-        beatCounter.addListener(OnKick, 32) {
-            cam.setRotations(camRotations.random()[0], camRotations.random()[1], camRotations.random()[2])
+        beatCounter.addListener(OnKick, 16) {
+            val rot = camRotations.random()
+            cam.setRotations(rot[0], rot[1], rot[2])
             cam.setDistance(camRotations.random()[3], 1000L)
         }
 
