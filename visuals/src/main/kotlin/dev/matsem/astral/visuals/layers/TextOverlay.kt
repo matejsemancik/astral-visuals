@@ -11,6 +11,7 @@ import processing.core.PApplet
 import processing.core.PGraphics
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.Month
 import kotlin.math.absoluteValue
 
 class TextOverlay : Layer(), KoinComponent {
@@ -18,7 +19,8 @@ class TextOverlay : Layer(), KoinComponent {
     override val parent: PApplet by inject()
 
     val countdownText = "SYMBOL_LP_KŘEST"
-    val deadline = LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 30, 0))
+
+    val deadline = LocalDateTime.of(2020, Month.SEPTEMBER, 11, 23, 0, 0)
     val jetbrainsMonoFont = parent.createFont(Files.Font.JETBRAINS_MONO, 24f, true)
 
     override fun PGraphics.draw() {
