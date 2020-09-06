@@ -1,7 +1,11 @@
 package dev.matsem.astral.visuals
 
 import ch.bildspur.postfx.builder.PostFX
-import ch.bildspur.postfx.pass.*
+import ch.bildspur.postfx.pass.BloomPass
+import ch.bildspur.postfx.pass.ChromaticAberrationPass
+import ch.bildspur.postfx.pass.NoisePass
+import ch.bildspur.postfx.pass.PixelatePass
+import ch.bildspur.postfx.pass.RGBSplitPass
 import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
@@ -51,8 +55,8 @@ class Effector(
                 if (bloomEnabled) {
                     bloom(
                         bloomThreshold.mapp(0f, 1f),
-                        bloomSize.mapp(0f, 200f).toInt(),
-                        bloomSigma.mapp(0f, 100f)
+                        bloomSize.mapp(0f, 80f).toInt(),
+                        bloomSigma.mapp(0f, 30f)
                     )
                 }
                 if (chromaticAberrationEnabled) {
