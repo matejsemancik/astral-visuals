@@ -27,7 +27,7 @@ class VisualsApp : KoinComponent {
     fun run(processingArgs: Array<String>) {
         startKoin {
             printLogger(Level.ERROR)
-            modules(coreModule + visualsModule { Mixer() })
+            modules(coreModule + visualsModule { MainSketch() })
         }
 
         PApplet.runSketch(processingArgs + arrayOf("AstralVisuals"), sketch)

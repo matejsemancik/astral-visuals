@@ -2,6 +2,7 @@ package dev.matsem.astral.visuals.di
 
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Effector
+import dev.matsem.astral.visuals.Mixer
 import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
@@ -47,6 +48,7 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { OldSkoolSketch() }
     factory { TunnelSketch() }
 
+    single { Mixer(get()) }
     single { Effector(get(), get()) }
     single { Colorizer(get(), get()) }
 

@@ -1,6 +1,10 @@
 package dev.matsem.astral.visuals
 
-import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.mapp
+import dev.matsem.astral.core.tools.extensions.withAlpha
+import dev.matsem.astral.core.tools.osc.OscHandler
+import dev.matsem.astral.core.tools.osc.OscManager
+import dev.matsem.astral.core.tools.osc.oscFader
 import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
@@ -9,35 +13,41 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
 
-class Mixer : PApplet(), KoinComponent {
-
-    private val effector: Effector by inject()
+class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
 
     private val backgroundLayer: BackgroundLayer by inject()
     private val attractorLayer: AttractorLayer by inject()
-    private val blobDetection: BlobDetectionTerrainLayer by inject()
-    private val krestOverlay: TextOverlayLayer by inject()
+    private val blobDetectionLayer: BlobDetectionTerrainLayer by inject()
+    private val textOverlayLayer: TextOverlayLayer by inject()
 
-    override fun settings() {
-        size(1920, 1080, P2D)
-    }
+    private val attractor by oscFader("/mix/ch/1/value", defaultValue = 0f)
+    private val blob by oscFader("/mix/ch/2/value", defaultValue = 1f)
+    private val krest by oscFader("/mix/ch/10/value", defaultValue = 1f)
 
-    override fun setup() {
-        colorModeHsb()
-        surface.setTitle("Astral Visuals")
-    }
-
-    override fun draw() {
-        background(0)
+    fun render(parent: PApplet) = with(parent) {
 
         backgroundLayer.update()
-        attractorLayer.update()
-        krestOverlay.update()
-
+        tint(0xffffff.withAlpha())
         image(backgroundLayer.canvas, 0f, 0f)
-        image(attractorLayer.canvas, 0f, 0f)
-        image(krestOverlay.canvas, 0f, 0f)
 
-        effector.render()
+        if (attractor > 0f) {
+            attractorLayer.update()
+            tint(attractor.oscAlpha())
+            image(attractorLayer.canvas, 0f, 0f)
+        }
+
+        if (blob > 0f) {
+            blobDetectionLayer.update()
+            tint(blob.oscAlpha())
+            image(blobDetectionLayer.canvas, 0f, 0f)
+        }
+
+        if (krest > 0f) {
+            textOverlayLayer.update()
+            tint(krest.oscAlpha())
+            image(textOverlayLayer.canvas, 0f, 0f)
+        }
     }
+
+    private fun Float.oscAlpha() = 0xffffff.withAlpha(this.mapp(0f, 255f).toInt())
 }
