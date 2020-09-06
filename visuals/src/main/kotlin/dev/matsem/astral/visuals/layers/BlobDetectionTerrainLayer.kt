@@ -5,6 +5,7 @@ import blobDetection.EdgeVertex
 import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
+import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
@@ -16,6 +17,7 @@ import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.value
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
+import dev.matsem.astral.core.tools.osc.oscFader
 import dev.matsem.astral.core.tools.osc.oscKnob
 import dev.matsem.astral.core.tools.osc.oscPushButton
 import dev.matsem.astral.core.tools.osc.oscToggleButton
@@ -45,6 +47,7 @@ class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHan
 
     private val sink: Sink by inject()
     private val beatCounter: BeatCounter by inject()
+    private val audioProcessor: AudioProcessor by inject()
 
     override val coroutineContext = Dispatchers.Default
     val camRotations = arrayOf(
@@ -62,7 +65,8 @@ class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHan
         lookAt(canvas.width / 2.0, canvas.height / 2.0, 0.0)
     }
 
-    private var oscilFreq by oscKnob("/blob/oscil/freq", defaultValue = 0.0f)
+    private var oscilFreq by oscKnob("/blob/oscil/freq", defaultValue = 0f)
+    private var oscilAudioGain by oscFader("/blob/oscil/audioGain", defaultValue = 0f)
     private var elevScale by oscKnob("/blob/elevation/scale", defaultValue = 1f)
     private var noiseScl by oscKnob("/blob/noise/scale", defaultValue = 0.5f)
     private var noiseAuto by oscToggleButton("/blob/noise/auto", defaultValue = false)
@@ -111,7 +115,7 @@ class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHan
         colorModeHsb()
 
         oscil.frequency.lastValue = oscilFreq.mapp(0f, 0.5f)
-        elevation = oscil.value.mapSin(-1f, 1f) * elevScale.mapp(0f, 600f)
+        elevation = oscil.value.mapSin(-1f, 1f) * elevScale.mapp(0f, 600f) + audioProcessor.getRange(20f..200f) * oscilAudioGain.mapp(0f, 2f)
         generateMap()
         computeBlobs()
         pushPop {
