@@ -17,6 +17,8 @@ import dev.matsem.astral.core.tools.extensions.value
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.osc.oscKnob
+import dev.matsem.astral.core.tools.osc.oscPushButton
+import dev.matsem.astral.core.tools.osc.oscToggleButton
 import dev.matsem.astral.visuals.ColorHandler
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Layer
@@ -60,11 +62,16 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler,
         lookAt(canvas.width / 2.0, canvas.height / 2.0, 0.0)
     }
 
-    private var oscilFreq by oscKnob("/play/fader1", 0.0f)
-    private var elevScale by oscKnob("/play/fader2", 1f)
-    private var noiseScl by oscKnob("/play/fader3", 0.5f)
-    private var flicker by oscKnob("/play/fader4", 0.5f)
-    private var speed by oscKnob("/play/fader5", 0.5f)
+    private var oscilFreq by oscKnob("/blob/oscil/freq", defaultValue = 0.0f)
+    private var elevScale by oscKnob("/blob/elevation/scale", defaultValue = 1f)
+    private var noiseScl by oscKnob("/blob/noise/scale", defaultValue = 0.5f)
+    private var noiseAuto by oscToggleButton("/blob/noise/auto", defaultValue = false)
+    private var flicker by oscKnob("/blob/flicker", defaultValue = 0.5f)
+    private var flickerAuto by oscToggleButton("/blob/flicker/auto", defaultValue = false)
+    private var speed by oscKnob("/blob/speed", defaultValue = 0.5f)
+
+    private val newCamAuto by oscToggleButton("/blob/cam/auto", defaultValue = false)
+    private val newCamTrigger by oscPushButton("/blob/cam/new") { switchCam() }
 
     private val levels = 25
     private var elevation = 600f
@@ -84,27 +91,27 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler,
 
     init {
         beatCounter.addListener(OnKick, 16) {
-            val rot = camRotations.random()
-            cam.setRotations(rot[0], rot[1], rot[2])
-            cam.setDistance(rot[3], 1000L)
+            if (newCamAuto) {
+                switchCam()
+            }
         }
 
         beatCounter.addListener(OnKick, 8) {
-            noiseScl = parent.random(0f, 0.8f)
-            flicker = parent.random(0.2f, 0.8f)
+            if (noiseAuto) {
+                noiseScl = parent.random(0f, 0.8f)
+            }
+            if (flickerAuto) {
+                flicker = parent.random(0.2f, 0.8f)
+            }
         }
     }
 
     override fun PGraphics.draw() {
         clear()
         colorModeHsb()
-        if (parent.frameCount == 100) {
-            cam.setRotations(camRotations[0][0], camRotations[0][1], camRotations[0][2])
-            cam.setDistance(camRotations[0][3], 1000L)
-        }
 
         oscil.frequency.lastValue = oscilFreq.mapp(0f, 0.5f)
-        elevation = oscil.value.mapSin(0.4f, 1f) * elevScale.mapp(0f, 600f)
+        elevation = oscil.value.mapSin(-1f, 1f) * elevScale.mapp(0f, 600f)
         generateMap()
         computeBlobs()
         pushPop {
@@ -187,5 +194,11 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler,
         withContext(Dispatchers.IO) {
             detector.computeBlobs(map.pixels)
         }
+    }
+
+    private fun switchCam() {
+        val rot = camRotations.random()
+        cam.setRotations(rot[0], rot[1], rot[2])
+        cam.setDistance(rot[3], 1000L)
     }
 }
