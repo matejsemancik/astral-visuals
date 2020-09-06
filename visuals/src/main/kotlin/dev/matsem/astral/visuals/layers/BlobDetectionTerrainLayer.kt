@@ -35,7 +35,7 @@ import processing.core.PConstants
 import processing.core.PGraphics
 import kotlin.math.absoluteValue
 
-class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler, ColorHandler {
+class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHandler, ColorHandler {
 
     override val renderer: String = PConstants.P3D
 

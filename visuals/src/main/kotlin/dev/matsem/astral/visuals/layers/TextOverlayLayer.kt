@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 import java.time.Month
 import kotlin.math.absoluteValue
 
-class TextOverlay : Layer(), KoinComponent {
+class TextOverlayLayer : Layer(), KoinComponent {
 
     override val parent: PApplet by inject()
 

@@ -3,8 +3,8 @@ package dev.matsem.astral.visuals.di
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Effector
 import dev.matsem.astral.visuals.layers.BackgroundLayer
-import dev.matsem.astral.visuals.layers.BlobDetectionTerrain
-import dev.matsem.astral.visuals.layers.TextOverlay
+import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
+import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import dev.matsem.astral.visuals.sketches.attractor.AttractorSketch
 import dev.matsem.astral.visuals.sketches.boxes.BoxesSketch
 import dev.matsem.astral.visuals.sketches.cubes.CubesSketch
@@ -50,6 +50,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     single { Colorizer(get(), get()) }
 
     factory { BackgroundLayer() }
-    factory { TextOverlay() }
-    factory { BlobDetectionTerrain() }
+    factory { TextOverlayLayer() }
+    factory { BlobDetectionTerrainLayer() }
 }
