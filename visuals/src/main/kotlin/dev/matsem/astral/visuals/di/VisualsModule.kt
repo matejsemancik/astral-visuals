@@ -2,6 +2,7 @@ package dev.matsem.astral.visuals.di
 
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Effector
+import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
@@ -52,4 +53,5 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { BackgroundLayer() }
     factory { TextOverlayLayer() }
     factory { BlobDetectionTerrainLayer() }
+    factory { AttractorLayer() }
 }
