@@ -51,7 +51,7 @@ class TextOverlayLayer : Layer(), KoinComponent, OscHandler {
 
     private fun addMinutes(count: Long) {
         synchronized(lock) {
-            deadline = deadline.plusMinutes(count.toLong())
+            deadline = deadline.plusMinutes(count)
         }
     }
 
