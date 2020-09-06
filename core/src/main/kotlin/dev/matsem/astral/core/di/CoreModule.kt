@@ -23,7 +23,7 @@ import shiffman.box2d.Box2DProcessing
 
 val coreModule = module {
     single { KontrolF1() }
-    single { Galaxy() }
+    single { Galaxy(get()) }
 
     single { MidiFileParser(get()) }
     factory { MidiRecorder(get()) }

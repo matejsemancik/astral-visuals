@@ -33,7 +33,6 @@ import dev.matsem.astral.visuals.sketches.spikes.SpikesSketch
 import dev.matsem.astral.visuals.sketches.starglitch.StarGlitchSketch
 import dev.matsem.astral.visuals.sketches.terrain.TerrainSketch
 import dev.matsem.astral.visuals.sketches.tunnel.TunnelSketch
-import dev.matsem.astral.visuals.sketches.video.VideoSketch
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -260,7 +259,6 @@ class SketchLoader : PApplet(), KoinComponent {
     }
 
     override fun draw() {
-        galaxy.update()
         automator.update()
 
         if (autoSwitchButton.isPressed) {

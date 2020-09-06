@@ -10,13 +10,14 @@ import dev.matsem.astral.core.tools.galaxy.controls.PushButtonGroup
 import dev.matsem.astral.core.tools.galaxy.controls.ToggleButton
 import dev.matsem.astral.core.tools.midi.MidiDevice
 import dev.matsem.astral.core.tools.midi.MidiListener
+import processing.core.PApplet
 import themidibus.MidiBus
 import themidibus.SimpleMidiListener
 
 /**
  * TouchOSC MIDI device
  */
-class Galaxy : MidiDevice {
+class Galaxy(private val parent: PApplet) : MidiDevice {
 
     lateinit var midiBus: MidiBus
 
@@ -24,10 +25,13 @@ class Galaxy : MidiDevice {
 
     fun connect() {
         midiBus = MidiBus(this, "TouchOSC Bridge", "TouchOSC Bridge")
+        parent.registerMethod("draw", this)
         println("MidiBus connected")
     }
 
-    fun update() {
+    fun draw() = update()
+
+    private fun update() {
         controls.forEach { it.update() }
     }
 

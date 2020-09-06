@@ -45,6 +45,14 @@ fun PGraphics.fadeToBlackBy(fadeAmount: Float) {
     updatePixels()
 }
 
+fun PGraphics.decreaseAlpha(amount: Float) {
+    loadPixels()
+    for(i in 0 until pixels.count()) {
+        pixels[i] = pixels[i].withAlpha(10)
+    }
+    updatePixels()
+}
+
 fun PGraphics.colorModeHsb() = colorMode(
     PConstants.HSB,
     ColorConfig.HUE_MAX,
