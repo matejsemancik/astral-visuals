@@ -7,12 +7,24 @@ import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
 import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
-import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.draw
+import dev.matsem.astral.core.tools.extensions.mapSin
+import dev.matsem.astral.core.tools.extensions.mapp
+import dev.matsem.astral.core.tools.extensions.pushPop
+import dev.matsem.astral.core.tools.extensions.translateCenter
+import dev.matsem.astral.core.tools.extensions.value
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.osc.oscKnob
+import dev.matsem.astral.visuals.ColorHandler
+import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Layer
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import peasy.PeasyCam
@@ -21,12 +33,14 @@ import processing.core.PConstants
 import processing.core.PGraphics
 import kotlin.math.absoluteValue
 
-class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler {
+class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler, ColorHandler {
 
     override val renderer: String = PConstants.P3D
 
     override val parent: PApplet by inject()
     override val oscManager: OscManager by inject()
+    override val colorizer: Colorizer by inject()
+
     private val sink: Sink by inject()
     private val beatCounter: BeatCounter by inject()
 
@@ -72,7 +86,7 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler 
         beatCounter.addListener(OnKick, 16) {
             val rot = camRotations.random()
             cam.setRotations(rot[0], rot[1], rot[2])
-            cam.setDistance(camRotations.random()[3], 1000L)
+            cam.setDistance(rot[3], 1000L)
         }
 
         beatCounter.addListener(OnKick, 8) {
@@ -99,7 +113,7 @@ class BlobDetectionTerrain : Layer(), KoinComponent, CoroutineScope, OscHandler 
                 pushPop {
                     noFill()
                     strokeWeight(2f)
-                    stroke(0xffffff.withAlpha())
+                    stroke(colorizer.fgColor)
                     translate(0f, 0f, elevation / levels * i)
                     drawContours(detector)
                 }

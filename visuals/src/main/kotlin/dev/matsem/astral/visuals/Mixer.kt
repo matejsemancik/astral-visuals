@@ -1,6 +1,7 @@
 package dev.matsem.astral.visuals
 
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrain
 import dev.matsem.astral.visuals.layers.TextOverlay
 import org.koin.core.KoinComponent
@@ -11,6 +12,7 @@ class Mixer : PApplet(), KoinComponent {
 
     private val effector: Effector by inject()
 
+    private val backgroundLayer: BackgroundLayer by inject()
     private val krestOverlay: TextOverlay by inject()
     private val blobDetection: BlobDetectionTerrain by inject()
 
@@ -21,18 +23,19 @@ class Mixer : PApplet(), KoinComponent {
     override fun setup() {
         colorModeHsb()
         surface.setTitle("Astral Visuals")
-
-        frameRate(24f)
     }
 
     override fun draw() {
         background(0)
 
+        backgroundLayer.update()
         blobDetection.update()
         krestOverlay.update()
 
+        image(backgroundLayer.canvas, 0f, 0f)
         image(blobDetection.canvas, 0f, 0f)
         image(krestOverlay.canvas, 0f, 0f)
+
         effector.render()
     }
 }
