@@ -73,6 +73,7 @@ class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHan
     private var flicker by oscKnob("/blob/flicker", defaultValue = 0.5f)
     private var flickerAuto by oscToggleButton("/blob/flicker/auto", defaultValue = false)
     private var speed by oscKnob("/blob/speed", defaultValue = 0.5f)
+    private var strokeFader by oscFader("/blob/stroke", defaultValue = 0f)
 
     private val newCamAuto by oscToggleButton("/blob/cam/auto", defaultValue = false)
     private val newCamTrigger by oscPushButton("/blob/cam/new") { switchCam() }
@@ -123,7 +124,7 @@ class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHan
             blobDetectors.forEachIndexed { i, detector ->
                 pushPop {
                     noFill()
-                    strokeWeight(2f)
+                    strokeWeight(strokeFader.mapp(2f, 10f))
                     stroke(colorizer.fgColor)
                     translate(0f, 0f, elevation / levels * i)
                     drawContours(detector)
