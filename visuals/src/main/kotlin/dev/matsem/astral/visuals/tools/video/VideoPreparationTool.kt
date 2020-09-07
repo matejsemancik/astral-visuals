@@ -4,7 +4,7 @@ import ddf.minim.AudioListener
 import ddf.minim.AudioPlayer
 import ddf.minim.Minim
 import dev.matsem.astral.core.VideoExportConfig
-import dev.matsem.astral.visuals.sketches.SketchLoader
+import dev.matsem.astral.visuals.legacy.SketchLoader
 import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.galaxy.Galaxy
 import dev.matsem.astral.core.tools.kontrol.KontrolF1
