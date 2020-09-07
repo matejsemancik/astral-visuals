@@ -6,6 +6,7 @@ import dev.matsem.astral.visuals.Mixer
 import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
+import dev.matsem.astral.visuals.layers.ConwayLayer
 import dev.matsem.astral.visuals.layers.StarsLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import dev.matsem.astral.visuals.sketches.attractor.AttractorSketch
@@ -58,4 +59,5 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { TextOverlayLayer() }
     factory { BlobDetectionTerrainLayer() }
     factory { AttractorLayer() }
+    factory { ConwayLayer() }
 }

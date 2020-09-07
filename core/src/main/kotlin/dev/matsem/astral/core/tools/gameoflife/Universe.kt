@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals.sketches.gameoflife
+package dev.matsem.astral.core.tools.gameoflife
 
 class Universe(
     var cells: Array<Array<Cell>>

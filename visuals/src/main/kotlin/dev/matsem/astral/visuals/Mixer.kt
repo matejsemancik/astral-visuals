@@ -8,6 +8,7 @@ import dev.matsem.astral.core.tools.osc.oscFader
 import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
+import dev.matsem.astral.visuals.layers.ConwayLayer
 import dev.matsem.astral.visuals.layers.StarsLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import org.koin.core.KoinComponent
@@ -20,11 +21,13 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
     private val starsLayer: StarsLayer by inject()
     private val attractorLayer: AttractorLayer by inject()
     private val blobDetectionLayer: BlobDetectionTerrainLayer by inject()
+    private val conwayLayer: ConwayLayer by inject()
     private val textOverlayLayer: TextOverlayLayer by inject()
 
-    private val attractor by oscFader("/mix/ch/1/value", defaultValue = 0f)
-    private val stars by oscFader("/mix/ch/2/value", defaultValue = 1f)
-    private val blob by oscFader("/mix/ch/3/value", defaultValue = 1f)
+    private val conway by oscFader("/mix/ch/1/value", defaultValue = 1f)
+    private val attractor by oscFader("/mix/ch/2/value", defaultValue = 0f)
+    private val stars by oscFader("/mix/ch/3/value", defaultValue = 0f)
+    private val blob by oscFader("/mix/ch/4/value", defaultValue = 1f)
     private val krest by oscFader("/mix/ch/10/value", defaultValue = 1f)
 
     fun render(parent: PApplet) = with(parent) {
@@ -32,6 +35,12 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
         backgroundLayer.update()
         tint(0xffffff.withAlpha())
         image(backgroundLayer.canvas, 0f, 0f)
+
+        if(conway > 0f) {
+            conwayLayer.update()
+            tint(conway.oscAlpha())
+            image(conwayLayer.canvas, 0f, 0f)
+        }
 
         if (attractor > 0f) {
             attractorLayer.update()
