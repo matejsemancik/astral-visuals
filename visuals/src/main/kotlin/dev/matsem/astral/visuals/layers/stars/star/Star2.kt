@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals.layers.star
+package dev.matsem.astral.visuals.layers.stars.star
 
 import processing.core.PApplet
 import processing.core.PApplet.map

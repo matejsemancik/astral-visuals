@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals.layers.star
+package dev.matsem.astral.visuals.layers.stars.star
 
 import dev.matsem.astral.core.tools.extensions.centerX
 import dev.matsem.astral.core.tools.extensions.centerY

@@ -9,8 +9,9 @@ import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
 import dev.matsem.astral.visuals.layers.ConwayLayer
-import dev.matsem.astral.visuals.layers.StarsLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
+import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
+import dev.matsem.astral.visuals.layers.stars.StarsLayer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -23,11 +24,13 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
     private val blobDetectionLayer: BlobDetectionTerrainLayer by inject()
     private val conwayLayer: ConwayLayer by inject()
     private val textOverlayLayer: TextOverlayLayer by inject()
+    private val galaxyLayer: GalaxyLayer by inject()
 
-    private val conway by oscFader("/mix/ch/1/value", defaultValue = 1f)
+    private val conway by oscFader("/mix/ch/1/value", defaultValue = 0f)
     private val attractor by oscFader("/mix/ch/2/value", defaultValue = 0f)
-    private val stars by oscFader("/mix/ch/3/value", defaultValue = 0f)
-    private val blob by oscFader("/mix/ch/4/value", defaultValue = 1f)
+    private val stars by oscFader("/mix/ch/3/value", defaultValue = 1f)
+    private val blob by oscFader("/mix/ch/4/value", defaultValue = 0f)
+    private val galaxy by oscFader("/mix/ch/5/value", defaultValue = 1f)
     private val krest by oscFader("/mix/ch/10/value", defaultValue = 1f)
 
     fun render(parent: PApplet) = with(parent) {
@@ -58,6 +61,12 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
             blobDetectionLayer.update()
             tint(blob.oscAlpha())
             image(blobDetectionLayer.canvas, 0f, 0f)
+        }
+
+        if (galaxy > 0f) {
+            galaxyLayer.update()
+            tint(galaxy.oscAlpha())
+            image(galaxyLayer.canvas, 0f, 0f)
         }
 
         if (krest > 0f) {

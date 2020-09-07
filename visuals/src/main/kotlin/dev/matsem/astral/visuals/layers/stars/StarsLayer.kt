@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals.layers
+package dev.matsem.astral.visuals.layers.stars
 
 import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.extensions.threshold
@@ -8,7 +8,7 @@ import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.visuals.ColorHandler
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Layer
-import dev.matsem.astral.visuals.layers.star.Starfield2
+import dev.matsem.astral.visuals.layers.stars.star.Starfield2
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet

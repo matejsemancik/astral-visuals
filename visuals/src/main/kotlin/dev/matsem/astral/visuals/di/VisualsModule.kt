@@ -7,12 +7,12 @@ import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
 import dev.matsem.astral.visuals.layers.ConwayLayer
-import dev.matsem.astral.visuals.layers.StarsLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
+import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
+import dev.matsem.astral.visuals.layers.stars.StarsLayer
 import dev.matsem.astral.visuals.legacy.boxes.BoxesSketch
 import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
 import dev.matsem.astral.visuals.legacy.fibonaccisphere.FibSphereSketch
-import dev.matsem.astral.visuals.legacy.galaxy.GalaxySketch
 import dev.matsem.astral.visuals.legacy.oldskool.OldSkoolSketch
 import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
 import dev.matsem.astral.visuals.legacy.tunnel.TunnelSketch
@@ -34,7 +34,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { PatternsSketch() }
     factory { BoxesSketch() }
     factory { CubesSketch() }
-    factory { GalaxySketch() }
     factory { OldSkoolSketch() }
     factory { TunnelSketch() }
 
@@ -48,4 +47,5 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { BlobDetectionTerrainLayer() }
     factory { AttractorLayer() }
     factory { ConwayLayer() }
+    factory { GalaxyLayer() }
 }
