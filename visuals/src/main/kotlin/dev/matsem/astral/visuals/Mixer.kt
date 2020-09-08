@@ -9,6 +9,7 @@ import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
 import dev.matsem.astral.visuals.layers.ConwayLayer
+import dev.matsem.astral.visuals.layers.SphereLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
 import dev.matsem.astral.visuals.layers.stars.StarsLayer
@@ -25,12 +26,14 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
     private val conwayLayer: ConwayLayer by inject()
     private val textOverlayLayer: TextOverlayLayer by inject()
     private val galaxyLayer: GalaxyLayer by inject()
+    private val sphereLayer: SphereLayer by inject()
 
     private val conway by oscFader("/mix/ch/1/value", defaultValue = 0f)
     private val attractor by oscFader("/mix/ch/2/value", defaultValue = 0f)
     private val stars by oscFader("/mix/ch/3/value", defaultValue = 1f)
     private val blob by oscFader("/mix/ch/4/value", defaultValue = 0f)
-    private val galaxy by oscFader("/mix/ch/5/value", defaultValue = 1f)
+    private val galaxy by oscFader("/mix/ch/5/value", defaultValue = 0f)
+    private val sphere by oscFader("/mix/ch/6/value", defaultValue = 1f)
     private val krest by oscFader("/mix/ch/10/value", defaultValue = 1f)
 
     fun render(parent: PApplet) = with(parent) {
@@ -39,7 +42,7 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
         tint(0xffffff.withAlpha())
         image(backgroundLayer.canvas, 0f, 0f)
 
-        if(conway > 0f) {
+        if (conway > 0f) {
             conwayLayer.update()
             tint(conway.oscAlpha())
             image(conwayLayer.canvas, 0f, 0f)
@@ -67,6 +70,12 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
             galaxyLayer.update()
             tint(galaxy.oscAlpha())
             image(galaxyLayer.canvas, 0f, 0f)
+        }
+
+        if (sphere > 0f) {
+            sphereLayer.update()
+            tint(sphere.oscAlpha())
+            image(sphereLayer.canvas, 0f, 0f)
         }
 
         if (krest > 0f) {

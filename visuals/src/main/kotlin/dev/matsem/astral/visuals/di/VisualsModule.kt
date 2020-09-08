@@ -7,12 +7,12 @@ import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
 import dev.matsem.astral.visuals.layers.ConwayLayer
+import dev.matsem.astral.visuals.layers.SphereLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
 import dev.matsem.astral.visuals.layers.stars.StarsLayer
 import dev.matsem.astral.visuals.legacy.boxes.BoxesSketch
 import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
-import dev.matsem.astral.visuals.legacy.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.visuals.legacy.oldskool.OldSkoolSketch
 import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
 import dev.matsem.astral.visuals.legacy.tunnel.TunnelSketch
@@ -30,7 +30,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     // BPM
     single { Tapper(get()) }
 
-    factory { FibSphereSketch() }
     factory { PatternsSketch() }
     factory { BoxesSketch() }
     factory { CubesSketch() }
@@ -48,4 +47,5 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { AttractorLayer() }
     factory { ConwayLayer() }
     factory { GalaxyLayer() }
+    factory { SphereLayer() }
 }

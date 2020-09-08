@@ -22,7 +22,6 @@ import dev.matsem.astral.core.tools.midi.MidiFileParser
 import dev.matsem.astral.core.tools.midi.MidiPlayer
 import dev.matsem.astral.visuals.legacy.boxes.BoxesSketch
 import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
-import dev.matsem.astral.visuals.legacy.fibonaccisphere.FibSphereSketch
 import dev.matsem.astral.visuals.legacy.oldskool.OldSkoolSketch
 import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
 import dev.matsem.astral.visuals.legacy.tunnel.TunnelSketch
@@ -101,7 +100,6 @@ class SketchLoader : PApplet(), KoinComponent {
 
     // region Sketches
 
-    private val fibSphereSketch: FibSphereSketch by inject()
     private val patternsSketch: PatternsSketch by inject()
     private val boxesSketch: BoxesSketch by inject()
     private val cubesSketch: CubesSketch by inject()
@@ -195,7 +193,6 @@ class SketchLoader : PApplet(), KoinComponent {
         )
 
         sketches.apply {
-            put('3', fibSphereSketch)
             put('5', patternsSketch)
             put('7', boxesSketch)
             put('p', cubesSketch)

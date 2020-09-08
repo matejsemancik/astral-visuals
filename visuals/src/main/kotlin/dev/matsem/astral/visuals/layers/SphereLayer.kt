@@ -1,30 +1,25 @@
-package dev.matsem.astral.visuals.legacy.fibonaccisphere
+package dev.matsem.astral.visuals.layers
 
+import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.extensions.centerX
 import dev.matsem.astral.core.tools.extensions.centerY
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.shorterDimension
-import dev.matsem.astral.visuals.legacy.BaseSketch
-import dev.matsem.astral.visuals.legacy.SketchLoader
-import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.midi.MidiAutomator
+import dev.matsem.astral.visuals.ColorHandler
+import dev.matsem.astral.visuals.Colorizer
+import dev.matsem.astral.visuals.Layer
+import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
-import processing.core.PApplet.asin
-import processing.core.PApplet.floor
-import processing.core.PApplet.lerp
-import processing.core.PApplet.map
-import processing.core.PApplet.min
-import processing.core.PApplet.radians
-import processing.core.PApplet.sin
 import processing.core.PConstants
+import processing.core.PGraphics
 
-/**
- * Based on https://www.openprocessing.org/sketch/103897
- */
-class FibSphereSketch : BaseSketch() {
+class SphereLayer : Layer(), KoinComponent, ColorHandler {
+    override val parent: PApplet by inject()
 
-    override val sketch: SketchLoader by inject()
+    override val colorizer: Colorizer by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
     private val automator: MidiAutomator by inject()
@@ -55,7 +50,7 @@ class FibSphereSketch : BaseSketch() {
     private var numPoints = 500
     private val pts = Array(MAX_POINTS) { SpherePoint(0f, 0f, 0f) }
 
-    private var radius = sketch.shorterDimension() / 2f
+    private var radius = canvas.shorterDimension() / 2f
 
     private val joystick = galaxy.createJoystick(2, 11, 12, 13, 14, 15, 16)
 
@@ -80,8 +75,8 @@ class FibSphereSketch : BaseSketch() {
     private val timerIntervalPot = galaxy.createPot(2, 23, 500f, 60000f, 1000f)
     private var timerLastTick = 0
 
-    fun osc(timeStretch: Float = 1f, timeOffset: Float = 0f) = with(sketch) {
-        sin(millis() / 1000f * PConstants.PI * 2 * timeStretch + timeOffset)
+    fun osc(timeStretch: Float = 1f, timeOffset: Float = 0f) = with(parent) {
+        PApplet.sin(millis() / 1000f * PConstants.PI * 2 * timeStretch + timeOffset)
     }
 
     fun initSphere(num: Int) {
@@ -89,23 +84,21 @@ class FibSphereSketch : BaseSketch() {
         for (i in 0 until num) {
             var lon = GA * i
             lon /= PConstants.TWO_PI
-            lon -= floor(lon)
+            lon -= PApplet.floor(lon)
             lon *= PConstants.TWO_PI
             if (lon > PConstants.PI) {
                 lon -= PConstants.TWO_PI
             }
 
             // Convert dome height (which is proportional to surface area) to latitude
-            val lat = asin(-1 + 2 * i / num.toFloat())
+            val lat = PApplet.asin(-1 + 2 * i / num.toFloat())
 
             pts[i] = SpherePoint(lat, lon, radius)
         }
     }
 
-    override fun setup() = with(sketch) {
-        sphereDetail(8)
+    init {
         initSphere(numPoints)
-
         automator.setupWithGalaxy(
             channel = 2,
             recordButtonCC = 24,
@@ -116,10 +109,15 @@ class FibSphereSketch : BaseSketch() {
         )
     }
 
-    override fun draw() = with(sketch) {
+    override fun PGraphics.draw() {
+        clear()
+        colorModeHsb()
+        sphereDetail(8)
+
         automator.update()
-        if (millis() > timerLastTick + timerIntervalPot.value) {
-            timerLastTick = millis()
+
+        if (parent.millis() > timerLastTick + timerIntervalPot.value) {
+            timerLastTick = parent.millis()
             onTimerTick()
         }
 
@@ -141,7 +139,6 @@ class FibSphereSketch : BaseSketch() {
 
         val drawMode = DrawMode.values()[drawModeButtons.activeButtonsIndices().first()]
 
-        background(bgHue, bgSat, bgBrightness)
         renderGlobe(drawMode)
     }
 
@@ -151,15 +148,15 @@ class FibSphereSketch : BaseSketch() {
         }
     }
 
-    fun renderGlobe(mode: DrawMode) = with(sketch) {
+    fun renderGlobe(mode: DrawMode) = with(canvas) {
         pushMatrix()
         translate(centerX(), centerY(), pushBack)
 
-        rotateX(radians(rotationX))
-        rotateY(radians(rotationY + 270))
-        rotateZ(radians(rotationZ))
+        rotateX(PApplet.radians(rotationX))
+        rotateY(PApplet.radians(rotationY + 270))
+        rotateZ(PApplet.radians(rotationZ))
 
-        val radius = map(
+        val radius = PApplet.map(
             osc(oscSpeedPot.value),
             -1f,
             1f,
@@ -167,20 +164,20 @@ class FibSphereSketch : BaseSketch() {
             oscHiPot.value
         )
 
-        val bass = lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
-        for (i in 0 until min(numPoints, pts.size)) {
+        val bass = PApplet.lerp(bass, audioProcessor.getRange(30f..200f), 0.5f)
+        for (i in 0 until PApplet.min(numPoints, pts.size)) {
             val pt = pts[i]
             pushMatrix()
 
             when (mode) {
                 DrawMode.MODE_1 -> {
                     noStroke()
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
 
                     pushMatrix()
                     rotateY(pt.lon + osc(0.5f, i + 10f) / 20f)
                     rotateZ(-pt.lat)
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
@@ -194,7 +191,7 @@ class FibSphereSketch : BaseSketch() {
 
                 DrawMode.MODE_2 -> {
                     noStroke()
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
 
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
@@ -210,13 +207,13 @@ class FibSphereSketch : BaseSketch() {
                     if (i % 2 == 0) {
                         sphere(sphereSizePot.value)
                     } else {
-                        sphere(map(bass, 0f, 80f, sphereSizePot.value, sphereSizePot.value * 5f))
+                        sphere(PApplet.map(bass, 0f, 80f, sphereSizePot.value, sphereSizePot.value * 5f))
                     }
                 }
 
                 DrawMode.MODE_3 -> {
                     noStroke()
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
 
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
@@ -227,7 +224,7 @@ class FibSphereSketch : BaseSketch() {
                     popMatrix()
 
                     pushMatrix()
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
@@ -241,7 +238,7 @@ class FibSphereSketch : BaseSketch() {
 
                 DrawMode.MODE_4 -> {
                     noStroke()
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
 
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
@@ -252,7 +249,7 @@ class FibSphereSketch : BaseSketch() {
                     popMatrix()
 
                     pushMatrix()
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
@@ -264,22 +261,22 @@ class FibSphereSketch : BaseSketch() {
                     popMatrix()
 
                     pushMatrix()
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
-                    stroke(accentHue, accentSat, accentBrightness)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    stroke(fgColor)
                     strokeWeight(spikeSizePot.value)
-                    sketch.line(0f, 0f, 0f, 0.5f * audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    line(0f, 0f, 0f, 0.5f * audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     popMatrix()
                 }
 
                 DrawMode.MODE_5 -> {
                     noStroke()
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
 
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
 
                     pushMatrix()
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
@@ -291,16 +288,16 @@ class FibSphereSketch : BaseSketch() {
                     popMatrix()
 
                     pushMatrix()
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
-                    stroke(fgHue, fgSat, fgBrightness)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    stroke(fgColor)
                     strokeWeight(spikeSizePot.value + 2f)
-                    sketch.line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
+                    line(0f, 0f, 0f, audioProcessor.getFftAvg((i % audioProcessor.fft.avgSize())), 0f, 0f)
                     popMatrix()
                 }
 
                 DrawMode.MODE_6 -> {
                     noStroke()
-                    fill(accentHue, accentSat, accentBrightness)
+                    fill(fgColor)
 
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
@@ -310,9 +307,9 @@ class FibSphereSketch : BaseSketch() {
                     sphere(sphereSizePot.value)
                     popMatrix()
 
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
                     pushMatrix()
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
@@ -334,7 +331,7 @@ class FibSphereSketch : BaseSketch() {
                         pushMatrix()
                         val spacing = audioProcessor.getRange((100f..200f)) * 0.1f
                         translate(radius + sphereSizePot.value * it + (it * spacing), 0f, 0f)
-                        fill(fgHue + it * 15f, fgSat, fgBrightness)
+                        fill(parent.hue(fgColor) + it * 15f, parent.saturation(fgColor), parent.brightness(fgColor))
                         sphere(sphereSizePot.value - it * .8f)
                         popMatrix()
                     }
@@ -343,15 +340,15 @@ class FibSphereSketch : BaseSketch() {
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 4f + radius * 2f, 0f, 0f)
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
                     sphere(sphereSizePot.value + 1f)
                     popMatrix()
                 }
 
                 DrawMode.MODE_8 -> {
                     noStroke()
-                    val hue = (i % audioProcessor.fft.avgSize()) * 2 + fgHue
-                    fill(hue, fgSat, fgBrightness)
+                    val hue = (i % audioProcessor.fft.avgSize()) * 2 + parent.hue(fgColor)
+                    fill(hue, parent.saturation(fgColor), parent.brightness(fgColor))
 
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
@@ -362,7 +359,7 @@ class FibSphereSketch : BaseSketch() {
                     popMatrix()
 
                     pushMatrix()
-                    translate(radius * map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
+                    translate(radius * PApplet.map(bass, 0f, 300f, 1f, 2f), 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
@@ -376,23 +373,23 @@ class FibSphereSketch : BaseSketch() {
 
                 DrawMode.MODE_9 -> {
                     noStroke()
-                    rotateY(pt.lon + if (i % 2 == 0) millis() * 0.0001f else millis() * -0.0001f)
+                    rotateY(pt.lon + if (i % 2 == 0) parent.millis() * 0.0001f else parent.millis() * -0.0001f)
                     rotateZ(-pt.lat)
 
                     pushMatrix()
-                    fill(fgHue, fgSat, fgBrightness)
+                    fill(fgColor)
                     translate(radius, 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
-                    fill(fgHue + 20f, fgSat, fgBrightness)
+                    fill(parent.hue(fgColor) + 20f, parent.saturation(fgColor), parent.brightness(fgColor))
                     translate(radius * 0.6f, 0f, 0f)
                     sphere(sphereSizePot.value)
                     popMatrix()
 
                     pushMatrix()
-                    fill(accentHue, accentBrightness, accentSat)
+                    fill(fgColor)
                     rotateY(pt.lon)
                     rotateZ(-pt.lat)
                     translate(radius * bass / 8f + radius * 2f, 0f, 0f)
