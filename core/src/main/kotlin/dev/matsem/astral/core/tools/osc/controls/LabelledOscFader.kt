@@ -9,8 +9,8 @@ import oscP5.OscMessage
 open class LabelledOscFader(
     private val oscManager: OscManager,
     private val address: String,
-    private val defaultValue: Float,
-    private val label: String
+    private val label: String,
+    private val defaultValue: Float
 ) : OscFader(oscManager, address, defaultValue) {
 
     init {

@@ -16,7 +16,7 @@ class LabelledOscFaderDelegate(
     defaultValue: Float
 ) : ReadWriteProperty<OscHandler, Float> {
 
-    private val fader = LabelledOscFader(oscManager, address, defaultValue, label)
+    private val fader = LabelledOscFader(oscManager, address, label, defaultValue)
 
     override fun getValue(thisRef: OscHandler, property: KProperty<*>): Float = fader.value
 
