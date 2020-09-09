@@ -29,7 +29,7 @@ val coreModule = module {
     factory { MidiRecorder(get()) }
     factory { MidiPlayer(get()) }
     factory { MidiAutomator(get(), get(), get()) }
-    single { OscManager(get(), 7001, "192.168.1.171", 7001) }
+    single { OscManager(get(), 7001, "192.168.1.11", 7001) }
 
     // Audio
     single { Minim(get() as PApplet) }

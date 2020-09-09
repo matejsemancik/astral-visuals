@@ -11,8 +11,7 @@ import ddf.minim.ugens.Waves
 import dev.matsem.astral.core.tools.extensions.*
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
-import dev.matsem.astral.core.tools.osc.oscKnob
+import dev.matsem.astral.core.tools.osc.oscFaderDelegate
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -33,14 +32,14 @@ class BlobDetectionSketch : PApplet(), KoinComponent, CoroutineScope, OscHandler
     private val sink: Sink by inject()
     private lateinit var cam: PeasyCam
 
-    private var oscilFreq by oscKnob("/play/fader1", 0.5f)
-    private var elevScale by oscKnob("/play/fader2", 0.5f)
-    private var noiseScl by oscKnob("/play/fader3", 0.5f)
-    private var flicker by oscKnob("/play/fader4", 0.5f)
-    private var speed by oscKnob("/play/fader5", 0.5f)
-    private var bloomThresh by oscFader("/play/fader6", 0.5f)
-    private var bloomSize by oscFader("/play/fader7", 0.2f)
-    private var bloomSigma by oscFader("/play/fader8", 0.4f)
+    private var oscilFreq by this.oscFaderDelegate("/play/fader1", 0.5f)
+    private var elevScale by this.oscFaderDelegate("/play/fader2", 0.5f)
+    private var noiseScl by this.oscFaderDelegate("/play/fader3", 0.5f)
+    private var flicker by this.oscFaderDelegate("/play/fader4", 0.5f)
+    private var speed by this.oscFaderDelegate("/play/fader5", 0.5f)
+    private var bloomThresh by this.oscFaderDelegate("/play/fader6", 0.5f)
+    private var bloomSize by this.oscFaderDelegate("/play/fader7", 0.2f)
+    private var bloomSigma by this.oscFaderDelegate("/play/fader8", 0.4f)
 
     private val levels = 25
     private var elevation = 200f

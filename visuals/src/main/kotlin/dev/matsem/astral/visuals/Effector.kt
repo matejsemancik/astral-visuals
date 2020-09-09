@@ -9,8 +9,8 @@ import ch.bildspur.postfx.pass.RGBSplitPass
 import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
-import dev.matsem.astral.core.tools.osc.oscToggleButton
+import dev.matsem.astral.core.tools.osc.oscFaderDelegate
+import dev.matsem.astral.core.tools.osc.oscToggleButtonDelegate
 import processing.core.PApplet
 
 class Effector(
@@ -20,18 +20,18 @@ class Effector(
 
     private val fx = PostFX(parent)
 
-    private val rgbSplitEnabled by oscToggleButton("/fx/rgbSplit/enabled")
-    private val rgbSplitDelta by oscFader("/fx/rgbSplit/delta", defaultValue = 0.5f)
+    private val rgbSplitEnabled by oscToggleButtonDelegate("/fx/rgbSplit/enabled")
+    private val rgbSplitDelta by oscFaderDelegate("/fx/rgbSplit/delta", defaultValue = 0.5f)
 
-    private val pixelateEnabled by oscToggleButton("/fx/pixelate/enabled")
-    private val pixelateAmount by oscFader("/fx/pixelate/amount", defaultValue = 0.8f)
+    private val pixelateEnabled by oscToggleButtonDelegate("/fx/pixelate/enabled")
+    private val pixelateAmount by oscFaderDelegate("/fx/pixelate/amount", defaultValue = 0.8f)
 
-    private val bloomEnabled by oscToggleButton("/fx/bloom/enabled")
-    private val bloomThreshold by oscFader("/fx/bloom/threshold", defaultValue = 0.5f)
-    private val bloomSize by oscFader("/fx/bloom/size", defaultValue = 0.5f)
-    private val bloomSigma by oscFader("/fx/bloom/sigma", defaultValue = 0.8f)
+    private val bloomEnabled by oscToggleButtonDelegate("/fx/bloom/enabled")
+    private val bloomThreshold by oscFaderDelegate("/fx/bloom/threshold", defaultValue = 0.5f)
+    private val bloomSize by oscFaderDelegate("/fx/bloom/size", defaultValue = 0.5f)
+    private val bloomSigma by oscFaderDelegate("/fx/bloom/sigma", defaultValue = 0.8f)
 
-    private val chromaticAberrationEnabled by oscToggleButton("/fx/aberration/enabled")
+    private val chromaticAberrationEnabled by oscToggleButtonDelegate("/fx/aberration/enabled")
 
     init {
         fx.apply {

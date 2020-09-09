@@ -17,10 +17,9 @@ import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.value
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
-import dev.matsem.astral.core.tools.osc.oscKnob
-import dev.matsem.astral.core.tools.osc.oscPushButton
-import dev.matsem.astral.core.tools.osc.oscToggleButton
+import dev.matsem.astral.core.tools.osc.oscFaderDelegate
+import dev.matsem.astral.core.tools.osc.oscPushButtonDelegate
+import dev.matsem.astral.core.tools.osc.oscToggleButtonDelegate
 import dev.matsem.astral.visuals.ColorHandler
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Layer
@@ -65,18 +64,18 @@ class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHan
         lookAt(canvas.width / 2.0, canvas.height / 2.0, 0.0)
     }
 
-    private var oscilFreq by oscKnob("/blob/oscil/freq", defaultValue = 0f)
-    private var oscilAudioGain by oscFader("/blob/oscil/audioGain", defaultValue = 0f)
-    private var elevScale by oscKnob("/blob/elevation/scale", defaultValue = 1f)
-    private var noiseScl by oscKnob("/blob/noise/scale", defaultValue = 0.5f)
-    private var noiseAuto by oscToggleButton("/blob/noise/auto", defaultValue = false)
-    private var flicker by oscKnob("/blob/flicker", defaultValue = 0.5f)
-    private var flickerAuto by oscToggleButton("/blob/flicker/auto", defaultValue = false)
-    private var speed by oscKnob("/blob/speed", defaultValue = 0.5f)
-    private var strokeFader by oscFader("/blob/stroke", defaultValue = 0f)
+    private var oscilFreq by this.oscFaderDelegate("/blob/oscil/freq", defaultValue = 0f)
+    private var oscilAudioGain by this.oscFaderDelegate("/blob/oscil/audioGain", defaultValue = 0f)
+    private var elevScale by this.oscFaderDelegate("/blob/elevation/scale", defaultValue = 1f)
+    private var noiseScl by this.oscFaderDelegate("/blob/noise/scale", defaultValue = 0.5f)
+    private var noiseAuto by oscToggleButtonDelegate("/blob/noise/auto", defaultValue = false)
+    private var flicker by this.oscFaderDelegate("/blob/flicker", defaultValue = 0.5f)
+    private var flickerAuto by oscToggleButtonDelegate("/blob/flicker/auto", defaultValue = false)
+    private var speed by this.oscFaderDelegate("/blob/speed", defaultValue = 0.5f)
+    private var strokeFader by this.oscFaderDelegate("/blob/stroke", defaultValue = 0f)
 
-    private val newCamAuto by oscToggleButton("/blob/cam/auto", defaultValue = false)
-    private val newCamTrigger by oscPushButton("/blob/cam/new") { switchCam() }
+    private val newCamAuto by oscToggleButtonDelegate("/blob/cam/auto", defaultValue = false)
+    private val newCamTrigger by oscPushButtonDelegate("/blob/cam/new") { switchCam() }
 
     private val levels = 25
     private var elevation = 600f

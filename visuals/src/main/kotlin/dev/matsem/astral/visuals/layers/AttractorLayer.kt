@@ -10,9 +10,9 @@ import dev.matsem.astral.core.tools.extensions.saw
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
-import dev.matsem.astral.core.tools.osc.oscPushButton
-import dev.matsem.astral.core.tools.osc.oscToggleButton
+import dev.matsem.astral.core.tools.osc.oscFaderDelegate
+import dev.matsem.astral.core.tools.osc.oscPushButtonDelegate
+import dev.matsem.astral.core.tools.osc.oscToggleButtonDelegate
 import dev.matsem.astral.visuals.ColorHandler
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Layer
@@ -34,55 +34,55 @@ class AttractorLayer : Layer(), KoinComponent, OscHandler, ColorHandler {
     override val colorizer: Colorizer by inject()
     val audioProcessor: AudioProcessor by inject()
 
-    private val iterationCount by oscFader("/attractor/iterations", defaultValue = 0.5f)
-    private val scale by oscFader("/attractor/scale", defaultValue = 0.4f)
-    private val stretchX by oscFader("/attractor/stretchX", defaultValue = 0.5f)
-    private val stabilize by oscToggleButton("/attractor/stabilize", defaultValue = true)
-    private val dotSize by oscFader("/attractor/dotSize", defaultValue = 0f)
-    private val bgAlpha by oscFader("/attractor/bgAlpha", defaultValue = 1f)
-    private val debug by oscToggleButton("/attractor/debug", defaultValue = true)
+    private val iterationCount by oscFaderDelegate("/attractor/iterations", defaultValue = 0.5f)
+    private val scale by oscFaderDelegate("/attractor/scale", defaultValue = 0.4f)
+    private val stretchX by oscFaderDelegate("/attractor/stretchX", defaultValue = 0.5f)
+    private val stabilize by oscToggleButtonDelegate("/attractor/stabilize", defaultValue = true)
+    private val dotSize by oscFaderDelegate("/attractor/dotSize", defaultValue = 0f)
+    private val bgAlpha by oscFaderDelegate("/attractor/bgAlpha", defaultValue = 1f)
+    private val debug by oscToggleButtonDelegate("/attractor/debug", defaultValue = true)
 
-    private var sliderA by oscFader("/attractor/a/value", defaultValue = 0.8f)
-    private var potA0 by oscFader("/attractor/a/speed", defaultValue = 0f)
-    private var potA1 by oscFader("/attractor/a/amt", defaultValue = 0f)
-    private var potA2 by oscFader("/attractor/a/audio", defaultValue = 0f)
+    private var sliderA by oscFaderDelegate("/attractor/a/value", defaultValue = 0.8f)
+    private var potA0 by oscFaderDelegate("/attractor/a/speed", defaultValue = 0f)
+    private var potA1 by oscFaderDelegate("/attractor/a/amt", defaultValue = 0f)
+    private var potA2 by oscFaderDelegate("/attractor/a/audio", defaultValue = 0f)
 
-    private var sliderB by oscFader("/attractor/b/value", defaultValue = 0.5f)
-    private var potB0 by oscFader("/attractor/b/speed", defaultValue = 0f)
-    private var potB1 by oscFader("/attractor/b/amt", defaultValue = 0f)
-    private var potB2 by oscFader("/attractor/b/audio", defaultValue = 0f)
+    private var sliderB by oscFaderDelegate("/attractor/b/value", defaultValue = 0.5f)
+    private var potB0 by oscFaderDelegate("/attractor/b/speed", defaultValue = 0f)
+    private var potB1 by oscFaderDelegate("/attractor/b/amt", defaultValue = 0f)
+    private var potB2 by oscFaderDelegate("/attractor/b/audio", defaultValue = 0f)
 
-    private var sliderC by oscFader("/attractor/c/value", defaultValue = 0.6f)
-    private var potC0 by oscFader("/attractor/c/speed", defaultValue = 0f)
-    private var potC1 by oscFader("/attractor/c/amt", defaultValue = 0f)
-    private var potC2 by oscFader("/attractor/c/audio", defaultValue = 0f)
+    private var sliderC by oscFaderDelegate("/attractor/c/value", defaultValue = 0.6f)
+    private var potC0 by oscFaderDelegate("/attractor/c/speed", defaultValue = 0f)
+    private var potC1 by oscFaderDelegate("/attractor/c/amt", defaultValue = 0f)
+    private var potC2 by oscFaderDelegate("/attractor/c/audio", defaultValue = 0f)
 
-    private var sliderD by oscFader("/attractor/d/value", defaultValue = 0.4f)
-    private var potD0 by oscFader("/attractor/d/speed", defaultValue = 0f)
-    private var potD1 by oscFader("/attractor/d/amt", defaultValue = 0f)
-    private var potD2 by oscFader("/attractor/d/audio", defaultValue = 0f)
+    private var sliderD by oscFaderDelegate("/attractor/d/value", defaultValue = 0.4f)
+    private var potD0 by oscFaderDelegate("/attractor/d/speed", defaultValue = 0f)
+    private var potD1 by oscFaderDelegate("/attractor/d/amt", defaultValue = 0f)
+    private var potD2 by oscFaderDelegate("/attractor/d/audio", defaultValue = 0f)
 
-    private var sliderABeat by oscToggleButton("/attractor/a/value/beat", defaultValue = false)
-    private var potA0Beat by oscToggleButton("/attractor/a/speed/beat", defaultValue = false)
-    private var potA1Beat by oscToggleButton("/attractor/a/amt/beat", defaultValue = false)
-    private var potA2Beat by oscToggleButton("/attractor/a/audio/beat", defaultValue = false)
+    private var sliderABeat by oscToggleButtonDelegate("/attractor/a/value/beat", defaultValue = false)
+    private var potA0Beat by oscToggleButtonDelegate("/attractor/a/speed/beat", defaultValue = false)
+    private var potA1Beat by oscToggleButtonDelegate("/attractor/a/amt/beat", defaultValue = false)
+    private var potA2Beat by oscToggleButtonDelegate("/attractor/a/audio/beat", defaultValue = false)
 
-    private var sliderBBeat by oscToggleButton("/attractor/b/value/beat", defaultValue = false)
-    private var potB0Beat by oscToggleButton("/attractor/b/speed/beat", defaultValue = false)
-    private var potB1Beat by oscToggleButton("/attractor/b/amt/beat", defaultValue = false)
-    private var potB2Beat by oscToggleButton("/attractor/b/audio/beat", defaultValue = false)
+    private var sliderBBeat by oscToggleButtonDelegate("/attractor/b/value/beat", defaultValue = false)
+    private var potB0Beat by oscToggleButtonDelegate("/attractor/b/speed/beat", defaultValue = false)
+    private var potB1Beat by oscToggleButtonDelegate("/attractor/b/amt/beat", defaultValue = false)
+    private var potB2Beat by oscToggleButtonDelegate("/attractor/b/audio/beat", defaultValue = false)
 
-    private var sliderCBeat by oscToggleButton("/attractor/c/value/beat", defaultValue = false)
-    private var potC0Beat by oscToggleButton("/attractor/c/speed/beat", defaultValue = false)
-    private var potC1Beat by oscToggleButton("/attractor/c/amt/beat", defaultValue = false)
-    private var potC2Beat by oscToggleButton("/attractor/c/audio/beat", defaultValue = false)
+    private var sliderCBeat by oscToggleButtonDelegate("/attractor/c/value/beat", defaultValue = false)
+    private var potC0Beat by oscToggleButtonDelegate("/attractor/c/speed/beat", defaultValue = false)
+    private var potC1Beat by oscToggleButtonDelegate("/attractor/c/amt/beat", defaultValue = false)
+    private var potC2Beat by oscToggleButtonDelegate("/attractor/c/audio/beat", defaultValue = false)
 
-    private var sliderDBeat by oscToggleButton("/attractor/d/value/beat", defaultValue = false)
-    private var potD0Beat by oscToggleButton("/attractor/d/speed/beat", defaultValue = false)
-    private var potD1Beat by oscToggleButton("/attractor/d/amt/beat", defaultValue = false)
-    private var potD2Beat by oscToggleButton("/attractor/d/audio/beat", defaultValue = false)
+    private var sliderDBeat by oscToggleButtonDelegate("/attractor/d/value/beat", defaultValue = false)
+    private var potD0Beat by oscToggleButtonDelegate("/attractor/d/speed/beat", defaultValue = false)
+    private var potD1Beat by oscToggleButtonDelegate("/attractor/d/amt/beat", defaultValue = false)
+    private var potD2Beat by oscToggleButtonDelegate("/attractor/d/audio/beat", defaultValue = false)
 
-    private val randomizeTrigger by oscPushButton("/attractor/randomize") {
+    private val randomizeTrigger by oscPushButtonDelegate("/attractor/randomize") {
         sliderA = parent.random(0f, 1f)
         potA0 = parent.random(0f, 1f)
         potA1 = parent.random(0f, 1f)
@@ -99,12 +99,12 @@ class AttractorLayer : Layer(), KoinComponent, OscHandler, ColorHandler {
         potD2 = parent.random(0f, 1f)
     }
 
-    private val beatDivide1 by oscToggleButton("/attractor/beatDivide/1/1", defaultValue = true)
-    private val beatDivide2 by oscToggleButton("/attractor/beatDivide/1/2", defaultValue = false)
-    private val beatDivide4 by oscToggleButton("/attractor/beatDivide/1/3", defaultValue = false)
-    private val beatDivide8 by oscToggleButton("/attractor/beatDivide/1/4", defaultValue = false)
-    private val beatDivide16 by oscToggleButton("/attractor/beatDivide/1/5", defaultValue = false)
-    private val beatDivide32 by oscToggleButton("/attractor/beatDivide/1/6", defaultValue = false)
+    private val beatDivide1 by oscToggleButtonDelegate("/attractor/beatDivide/1/1", defaultValue = true)
+    private val beatDivide2 by oscToggleButtonDelegate("/attractor/beatDivide/1/2", defaultValue = false)
+    private val beatDivide4 by oscToggleButtonDelegate("/attractor/beatDivide/1/3", defaultValue = false)
+    private val beatDivide8 by oscToggleButtonDelegate("/attractor/beatDivide/1/4", defaultValue = false)
+    private val beatDivide16 by oscToggleButtonDelegate("/attractor/beatDivide/1/5", defaultValue = false)
+    private val beatDivide32 by oscToggleButtonDelegate("/attractor/beatDivide/1/6", defaultValue = false)
 
     private var rightmost = Float.MIN_VALUE
     private var leftmost = Float.MAX_VALUE

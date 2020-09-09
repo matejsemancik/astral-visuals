@@ -15,7 +15,7 @@ import dev.matsem.astral.core.tools.galaxy.Galaxy
 import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscToggleButton
+import dev.matsem.astral.core.tools.osc.oscToggleButtonDelegate
 import dev.matsem.astral.visuals.ColorHandler
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Layer
@@ -113,7 +113,7 @@ class GalaxyLayer : Layer(), KoinComponent, ColorHandler, OscHandler {
     private val starDiameterSlider = galaxy.createPot(channel = 10, cc = 15, min = 0.2f, max = 1.5f, initialValue = 1f)
 
     private val bassGainSlider = galaxy.createPot(channel = 10, cc = 16, min = 0f, max = 2f)
-    var shuffleStarsEnabled by oscToggleButton("/galaxy/shuffleEnabled", defaultValue = true)
+    var shuffleStarsEnabled by oscToggleButtonDelegate("/galaxy/shuffleEnabled", defaultValue = true)
 
     // endregion
 

@@ -2,7 +2,7 @@ package dev.matsem.astral.playground.sketches
 
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
+import dev.matsem.astral.core.tools.osc.oscFaderDelegate
 import dev.matsem.astral.core.tools.pixelsort.PixelSorter
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -15,7 +15,7 @@ class PixelSortingSketch : PApplet(), KoinComponent, OscHandler {
     val originalImg by lazy { loadImage("lenna.png").apply { loadPixels() } }
     override val oscManager by lazy { OscManager(this, 7001, "192.168.1.11", 7001) }
 
-    val threshold by oscFader("/play/fader1")
+    val threshold by oscFaderDelegate("/play/fader1")
 
     override fun settings() {
         size(1, 1, PConstants.P2D)

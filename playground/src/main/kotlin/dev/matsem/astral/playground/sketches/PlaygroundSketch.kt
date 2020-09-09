@@ -25,18 +25,18 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
         OscManager(sketch = this, inputPort = 7001, outputIp = "192.168.1.11", outputPort = 7001)
     }
 
-    private var fader1: Float by oscFader("/1/fader1", defaultValue = 0.5f)
-    private var fader2: Float by oscFader("/1/fader2")
-    private var knob1: Float by oscKnob("/1/rotary1")
-    private var knob2: Float by oscKnob("/1/rotary2", defaultValue = 0.5f)
-    private var toggle1: Boolean by oscToggleButton("/1/toggle1", defaultValue = false)
-    private val push1: Boolean by oscPushButton("/1/push1") {
+    private var fader1: Float by this.oscFaderDelegate("/1/fader1", defaultValue = 0.5f)
+    private var fader2: Float by this.oscFaderDelegate("/1/fader2")
+    private var knob1: Float by this.oscFaderDelegate("/1/rotary1")
+    private var knob2: Float by this.oscFaderDelegate("/1/rotary2", defaultValue = 0.5f)
+    private var toggle1: Boolean by oscToggleButtonDelegate("/1/toggle1", defaultValue = false)
+    private val push1: Boolean by oscPushButtonDelegate("/1/push1") {
         println("Trigger!")
     }
-    private var xy1: PVector by oscXyPad("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
-    private var led1: Float by oscLedIndicator("/1/led1")
-    private var label1: String by oscLabelIndicator("/1/label1")
-    private val encoder1: Float by oscEncoder(
+    private var xy1: PVector by oscXyPadDelegate("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
+    private var led1: Float by oscLedIndicatorDelegate("/1/led1")
+    private var label1: String by oscLabelIndicatorDelegate("/1/label1")
+    private val encoder1: Float by oscEncoderDelegate(
         "/1/encoder1",
         defaultValue = 100f,
         increment = 1f,

@@ -4,7 +4,7 @@ import dev.matsem.astral.core.ColorConfig
 import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscFader
+import dev.matsem.astral.core.tools.osc.oscFaderDelegate
 import processing.core.PApplet
 
 class Colorizer(
@@ -12,13 +12,13 @@ class Colorizer(
     override val oscManager: OscManager
 ) : OscHandler {
 
-    private val fgHue by oscFader("/color/fg/hue", defaultValue = 0f)
-    private val fgSaturation by oscFader("/color/fg/sat", defaultValue = 0f)
-    private val fgBrightness by oscFader("/color/fg/bri", defaultValue = 1f)
+    private val fgHue by oscFaderDelegate("/color/fg/hue", defaultValue = 0f)
+    private val fgSaturation by oscFaderDelegate("/color/fg/sat", defaultValue = 0f)
+    private val fgBrightness by oscFaderDelegate("/color/fg/bri", defaultValue = 1f)
 
-    private val bgHue by oscFader("/color/bg/hue", defaultValue = 0f)
-    private val bgSaturation by oscFader("/color/bg/sat", defaultValue = 0f)
-    private val bgBrightness by oscFader("/color/bg/bri", defaultValue = 0f)
+    private val bgHue by oscFaderDelegate("/color/bg/hue", defaultValue = 0f)
+    private val bgSaturation by oscFaderDelegate("/color/bg/sat", defaultValue = 0f)
+    private val bgBrightness by oscFaderDelegate("/color/bg/bri", defaultValue = 0f)
 
     private val inputFgColor
         get() = parent.color(

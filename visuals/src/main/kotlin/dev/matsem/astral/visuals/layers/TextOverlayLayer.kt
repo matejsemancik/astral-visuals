@@ -6,8 +6,8 @@ import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.core.tools.osc.OscHandler
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.osc.oscLabelIndicator
-import dev.matsem.astral.core.tools.osc.oscPushButton
+import dev.matsem.astral.core.tools.osc.oscLabelIndicatorDelegate
+import dev.matsem.astral.core.tools.osc.oscPushButtonDelegate
 import dev.matsem.astral.visuals.Layer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -31,23 +31,23 @@ class TextOverlayLayer : Layer(), KoinComponent, OscHandler {
     var deadline = LocalDateTime.of(2020, Month.SEPTEMBER, 11, 23, 0, 0)
     val jetbrainsMonoFont = parent.createFont(Files.Font.JETBRAINS_MONO, 24f, true)
 
-    val minus1Button by oscPushButton("/text/minus1") {
+    val minus1Button by oscPushButtonDelegate("/text/minus1") {
         addMinutes(-1)
         updateLabel()
     }
-    val minus10Button by oscPushButton("/text/minus10") {
+    val minus10Button by oscPushButtonDelegate("/text/minus10") {
         addMinutes(-10)
         updateLabel()
     }
-    val plus10Button by oscPushButton("/text/plus10") {
+    val plus10Button by oscPushButtonDelegate("/text/plus10") {
         addMinutes(10)
         updateLabel()
     }
-    val plus1Button by oscPushButton("/text/plus1") {
+    val plus1Button by oscPushButtonDelegate("/text/plus1") {
         addMinutes(1)
         updateLabel()
     }
-    var deadlineLabel by oscLabelIndicator("/text/deadline", defaultValue = "--:--:--")
+    var deadlineLabel by oscLabelIndicatorDelegate("/text/deadline", defaultValue = "--:--:--")
 
     private fun addMinutes(count: Long) {
         synchronized(lock) {
