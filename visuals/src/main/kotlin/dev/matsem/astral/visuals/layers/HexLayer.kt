@@ -1,26 +1,28 @@
-package dev.matsem.astral.visuals.legacy.tunnel
+package dev.matsem.astral.visuals.layers
 
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.extensions.midiRange
 import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.saw
 import dev.matsem.astral.core.tools.extensions.shorterDimension
 import dev.matsem.astral.core.tools.extensions.translateCenter
-import dev.matsem.astral.visuals.legacy.BaseSketch
-import dev.matsem.astral.visuals.legacy.SketchLoader
-import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.midi.MidiAutomator
+import dev.matsem.astral.visuals.ColorHandler
+import dev.matsem.astral.visuals.Colorizer
+import dev.matsem.astral.visuals.Layer
+import org.koin.core.KoinComponent
 import org.koin.core.inject
-import processing.core.PApplet.cos
-import processing.core.PApplet.lerp
-import processing.core.PApplet.sin
-import processing.core.PConstants.CLOSE
-import processing.core.PConstants.TWO_PI
+import processing.core.PApplet
+import processing.core.PConstants
+import processing.core.PGraphics
 
-class TunnelSketch : BaseSketch() {
+class HexLayer : Layer(), KoinComponent, ColorHandler {
+    override val parent: PApplet by inject()
+    override val colorizer: Colorizer by inject()
 
-    override val sketch: SketchLoader by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val ex: extruder.extruder by inject()
     private val automator: MidiAutomator by inject()
@@ -35,30 +37,28 @@ class TunnelSketch : BaseSketch() {
     private val slider7 = galaxy.createPot(channel = 13, cc = 10)
     private val slider8 = galaxy.createPot(channel = 13, cc = 11)
 
-    private val hexagon = with(sketch) {
+    private val hexagon = with(canvas) {
         ex.extrude(
             createShape().apply {
                 val radius = shorterDimension() / 2f
-                val angle = TWO_PI / 6
+                val angle = PConstants.TWO_PI / 6
 
                 beginShape()
                 var a = 0f
-                while (a < TWO_PI) {
-                    val sx = cos(a) * radius
-                    val sy = sin(a) * radius
+                while (a < PConstants.TWO_PI) {
+                    val sx = PApplet.cos(a) * radius
+                    val sy = PApplet.sin(a) * radius
                     vertex(sx, sy)
                     a += angle
                 }
-                endShape(CLOSE)
+                endShape(PConstants.CLOSE)
             },
             50,
             "box"
         )
     }
 
-    override fun onBecameActive() = Unit
-
-    override fun setup() = with(sketch) {
+    init {
         automator.setupWithGalaxy(
             channel = 13,
             recordButtonCC = 0,
@@ -70,10 +70,12 @@ class TunnelSketch : BaseSketch() {
     }
 
     private var speed: Float = 0f
-    private var stroke = 0f
+    private var strokew = 0f
     private var amplitude = 0f
 
-    override fun draw() = with(sketch) {
+    override fun PGraphics.draw() {
+        colorModeHsb()
+        clear()
         automator.update()
 
         amplitude += audioProcessor.getRange(100f..500f)
@@ -88,24 +90,24 @@ class TunnelSketch : BaseSketch() {
         val kickStrokeMultiplier = slider5.rawValue.midiRange(0f, 4f)
 
         if (audioProcessor.beatDetect.isKick) {
-            stroke = targetStroke * kickStrokeMultiplier
+            strokew = targetStroke * kickStrokeMultiplier
         }
 
-        stroke = lerp(stroke, targetStroke, 0.1f)
-        speed = lerp(speed, targetSpeed, 0.1f)
+        strokew = PApplet.lerp(strokew, targetStroke, 0.1f)
+        speed = PApplet.lerp(speed, targetSpeed, 0.1f)
 
-        background(bgColor)
         noFill()
         stroke(fgColor)
-        strokeWeight(stroke)
+        strokeWeight(this@HexLayer.strokew)
         translateCenter()
+        rotateZ(parent.millis() * slider7.value.mapp(-0.001f, 0.001f))
 
         polygon(amplitude, 6)
 
         for (z in 200 downTo -2200 step step) {
-            val stroke = z.remap(0f, -2000f, stroke, stroke / 4f)
-            val realZ = z + saw(speed).mapp(0f, step.toFloat())
-            if (random(0f, 1f) > flickerThresh) {
+            val stroke = z.remap(0f, -2000f, strokew, strokew / 4f)
+            val realZ = z + parent.saw(speed).mapp(0f, step.toFloat())
+            if (parent.random(0f, 1f) > flickerThresh) {
                 strokeWeight(stroke)
                 pushMatrix()
                 translate(0f, 0f, realZ)
@@ -115,23 +117,23 @@ class TunnelSketch : BaseSketch() {
         }
     }
 
-    private fun drawHexagon() = with(sketch) {
+    private fun drawHexagon() = with(canvas) {
         hexagon.forEachIndexed { index, shape ->
             shape.disableStyle()
             shape(shape)
         }
     }
 
-    private fun polygon(radius: Float, nPoints: Int) = with(sketch) {
-        val angle = TWO_PI / nPoints
+    private fun polygon(radius: Float, nPoints: Int) = with(canvas) {
+        val angle = PConstants.TWO_PI / nPoints
         beginShape()
         var a = 0f
-        while (a < TWO_PI) {
-            val sx = cos(a) * radius
-            val sy = sin(a) * radius
+        while (a < PConstants.TWO_PI) {
+            val sx = PApplet.cos(a) * radius
+            val sy = PApplet.sin(a) * radius
             vertex(sx, sy)
             a += angle
         }
-        endShape(CLOSE)
+        endShape(PConstants.CLOSE)
     }
 }

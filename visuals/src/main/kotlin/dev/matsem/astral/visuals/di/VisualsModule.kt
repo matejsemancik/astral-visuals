@@ -7,6 +7,7 @@ import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
 import dev.matsem.astral.visuals.layers.ConwayLayer
+import dev.matsem.astral.visuals.layers.HexLayer
 import dev.matsem.astral.visuals.layers.SphereLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
@@ -15,7 +16,6 @@ import dev.matsem.astral.visuals.legacy.boxes.BoxesSketch
 import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
 import dev.matsem.astral.visuals.legacy.oldskool.OldSkoolSketch
 import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
-import dev.matsem.astral.visuals.legacy.tunnel.TunnelSketch
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import dev.matsem.astral.visuals.tools.video.VideoPreparationTool
 import org.koin.dsl.bind
@@ -34,7 +34,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { BoxesSketch() }
     factory { CubesSketch() }
     factory { OldSkoolSketch() }
-    factory { TunnelSketch() }
 
     single { Mixer(get()) }
     single { Effector(get(), get()) }
@@ -48,4 +47,5 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { ConwayLayer() }
     factory { GalaxyLayer() }
     factory { SphereLayer() }
+    factory { HexLayer() }
 }

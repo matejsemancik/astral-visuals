@@ -15,6 +15,7 @@ import dev.matsem.astral.visuals.layers.AttractorLayer
 import dev.matsem.astral.visuals.layers.BackgroundLayer
 import dev.matsem.astral.visuals.layers.BlobDetectionTerrainLayer
 import dev.matsem.astral.visuals.layers.ConwayLayer
+import dev.matsem.astral.visuals.layers.HexLayer
 import dev.matsem.astral.visuals.layers.SphereLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
@@ -46,6 +47,7 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
     private val textOverlayLayer: TextOverlayLayer by inject()
     private val galaxyLayer: GalaxyLayer by inject()
     private val sphereLayer: SphereLayer by inject()
+    private val hexLayer: HexLayer by inject()
 
     private val channels = listOf(
         Channel(
@@ -77,6 +79,11 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
             labelledOscFader(address = "/mix/ch/6/value", label = "sphere", defaultValue = 1f),
             sphereLayer,
             oscToggleButton(address = "/mix/ch/6/autopilot/enable")
+        ),
+        Channel(
+            labelledOscFader(address = "/mix/ch/7/value", label = "hex", defaultValue = 1f),
+            hexLayer,
+            oscToggleButton(address = "/mix/ch/7/autopilot/enable")
         ),
         Channel(
             labelledOscFader(address = "/mix/ch/10/value", label = "krest", defaultValue = 1f),
