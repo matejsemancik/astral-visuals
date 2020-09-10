@@ -18,6 +18,7 @@ import dev.matsem.astral.visuals.layers.ConwayLayer
 import dev.matsem.astral.visuals.layers.HexLayer
 import dev.matsem.astral.visuals.layers.SphereLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
+import dev.matsem.astral.visuals.layers.debris.DebrisLayer
 import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
 import dev.matsem.astral.visuals.layers.stars.StarsLayer
 import org.koin.core.KoinComponent
@@ -48,6 +49,7 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
     private val galaxyLayer: GalaxyLayer by inject()
     private val sphereLayer: SphereLayer by inject()
     private val hexLayer: HexLayer by inject()
+    private val debrisLayer: DebrisLayer by inject()
 
     private val channels = listOf(
         Channel(
@@ -76,14 +78,19 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
             oscToggleButton(address = "/mix/ch/5/autopilot/enable")
         ),
         Channel(
-            labelledOscFader(address = "/mix/ch/6/value", label = "sphere", defaultValue = 1f),
+            labelledOscFader(address = "/mix/ch/6/value", label = "sphere", defaultValue = 0f),
             sphereLayer,
             oscToggleButton(address = "/mix/ch/6/autopilot/enable")
         ),
         Channel(
-            labelledOscFader(address = "/mix/ch/7/value", label = "hex", defaultValue = 1f),
+            labelledOscFader(address = "/mix/ch/7/value", label = "hex", defaultValue = 0f),
             hexLayer,
             oscToggleButton(address = "/mix/ch/7/autopilot/enable")
+        ),
+        Channel(
+            labelledOscFader(address = "/mix/ch/8/value", label = "hex", defaultValue = 1f),
+            debrisLayer,
+            oscToggleButton(address = "/mix/ch/8/autopilot/enable")
         ),
         Channel(
             labelledOscFader(address = "/mix/ch/10/value", label = "krest", defaultValue = 1f),

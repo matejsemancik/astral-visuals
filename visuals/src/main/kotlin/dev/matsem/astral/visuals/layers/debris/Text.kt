@@ -1,9 +1,10 @@
-package dev.matsem.astral.visuals.legacy.oldskool
+package dev.matsem.astral.visuals.layers.debris
 
+import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.rotate
 import dev.matsem.astral.core.tools.extensions.translate
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
-import processing.core.PApplet
+import processing.core.PGraphics
 import processing.core.PVector
 
 class Text(
@@ -16,18 +17,17 @@ class Text(
     targetSize: Float
 ) : FlyingObject(position, rotation, rotationVector, size, targetSize) {
 
-    override fun draw(sketch: PApplet) = with(sketch) {
-        pushMatrix()
-        translate(position)
-        rotate(rotation)
-        scale(size / 48f)
+    override fun draw(canvas: PGraphics) = with(canvas) {
+        pushPop {
+            translate(position)
+            rotate(rotation)
+            scale(size / 48f)
 
-        for (shape in cache.getText(text)) {
-            shape.disableStyle()
-            shape.setStroke(true)
-            shape(shape)
+            for (shape in cache.getText(text)) {
+                shape.disableStyle()
+                shape.setStroke(true)
+                shape(shape)
+            }
         }
-
-        popMatrix()
     }
 }

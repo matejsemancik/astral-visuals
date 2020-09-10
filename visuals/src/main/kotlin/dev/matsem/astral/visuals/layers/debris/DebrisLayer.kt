@@ -1,5 +1,9 @@
-package dev.matsem.astral.visuals.legacy.oldskool
+package dev.matsem.astral.visuals.layers.debris
 
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.constrain
 import dev.matsem.astral.core.tools.extensions.isInRadius
 import dev.matsem.astral.core.tools.extensions.longerDimension
@@ -9,26 +13,27 @@ import dev.matsem.astral.core.tools.extensions.rotate
 import dev.matsem.astral.core.tools.extensions.saw
 import dev.matsem.astral.core.tools.extensions.shorterDimension
 import dev.matsem.astral.core.tools.extensions.translateCenter
-import dev.matsem.astral.visuals.legacy.BaseSketch
-import dev.matsem.astral.visuals.legacy.SketchLoader
-import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
-import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
-import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.galaxy.Galaxy
+import dev.matsem.astral.core.tools.midi.MidiAutomator
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
+import dev.matsem.astral.visuals.ColorHandler
+import dev.matsem.astral.visuals.Colorizer
+import dev.matsem.astral.visuals.Layer
 import dev.matsem.astral.visuals.tools.tapper.Tapper
+import org.koin.core.KoinComponent
 import org.koin.core.inject
+import processing.core.PApplet
 import processing.core.PApplet.lerp
 import processing.core.PApplet.radians
 import processing.core.PConstants.PI
 import processing.core.PConstants.TWO_PI
+import processing.core.PGraphics
 import processing.core.PVector
 
 /**
  * Taking it oldskool with raw shapes
  */
-class OldSkoolSketch : BaseSketch() {
+class DebrisLayer : Layer(), KoinComponent, ColorHandler {
 
     enum class ExpandMode {
         TAP, KICK
@@ -49,13 +54,14 @@ class OldSkoolSketch : BaseSketch() {
             "S B U",
             "ROUGH : RESULT",
             "J O H N E Y",
-            "K I D  K O D A M A",
-            "S E B A",
-            "A S T R A L"
+            "W Z",
+            "DANIEL WEIRDONE",
+            "SYMBOL _ LP"
         )
     }
 
-    override val sketch: SketchLoader by inject()
+    override val parent: PApplet by inject()
+    override val colorizer: Colorizer by inject()
     private val beatCounter: BeatCounter by inject()
     private val automator: MidiAutomator by inject()
     private val tapper: Tapper by inject()
@@ -63,7 +69,7 @@ class OldSkoolSketch : BaseSketch() {
     private val extrusionCache: ExtrusionCache by inject()
     private val audioProcessor: AudioProcessor by inject()
 
-    private val zMax = sketch.longerDimension() * 2f
+    private val zMax = canvas.longerDimension() * 2f
 
     private val flyingSpeedSlider = galaxy.createPot(12, 4, 0.2f, 15f, 1f)
     private val deadZoneSlider = galaxy.createPot(12, 5, 0f, zMax / 2f, zMax / 4f)
@@ -107,7 +113,122 @@ class OldSkoolSketch : BaseSketch() {
     private val flyingObjects = mutableListOf<FlyingObject>()
     private val lock = Any()
 
-    private fun newObject(): FlyingObject = with(sketch) {
+    init {
+        automator.setupWithGalaxy(
+            channel = 12,
+            recordButtonCC = 0,
+            playButtonCC = 1,
+            loopButtonCC = 2,
+            clearButtonCC = 3,
+            channelFilter = null
+        )
+
+        tapper.doOnBeat {
+            if (expandMode == ExpandMode.TAP) {
+                flyingObjects.shuffled().take((flyingObjects.size * expandAffectedPercentageSlider.value).toInt())
+                    .forEach {
+                        it.size *= expandScalePot.value
+                    }
+            }
+        }
+
+        beatCounter.addListener(OnKick, 1) {
+            if (expandMode == ExpandMode.KICK) {
+                flyingObjects.shuffled().take((flyingObjects.size * expandAffectedPercentageSlider.value).toInt())
+                    .forEach {
+                        it.size *= expandScalePot.value
+                    }
+            }
+        }
+
+        beatCounter.addListener(OnKick, 1) {
+            beatStrokeWeight = strokeWeight * 6f
+        }
+
+        beatCounter.addListener(OnKick, 24) {
+            if (sceneRotationButton.isPressed) {
+                if (parent.random(1f) > 0.9f) {
+                    targetSceneRotation = PVector(0f, 0f, parent.random(-radians(90f), radians(90f)))
+                } else {
+                    targetSceneRotation = PVector.random3D()
+                }
+            }
+        }
+
+        repeat(500) { flyingObjects.add(newObject()) }
+    }
+
+    override fun PGraphics.draw() {
+        colorModeHsb()
+        clear()
+        automator.update()
+
+        textAwareRotationZ += textAwareRotationZAccelSlider.value
+        expandMode = ExpandMode.values()[expandModeButtons.activeButtonsIndices(true).first()]
+        strokeMode = StrokeMode.values()[strokeModeButtons.activeButtonsIndices(true).first()]
+        positionMode = when (positionModeButtons.activeButtonsIndices(exclusive = true).first()) {
+            0 -> PositionMode.SCATTER
+            else -> PositionMode.RADIAL
+        }
+        strokeWeight = strokeControlSlider.rawValue.midiRange(0f, 4f)
+        strokeFreq = strokeControlSlider.rawValue.midiRange(0.1f, 30f)
+        beatStrokeWeight = lerp(beatStrokeWeight, strokeWeight, 0.4f)
+        if (sceneRotationButton.isPressed.not()) {
+            targetSceneRotation = PVector(0f, 0f, 0f)
+        }
+        sceneRotation = PVector.lerp(sceneRotation, targetSceneRotation, 0.001f)
+
+        rotRandomMin = -1e-2f * audioProcessor.getRange(100f..200f) * 0.04f
+        rotRandomMax = 1e-2f * audioProcessor.getRange(100f..200f) * 0.04f
+
+        translateCenter()
+        rotate(sceneRotation)
+        rotateZ(textAwareRotationZ)
+
+        synchronized(lock) {
+            updateObjects()
+
+            flyingObjects.forEach {
+                when (it) {
+                    is Text -> {
+                        fill(bgColor)
+                        stroke(fgColor)
+                    }
+                    else -> {
+                        it.size += audioProcessor.getRange(20f..200f) * 0.01f
+                        if (fillToggleButton.isPressed) {
+                            fill(bgColor)
+                        } else {
+                            noFill()
+                        }
+
+                        stroke(fgColor)
+                    }
+                }
+
+                // constrain to 0.001f - bug with missing stroke in PShapes once stroke is set to 0
+                val strokeW = when (strokeMode) {
+                    StrokeMode.STILL -> strokeWeight
+                    StrokeMode.FREQ -> parent.saw(strokeFreq).mapp(0f, 4f)
+                    StrokeMode.TAP -> parent.saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight)
+                    StrokeMode.KICK -> beatStrokeWeight
+                }.constrain(low = 0.01f)
+
+                strokeWeight(strokeW)
+
+                if (it is Text) {
+                    pushMatrix()
+                    rotateZ(-textAwareRotationZ)
+                    it.draw(this)
+                    popMatrix()
+                } else {
+                    it.draw(this)
+                }
+            }
+        }
+    }
+
+    private fun newObject(): FlyingObject = with(parent) {
         val random = random(1f)
 
         return when {
@@ -137,7 +258,7 @@ class OldSkoolSketch : BaseSketch() {
         }
     }
 
-    private fun resetObject(flyingObject: FlyingObject) = with(sketch) {
+    private fun resetObject(flyingObject: FlyingObject) = with(parent) {
         val newPosition: PVector = when (flyingObject) {
             is Text -> newRandomPosition(PositionMode.CENTER).apply {
                 x = 0f
@@ -157,7 +278,7 @@ class OldSkoolSketch : BaseSketch() {
         flyingObject.targetSize = random(10f, 20f)
     }
 
-    private fun addText(text: String) = with(sketch) {
+    private fun addText(text: String) = with(parent) {
         synchronized(lock) {
             flyingObjects += Text(
                 text = text,
@@ -180,7 +301,7 @@ class OldSkoolSketch : BaseSketch() {
         }
     }
 
-    private fun newRandomPosition(mode: PositionMode = PositionMode.SCATTER): PVector = with(sketch) {
+    private fun newRandomPosition(mode: PositionMode = PositionMode.SCATTER): PVector = with(parent) {
         return when (mode) {
             PositionMode.SCATTER -> {
                 var newPosition: PVector
@@ -228,120 +349,6 @@ class OldSkoolSketch : BaseSketch() {
             val isDead = it.position.z > deadZoneSlider.value
             if (isDead) {
                 resetObject(it)
-            }
-        }
-    }
-
-    override fun setup() = with(sketch) {
-        automator.setupWithGalaxy(
-            channel = 12,
-            recordButtonCC = 0,
-            playButtonCC = 1,
-            loopButtonCC = 2,
-            clearButtonCC = 3,
-            channelFilter = null
-        )
-
-        tapper.doOnBeat {
-            if (expandMode == ExpandMode.TAP) {
-                flyingObjects.shuffled().take((flyingObjects.size * expandAffectedPercentageSlider.value).toInt())
-                    .forEach {
-                        it.size *= expandScalePot.value
-                    }
-            }
-        }
-
-        beatCounter.addListener(OnKick, 1) {
-            if (expandMode == ExpandMode.KICK) {
-                flyingObjects.shuffled().take((flyingObjects.size * expandAffectedPercentageSlider.value).toInt())
-                    .forEach {
-                        it.size *= expandScalePot.value
-                    }
-            }
-        }
-
-        beatCounter.addListener(OnKick, 1) {
-            beatStrokeWeight = strokeWeight * 6f
-        }
-
-        beatCounter.addListener(OnKick, 24) {
-            if (sceneRotationButton.isPressed) {
-                if (random(1f) > 0.9f) {
-                    targetSceneRotation = PVector(0f, 0f, random(-radians(90f), radians(90f)))
-                } else {
-                    targetSceneRotation = PVector.random3D()
-                }
-            }
-        }
-
-        repeat(500) { flyingObjects.add(newObject()) }
-    }
-
-    override fun draw() = with(sketch) {
-        automator.update()
-
-        textAwareRotationZ += textAwareRotationZAccelSlider.value
-        expandMode = ExpandMode.values()[expandModeButtons.activeButtonsIndices(true).first()]
-        strokeMode = StrokeMode.values()[strokeModeButtons.activeButtonsIndices(true).first()]
-        positionMode = when (positionModeButtons.activeButtonsIndices(exclusive = true).first()) {
-            0 -> PositionMode.SCATTER
-            else -> PositionMode.RADIAL
-        }
-        strokeWeight = strokeControlSlider.rawValue.midiRange(0f, 4f)
-        strokeFreq = strokeControlSlider.rawValue.midiRange(0.1f, 30f)
-        beatStrokeWeight = lerp(beatStrokeWeight, strokeWeight, 0.4f)
-        if (sceneRotationButton.isPressed.not()) {
-            targetSceneRotation = PVector(0f, 0f, 0f)
-        }
-        sceneRotation = PVector.lerp(sceneRotation, targetSceneRotation, 0.001f)
-
-        rotRandomMin = -1e-2f * audioProcessor.getRange(100f..200f) * 0.04f
-        rotRandomMax = 1e-2f * audioProcessor.getRange(100f..200f) * 0.04f
-
-        background(bgColor)
-        translateCenter()
-        rotate(sceneRotation)
-        rotateZ(textAwareRotationZ)
-
-        synchronized(lock) {
-            updateObjects()
-
-            flyingObjects.forEach {
-                when (it) {
-                    is Text -> {
-                        fill(bgColor)
-                        stroke(fgColor)
-                    }
-                    else -> {
-                        it.size += audioProcessor.getRange(20f..200f) * 0.01f
-                        if (fillToggleButton.isPressed) {
-                            fill(bgColor)
-                        } else {
-                            noFill()
-                        }
-
-                        stroke(fgColor)
-                    }
-                }
-
-                // constrain to 0.001f - bug with missing stroke in PShapes once stroke is set to 0
-                val strokeW = when (strokeMode) {
-                    StrokeMode.STILL -> strokeWeight
-                    StrokeMode.FREQ -> saw(strokeFreq).mapp(0f, 4f)
-                    StrokeMode.TAP -> saw(1000f / tapper.interval, tapper.prev).mapp(0f, strokeWeight)
-                    StrokeMode.KICK -> beatStrokeWeight
-                }.constrain(low = 0.001f)
-
-                strokeWeight(strokeW)
-
-                if (it is Text) {
-                    pushMatrix()
-                    rotateZ(-textAwareRotationZ)
-                    it.draw(this)
-                    popMatrix()
-                } else {
-                    it.draw(this)
-                }
             }
         }
     }

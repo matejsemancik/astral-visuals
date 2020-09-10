@@ -41,8 +41,8 @@ class ExtrusionCache(
         }
 
         mutableListOf<PShape>().apply {
-            this += ex.extrude(upper, 40, "box")
-            this += ex.extrude(lower, 40, "box")
+            this += ex.extrude(upper, 100, "box")
+            this += ex.extrude(lower, 100, "box")
             forEach { it.translate(-50f, -50f) }
         }.toTypedArray()
     }

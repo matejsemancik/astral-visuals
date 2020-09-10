@@ -10,11 +10,11 @@ import dev.matsem.astral.visuals.layers.ConwayLayer
 import dev.matsem.astral.visuals.layers.HexLayer
 import dev.matsem.astral.visuals.layers.SphereLayer
 import dev.matsem.astral.visuals.layers.TextOverlayLayer
+import dev.matsem.astral.visuals.layers.debris.DebrisLayer
 import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
 import dev.matsem.astral.visuals.layers.stars.StarsLayer
 import dev.matsem.astral.visuals.legacy.boxes.BoxesSketch
 import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
-import dev.matsem.astral.visuals.legacy.oldskool.OldSkoolSketch
 import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import dev.matsem.astral.visuals.tools.video.VideoPreparationTool
@@ -33,7 +33,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { PatternsSketch() }
     factory { BoxesSketch() }
     factory { CubesSketch() }
-    factory { OldSkoolSketch() }
 
     single { Mixer(get()) }
     single { Effector(get(), get()) }
@@ -48,4 +47,5 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
     factory { GalaxyLayer() }
     factory { SphereLayer() }
     factory { HexLayer() }
+    factory { DebrisLayer() }
 }

@@ -5,6 +5,7 @@ import processing.core.PApplet.max
 import processing.core.PApplet.min
 import processing.core.PConstants
 import processing.core.PGraphics
+import processing.core.PVector
 
 fun PGraphics.shorterDimension(): Int = min(width, height)
 
@@ -15,6 +16,14 @@ fun PGraphics.centerX() = this.width / 2f
 fun PGraphics.centerY() = this.height / 2f
 
 fun PGraphics.translateCenter() = translate(centerX(), centerY())
+
+fun PGraphics.translate(vector: PVector) = translate(vector.x, vector.y, vector.z)
+
+fun PGraphics.rotate(vector: PVector) {
+    rotateX(vector.x)
+    rotateY(vector.y)
+    rotateZ(vector.z)
+}
 
 fun PGraphics.pushPop(block: PGraphics.() -> Unit) {
     push()
@@ -47,7 +56,7 @@ fun PGraphics.fadeToBlackBy(fadeAmount: Float) {
 
 fun PGraphics.decreaseAlpha(amount: Float) {
     loadPixels()
-    for(i in 0 until pixels.count()) {
+    for (i in 0 until pixels.count()) {
         pixels[i] = pixels[i].withAlpha(10)
     }
     updatePixels()

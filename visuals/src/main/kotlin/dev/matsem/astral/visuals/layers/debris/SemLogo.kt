@@ -1,11 +1,13 @@
-package dev.matsem.astral.visuals.legacy.oldskool
+package dev.matsem.astral.visuals.layers.debris
 
 import dev.matsem.astral.core.tools.extensions.rotate
 import dev.matsem.astral.core.tools.extensions.translate
-import processing.core.PApplet
+import dev.matsem.astral.core.tools.shapes.ExtrusionCache
+import processing.core.PGraphics
 import processing.core.PVector
 
-class Box(
+class SemLogo(
+    private val cache: ExtrusionCache,
     position: PVector,
     rotation: PVector,
     rotationVector: PVector,
@@ -13,11 +15,16 @@ class Box(
     targetSize: Float
 ) : FlyingObject(position, rotation, rotationVector, size, targetSize) {
 
-    override fun draw(sketch: PApplet) = with(sketch) {
+    override fun draw(canvas: PGraphics) = with(canvas) {
         pushMatrix()
         translate(position)
         rotate(rotation)
-        box(size)
+        scale(size / 100f)
+
+        for (shape in cache.semLogo) {
+            shape.disableStyle()
+            shape(shape)
+        }
         popMatrix()
     }
 }

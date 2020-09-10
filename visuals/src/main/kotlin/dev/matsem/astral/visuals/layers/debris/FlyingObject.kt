@@ -1,7 +1,8 @@
-package dev.matsem.astral.visuals.legacy.oldskool
+package dev.matsem.astral.visuals.layers.debris
 
 import dev.matsem.astral.core.tools.extensions.plusAssign
 import processing.core.PApplet
+import processing.core.PGraphics
 import processing.core.PVector
 
 abstract class FlyingObject(
@@ -17,5 +18,5 @@ abstract class FlyingObject(
         size = PApplet.lerp(size, targetSize, 0.1f)
     }
 
-    abstract fun draw(sketch: PApplet)
+    abstract fun draw(canvas: PGraphics)
 }

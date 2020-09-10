@@ -22,7 +22,6 @@ import dev.matsem.astral.core.tools.midi.MidiFileParser
 import dev.matsem.astral.core.tools.midi.MidiPlayer
 import dev.matsem.astral.visuals.legacy.boxes.BoxesSketch
 import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
-import dev.matsem.astral.visuals.legacy.oldskool.OldSkoolSketch
 import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import org.koin.core.KoinComponent
@@ -102,7 +101,6 @@ class SketchLoader : PApplet(), KoinComponent {
     private val patternsSketch: PatternsSketch by inject()
     private val boxesSketch: BoxesSketch by inject()
     private val cubesSketch: CubesSketch by inject()
-    private val oldSkoolSketch: OldSkoolSketch by inject()
 
     // endregion
 
@@ -194,7 +192,6 @@ class SketchLoader : PApplet(), KoinComponent {
             put('5', patternsSketch)
             put('7', boxesSketch)
             put('p', cubesSketch)
-            put('o', oldSkoolSketch)
         }
 
         sketches.forEach { key, sketch ->
