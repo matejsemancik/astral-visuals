@@ -12,13 +12,13 @@ class Colorizer(
     override val oscManager: OscManager
 ) : OscHandler {
 
-    private val fgHue by oscFaderDelegate("/color/fg/hue", defaultValue = 0f)
-    private val fgSaturation by oscFaderDelegate("/color/fg/sat", defaultValue = 0f)
-    private val fgBrightness by oscFaderDelegate("/color/fg/bri", defaultValue = 1f)
+    private var fgHue by oscFaderDelegate("/color/fg/hue", defaultValue = 0f)
+    private var fgSaturation by oscFaderDelegate("/color/fg/sat", defaultValue = 0f)
+    private var fgBrightness by oscFaderDelegate("/color/fg/bri", defaultValue = 1f)
 
-    private val bgHue by oscFaderDelegate("/color/bg/hue", defaultValue = 0f)
-    private val bgSaturation by oscFaderDelegate("/color/bg/sat", defaultValue = 0f)
-    private val bgBrightness by oscFaderDelegate("/color/bg/bri", defaultValue = 0f)
+    private var bgHue by oscFaderDelegate("/color/bg/hue", defaultValue = 0f)
+    private var bgSaturation by oscFaderDelegate("/color/bg/sat", defaultValue = 0f)
+    private var bgBrightness by oscFaderDelegate("/color/bg/bri", defaultValue = 0f)
 
     private val inputFgColor
         get() = parent.color(
@@ -47,5 +47,15 @@ class Colorizer(
     fun draw() {
         fgColor = parent.lerpColor(fgColor, inputFgColor, 0.1f)
         bgColor = parent.lerpColor(bgColor, inputBgColor, 0.1f)
+    }
+
+    fun reset() {
+        fgHue = 0f
+        fgSaturation = 0f
+        fgBrightness = 1f
+
+        bgHue = 0f
+        bgSaturation = 0f
+        bgBrightness = 0f
     }
 }

@@ -12,6 +12,7 @@ class MainSketch : PApplet(), KoinComponent {
     private val mixer: Mixer by inject()
     private val effector: Effector by inject()
     private val galaxy: Galaxy by inject()
+    private val engineRoom: EngineRoom by inject()
 
     override fun settings() {
         size(1920, 1080, PConstants.P2D)
@@ -21,6 +22,7 @@ class MainSketch : PApplet(), KoinComponent {
         colorModeHsb()
         surface.setTitle("Astral Visuals")
         galaxy.connect()
+        engineRoom
     }
 
     override fun draw() {
