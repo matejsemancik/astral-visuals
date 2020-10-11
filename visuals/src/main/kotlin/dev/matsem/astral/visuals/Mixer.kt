@@ -88,7 +88,7 @@ class Mixer(override val oscManager: OscManager) : KoinComponent, OscHandler {
             oscToggleButton(address = "/mix/ch/7/autopilot/enable")
         ),
         Channel(
-            labelledOscFader(address = "/mix/ch/8/value", label = "hex", defaultValue = 1f),
+            labelledOscFader(address = "/mix/ch/8/value", label = "debris", defaultValue = 1f),
             debrisLayer,
             oscToggleButton(address = "/mix/ch/8/autopilot/enable")
         ),
