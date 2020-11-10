@@ -6,11 +6,11 @@ Follow [Soul Ex Machina crew](https://www.facebook.com/SoulExMachinaDnB) to see 
 
 ![](demo-gif.gif)
 
-The project is divided into 3 modules, `:core` module cointains the core stuff (duh) like audio processing, tools, remote control handlers, extensions, etc. Then there are two application modules - the `:playground` and `:visuals` module.
+The project is divided into 3 modules, `:core` module cointains the core stuff like audio processing, tools, remote control handlers, extensions, etc. Then there are two application modules - the `:playground` and `:visuals` module.
 
 The `:playground` module serves as, well... playground. You can quickly create a new sketch and play around. I'm using the [Koin](https://insert-koin.io/) DI framework, so you can inject here whatever is defined in the `CoreModule`. Have a look around.
 
-The `:visuals` module is meant to be used in live environment at the parties. There is an abstraction layer in form of `BaseSketch` which allows me to switch between multiple sketches on demand. Also, have a look around.
+The `:visuals` module is meant to be used in live environment at the parties. There is an abstraction layer in form of `Mixer` and `Layer`s, which allows me to blend multiple scenes together. Also, have a look around, proceed at your own risk, ignore `legacy` package 😅 (I like to change things, API is generally unstable).
 
 ## How to build
 
@@ -28,7 +28,7 @@ processingLibsDir=/Users/username/Documents/Processing/libraries
 processingCoreDir=/Applications/Processing.app/Contents/Java/core/library
 ```
 
-The `build.gradle` buildscript will look for Processing dependencies at these two paths. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `processingLibsDir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
+The Gradle buildscript will look for Processing dependencies at these two paths. Dependencies are defined in CommonDependencies gradle plugin. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `processingLibsDir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
 
 Current list of library dependencies is
 
@@ -62,11 +62,11 @@ You can run the project with Gradle `run` task. Be sure to include the `--sketch
 Currently, the project supports 3 remote control options:
 
 - If you own Traktor Kontrol F1, the `KontrolF1` class is for you - I use it for quick prototyping. It handles most of KontrolF1's hardware features, like pad buttons (with colors feature), encoder, knobs and faders.
-- If you'd like to try the `:visuals` module, go ahead and get yourself the [TouchOSC](https://hexler.net/products/touchosc) app and load it with `Astral.touchosc` layout that can be found in the `touchosc` folder. This layout uses MIDI protocol and there is a `Galaxy` class that handles most of TouchOSC MIDI controls. For future, I plan on to get rid of `Galaxy` and migrate everyhing to OSC protocol, which leads us to the last option
+- If you'd like to try the `:visuals` module, go ahead and get yourself the [TouchOSC](https://hexler.net/products/touchosc) app and load it with `Astral.touchosc` layout that can be found in the `touchosc` folder. This layout uses MIDI and OSC protocol and there is a `Galaxy` class that handles most of TouchOSC MIDI controls. For future, I plan on to get rid of `Galaxy` and migrate everyhing to OSC protocol, which leads us to the last option
 - OSC - The most convinient way, though, is to use the [OSC](http://opensoundcontrol.org/introduction-osc) (Open Sound Control) with Delegated Properties
 
 ### Osc Delegated Properties
-First, make your sketch implement the `OscHandler` interface, which makes you provide the `OscManager` class.
+First, make your sketch/class implement the `OscHandler` interface, which makes you provide the `OscManager` class.
 
 ```kotlin
 class OscHandlerExample : PApplet(), OscHandler {
@@ -82,25 +82,10 @@ class OscHandlerExample : PApplet(), OscHandler {
 }
 ```
 
-Then, you can create all sorts of properties tied to various OSC controls, like buttons, faders, labels, LED indicators, etc. Check out the `dev.matsem.astral.core.tools.osc.delegates` package for full list.
+Then, you can create all sorts of properties tied to various OSC controls, like buttons, faders, labels, LED indicators, etc. Check out the `dev.matsem.astral.core.tools.osc.delegates` package for full list. Example:
 
 ```kotlin
-    private var fader1: Float by oscFader("/1/fader1", defaultValue = 0.5f)
-    private var knob1: Float by oscKnob("/1/rotary1")
-    private var toggle1: Boolean by oscToggleButton("/1/toggle1", defaultValue = false)
-    private val push1: Boolean by oscPushButton("/1/push1") { 
-        println("Trigger!") // Called when button pushed
-    }
-    private var xy1: PVector by oscXyPad("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
-    private var led1: Float by oscLedIndicator("/1/led1")
-    private var label1: String by oscLabelIndicator("/1/label1")
-    private val encoder1: Float by oscEncoder(
-        address = "/1/encoder1",
-        defaultValue = 100f,
-        increment = 1f,
-        cw = { println("-> $it") },
-        ccw = { println("<- $it") }
-    )
+private var fader1: Float by oscFaderDelegate("/1/fader1", defaultValue = 0.5f)
 ```
 
 Most of the delegated properties support writing, so, if for example you create the fader variable and at some point in time you assing the value into it, the corresponding control in TouchOSC app will reflect that change.
