@@ -34,7 +34,7 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.PrintWriter
 
-
+@Deprecated("This has been deprecated in favor of Mixer class")
 class SketchLoader : PApplet(), KoinComponent {
 
     // region shared resources

@@ -3,6 +3,7 @@ package dev.matsem.astral.visuals.legacy
 import org.koin.core.KoinComponent
 import processing.event.KeyEvent
 
+@Deprecated("This has been deprecated in favor of Layer class")
 abstract class BaseSketch : KoinComponent {
 
     abstract val sketch: SketchLoader
