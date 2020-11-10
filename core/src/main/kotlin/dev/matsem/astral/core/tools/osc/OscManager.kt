@@ -23,7 +23,7 @@ class OscManager(
     companion object {
         const val INPUT_PORT = 7001
         const val OUTPUT_PORT = 7001
-        const val OUTPUT_IP = "192.168.1.11"
+        const val OUTPUT_IP = "192.168.1.17"
     }
     private val outputDevice = NetAddress(outputIp, outputPort)
     private val oscP5: OscP5 by lazy { OscP5(sketch, inputPort) }

@@ -1,6 +1,6 @@
 # astral-visuals
 
-Just some Processing sketches. Source code for visuals we use in [Soul Ex Machina](https://www.facebook.com/SoulExMachinaDnB).
+Just some Processing sketches. Source code for visuals we use at [Soul Ex Machina](https://www.facebook.com/SoulExMachinaDnB).
 
 
 ![](demo-gif.gif)
