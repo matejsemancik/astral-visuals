@@ -1,7 +1,6 @@
 # astral-visuals
 
-Just some Processing sketches.
-Follow [Soul Ex Machina crew](https://www.facebook.com/SoulExMachinaDnB) to see them live.
+Just some Processing sketches. Source code for visuals we use in [Soul Ex Machina](https://www.facebook.com/SoulExMachinaDnB).
 
 
 ![](demo-gif.gif)
@@ -75,7 +74,7 @@ class OscHandlerExample : PApplet(), OscHandler {
         OscManager(
             sketch = this,
             inputPort = 7001, // Port that this computer is listening on
-            outputIp = "192.168.1.11", // IP of phone running TOuchOSC
+            outputIp = "192.168.1.11", // IP of phone running TouchOSC
             outputPort = 7001 // Port, the TouchOSC app is listening on
         )
     }
