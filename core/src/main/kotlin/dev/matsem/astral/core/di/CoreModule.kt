@@ -36,7 +36,7 @@ val coreModule = module {
     single { (get() as Minim).lineOut }
     single { (get() as Minim).lineIn }
     single { Sink().apply { patch(get() as AudioOutput) } }
-    single { AudioProcessor(get(), VideoExportConfig.IS_IN_RENDER_MODE) }
+    single { AudioProcessor(get()) }
     factory { BeatCounter(get(), get()) }
 
     // Extrusion
