@@ -18,15 +18,12 @@ import dev.matsem.astral.visuals.legacy.boxes.BoxesSketch
 import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
 import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
 import dev.matsem.astral.visuals.tools.tapper.Tapper
-import dev.matsem.astral.visuals.tools.video.VideoPreparationTool
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import processing.core.PApplet
 
 fun visualsModule(provideSketch: () -> PApplet) = module {
     single { provideSketch() } bind PApplet::class
-
-    factory { VideoPreparationTool(get(), get(), get(), get(), get(), get(), get(), get()) }
 
     // BPM
     single { Tapper(get()) }
