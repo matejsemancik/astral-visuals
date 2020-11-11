@@ -4,7 +4,6 @@ import com.hamoid.VideoExport
 import ddf.minim.AudioOutput
 import ddf.minim.Minim
 import ddf.minim.ugens.Sink
-import dev.matsem.astral.core.VideoExportConfig
 import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.core.tools.galaxy.Galaxy
@@ -16,6 +15,8 @@ import dev.matsem.astral.core.tools.midi.MidiRecorder
 import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.pixelsort.PixelSorter
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
+import dev.matsem.astral.core.tools.videoexport.FFTSerializer
+import dev.matsem.astral.core.tools.videoexport.VideoExporter
 import org.jbox2d.common.Vec2
 import org.koin.dsl.module
 import processing.core.PApplet
@@ -46,12 +47,10 @@ val coreModule = module {
     // Effects
     single { PixelSorter() }
 
-    single {
-        VideoExport(get()).apply {
-            setFrameRate(VideoExportConfig.MOVIE_FPS)
-            setAudioFileName(VideoExportConfig.AUDIO_FILE_PATH)
-        }
-    }
+    // VideoExporter
+    single { VideoExport(get()) }
+    single { FFTSerializer(get(), get()) }
+    factory { VideoExporter(get(), get(), get(), get()) }
 
     factory {
         Box2DProcessing(get()).apply {
