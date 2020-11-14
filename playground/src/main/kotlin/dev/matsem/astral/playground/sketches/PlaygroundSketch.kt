@@ -4,20 +4,29 @@ import ch.bildspur.postfx.builder.PostFX
 import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
-import dev.matsem.astral.core.tools.extensions.*
-import dev.matsem.astral.core.tools.osc.*
+import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.extensions.angularTimeS
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.mapSin
+import dev.matsem.astral.core.tools.extensions.pushPop
+import dev.matsem.astral.core.tools.extensions.remap
+import dev.matsem.astral.core.tools.extensions.translateCenter
+import dev.matsem.astral.core.tools.extensions.value
+import dev.matsem.astral.core.tools.extensions.withAlpha
+import dev.matsem.astral.core.tools.osc.OscHandler
+import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
-import processing.event.MouseEvent
 
 class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
 
     private val ec: ExtrusionCache by inject()
     private val sink: Sink by inject()
+    private val audioProcessor: AudioProcessor by inject()
 
     private lateinit var fx: PostFX
     private lateinit var oscil: Oscil
@@ -25,49 +34,37 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
         OscManager(sketch = this, inputPort = 7001, outputIp = "192.168.1.11", outputPort = 7001)
     }
 
-    private var fader1: Float by this.oscFaderDelegate("/1/fader1", defaultValue = 0.5f)
-    private var fader2: Float by this.oscFaderDelegate("/1/fader2")
-    private var knob1: Float by this.oscFaderDelegate("/1/rotary1")
-    private var knob2: Float by this.oscFaderDelegate("/1/rotary2", defaultValue = 0.5f)
-    private var toggle1: Boolean by oscToggleButtonDelegate("/1/toggle1", defaultValue = false)
-    private val push1: Boolean by oscPushButtonDelegate("/1/push1") {
-        println("Trigger!")
-    }
-    private var xy1: PVector by oscXyPadDelegate("/1/xy1", defaultValue = PVector(0.5f, 0.5f))
-    private var led1: Float by oscLedIndicatorDelegate("/1/led1")
-    private var label1: String by oscLabelIndicatorDelegate("/1/label1")
-    private val encoder1: Float by oscEncoderDelegate(
-        "/1/encoder1",
-        defaultValue = 100f,
-        increment = 1f,
-        cw = { println("-> $it") },
-        ccw = { println("<- $it") })
-
     val numX = 5
-    val numY = 7
+    val numY = 4
+    val numZ = 5
+    val depth = 1280f
 
     data class Rotator(
         val velocity: PVector,
         val speed: Float,
         val offsetX: Float,
         val offsetY: Float,
+        val offsetZ: Float,
         val scale: Float
     )
 
-    val rotators = Array(numX) {
-        Array(numY) {
-            Rotator(
-                velocity = PVector(random(1f), random(1f), random(1f)),
-                speed = random(-0.0002f, 0.0002f),
-                offsetX = random(-20f, 20f),
-                offsetY = random(-20f, 20f),
-                scale = random(0.4f, 0.7f)
-            )
+    val rotators = Array(numZ) {
+        Array(numX) {
+            Array(numY) {
+                Rotator(
+                    velocity = PVector(random(1f), random(1f), random(1f)),
+                    speed = random(-0.0002f, 0.0002f),
+                    offsetX = random(-100f, 100f),
+                    offsetY = random(-50f, 50f),
+                    offsetZ = random(-20f, 20f),
+                    scale = random(0.4f, 0.7f)
+                )
+            }
         }
     }
 
     override fun settings() {
-        size(720, 1280, PConstants.P3D)
+        size(1280, 720, PConstants.P3D)
     }
 
     override fun setup() {
@@ -81,38 +78,41 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
     }
 
     override fun draw() {
-        led1 = fader2
-        label1 = fader2.toString().take(5)
-
         val bgColor = 0x0f0f0f.withAlpha()
-        val fgColor = 0xfca503.withAlpha()
+        val fgColor = 0xffffff.withAlpha()
         background(bgColor)
         fill(bgColor)
         stroke(fgColor)
         strokeWeight(random(2f, 3f))
 
         translateCenter()
-        scale(oscil.value.mapSin(1f, 0.9f))
+        scale(oscil.value.mapSin(1.5f, 1f))
+        rotateY(angularTimeS(60f))
 
-        for (x in 0 until numX) {
-            for (y in 0 until numY) {
-                pushPop {
-                    val centerX = x * width / numX + rotators[x][y].offsetX - width / 2f
-                    val centerY = y * height / numY + rotators[x][y].offsetY - height / 2f
-                    translate(
-                        centerX + width / (numX * 2f),
-                        centerY + height / (numY * 2f)
-                    )
-                    scale(rotators[x][y].scale)
-                    rotate(
-                        PConstants.PI * rotators[x][y].speed * millis(),
-                        rotators[x][y].velocity.x,
-                        rotators[x][y].velocity.y,
-                        rotators[x][y].velocity.z
-                    )
-                    for (shape in ec.semLogo) {
-                        shape.disableStyle()
-                        shape(shape)
+        for (z in 0 until numZ) {
+            for (x in 0 until numX) {
+                for (y in 0 until numY) {
+                    val rotator = rotators[z][x][y]
+                    pushPop {
+                        val centerZ = z * depth / numZ + rotator.offsetZ - depth / 2f
+                        val centerX = x * width / numX + rotator.offsetX - width / 2f
+                        val centerY = y * height / numY + rotator.offsetY - height / 2f
+                        translate(
+                            centerX + width / (numX * 2f),
+                            centerY + height / (numY * 2f),
+                            centerZ + depth / (numZ * 2f)
+                        )
+                        scale(rotator.scale)
+                        rotate(
+                            PConstants.PI * rotator.speed * millis(),
+                            rotator.velocity.x,
+                            rotator.velocity.y,
+                            rotator.velocity.z
+                        )
+                        for (shape in ec.semLogo) {
+                            shape.disableStyle()
+                            shape(shape)
+                        }
                     }
                 }
             }
@@ -124,12 +124,11 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
                 if (frameCount % 120 in (0..10)) {
                     rgbSplit(random(50f))
                 }
+                noise(
+                    audioProcessor.getRange(20f..100f).remap(0f, 50f, 0.05f, 0.08f),
+                    0.4f
+                )
+                rgbSplit(20f)
             }.compose()
-    }
-
-    override fun mouseClicked(event: MouseEvent?) {
-        when (event?.button) {
-            PConstants.LEFT -> redraw()
-        }
     }
 }
