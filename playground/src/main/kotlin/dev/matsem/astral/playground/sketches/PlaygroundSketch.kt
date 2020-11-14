@@ -5,7 +5,6 @@ import ddf.minim.ugens.Oscil
 import ddf.minim.ugens.Sink
 import ddf.minim.ugens.Waves
 import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.extensions.angularTimeS
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.mapSin
 import dev.matsem.astral.core.tools.extensions.pushPop
@@ -13,71 +12,87 @@ import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.value
 import dev.matsem.astral.core.tools.extensions.withAlpha
-import dev.matsem.astral.core.tools.osc.OscHandler
-import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
+import dev.matsem.astral.core.tools.videoexport.VideoExporter
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
 
-class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
+class PlaygroundSketch : PApplet(), KoinComponent {
 
     private val ec: ExtrusionCache by inject()
     private val sink: Sink by inject()
     private val audioProcessor: AudioProcessor by inject()
+    private val videoExporter: VideoExporter by inject()
 
     private lateinit var fx: PostFX
     private lateinit var oscil: Oscil
-    override val oscManager: OscManager by lazy {
-        OscManager(sketch = this, inputPort = 7001, outputIp = "192.168.1.11", outputPort = 7001)
-    }
 
-    val numX = 5
-    val numY = 4
-    val numZ = 5
-    val depth = 1280f
+    val fixedFrameRate = 60f
+    val numX = 6
+    val numY = 5
+    val numZ = 6
+    val depth = 1920f
 
     data class Rotator(
-        val velocity: PVector,
-        val speed: Float,
+        val rootationDirection: PVector,
+        val rotationFrequency: Float,
+        val rotationPhi: Float,
         val offsetX: Float,
         val offsetY: Float,
         val offsetZ: Float,
-        val scale: Float
+        val scale: Float,
+        val freqRange: ClosedFloatingPointRange<Float>,
+        val freqAmplitude: Float
     )
 
-    val rotators = Array(numZ) {
-        Array(numX) {
-            Array(numY) {
-                Rotator(
-                    velocity = PVector(random(1f), random(1f), random(1f)),
-                    speed = random(-0.0002f, 0.0002f),
-                    offsetX = random(-100f, 100f),
-                    offsetY = random(-50f, 50f),
-                    offsetZ = random(-20f, 20f),
-                    scale = random(0.4f, 0.7f)
-                )
+    val rotators: Array<Array<Array<Rotator>>> by lazy {
+        Array(numZ) {
+            Array(numX) {
+                Array(numY) {
+                    val freqStart = random(20f, 1000f)
+                    val freqBandWidth = random(100f, 500f)
+                    Rotator(
+                        rootationDirection = PVector(random(1f), random(1f), random(1f)),
+                        rotationFrequency = random(-0.1f, 0.1f),
+                        rotationPhi = random(0f, 2 * PConstants.PI),
+                        offsetX = random(-100f, 100f),
+                        offsetY = random(-50f, 50f),
+                        offsetZ = random(-100f, 100f),
+                        scale = random(0.4f, 0.7f),
+                        freqRange = (freqStart..freqStart + freqBandWidth),
+                        freqAmplitude = 1.5f
+                    )
+                }
             }
         }
     }
 
     override fun settings() {
-        size(1280, 720, PConstants.P3D)
+        size(1920, 1080, PConstants.P3D)
     }
 
     override fun setup() {
-        surface.setResizable(true)
+        randomSeed(420L)
+        noiseSeed(420L)
         fx = PostFX(this)
         colorModeHsb()
-        ortho()
-        frameRate(30f)
-
         oscil = Oscil(1 / 15f, 1f, Waves.SAW).apply { patch(sink) }
+
+        frameRate(fixedFrameRate)
+//        videoExporter.prepare(
+//            audioFilePath = "music/001clip02.wav",
+//            movieFps = fixedFrameRate
+//        ) {
+//            drawSketch()
+//        }
     }
 
-    override fun draw() {
+    override fun draw() = drawSketch()
+
+    private fun PApplet.drawSketch() {
         val bgColor = 0x0f0f0f.withAlpha()
         val fgColor = 0xffffff.withAlpha()
         background(bgColor)
@@ -86,8 +101,8 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
         strokeWeight(random(2f, 3f))
 
         translateCenter()
-        scale(oscil.value.mapSin(1.5f, 1f))
-        rotateY(angularTimeS(60f))
+        scale(oscil.value.mapSin(1.2f, 1f))
+        rotateY(frameCount / 500f)
 
         for (z in 0 until numZ) {
             for (x in 0 until numX) {
@@ -102,12 +117,22 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
                             centerY + height / (numY * 2f),
                             centerZ + depth / (numZ * 2f)
                         )
-                        scale(rotator.scale)
+                        scale(
+                            rotator.scale * audioProcessor.getRange(rotator.freqRange)
+                                .remap(0f, 50f, 1f, rotator.freqAmplitude)
+                        )
+
                         rotate(
-                            PConstants.PI * rotator.speed * millis(),
-                            rotator.velocity.x,
-                            rotator.velocity.y,
-                            rotator.velocity.z
+                            PApplet.map(
+                                frameCount.toFloat(),
+                                0f,
+                                fixedFrameRate,
+                                0f,
+                                2 * PConstants.PI * rotator.rotationFrequency
+                            ) + rotator.rotationPhi,
+                            rotator.rootationDirection.x,
+                            rotator.rootationDirection.y,
+                            rotator.rootationDirection.z
                         )
                         for (shape in ec.semLogo) {
                             shape.disableStyle()
@@ -125,7 +150,7 @@ class PlaygroundSketch : PApplet(), KoinComponent, OscHandler {
                     rgbSplit(random(50f))
                 }
                 noise(
-                    audioProcessor.getRange(20f..100f).remap(0f, 50f, 0.05f, 0.08f),
+                    audioProcessor.getRange(20f..100f).remap(0f, 50f, 0.05f, 0.09f),
                     0.4f
                 )
                 rgbSplit(20f)

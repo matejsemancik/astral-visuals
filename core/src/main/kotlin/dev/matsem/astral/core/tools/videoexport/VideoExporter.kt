@@ -28,6 +28,8 @@ class VideoExporter(
      * Initialization method. When called, prepares the video exporter for movie export and video
      * will be exported starting from the first frame.
      * Call in the sketch setup() method and move your draw logic to [draw] lambda.
+     * Note, that you still have to override the parent's [draw] method, but leave it empty in order for this to work
+     * (super.draw() must not be called).
      */
     fun prepare(audioFilePath: String, movieFps: Float, draw: PApplet.() -> Unit) {
         parent.frameRate(1000f)
@@ -86,7 +88,6 @@ class VideoExporter(
             // but I'm not sure if it's useful nor what
             // would be the ideal value. Please experiment :)
 
-            println(videoExport.currentTime)
             while (videoExport.currentTime < soundTime + frameDuration * 0.5) {
                 val channelLeft = mutableListOf<Float>()
                 val channelRight = mutableListOf<Float>()
