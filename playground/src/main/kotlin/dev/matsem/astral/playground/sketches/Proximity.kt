@@ -2,113 +2,146 @@ package dev.matsem.astral.playground.sketches
 
 import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.extensions.angularTimeS
+import dev.matsem.astral.core.tools.extensions.angularTimeHz
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.core.tools.extensions.draw
-import dev.matsem.astral.core.tools.extensions.pixelAt
 import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.withAlpha
-import dev.matsem.astral.core.tools.osc.OscHandler
-import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
+import dev.matsem.astral.core.tools.videoexport.VideoExporter
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
 import processing.core.PConstants
+import processing.core.PVector
 
-class Proximity : PApplet(), KoinComponent, OscHandler {
+class Proximity : PApplet(), KoinComponent {
 
-    override val oscManager: OscManager by inject()
-    private val extrusionCache: ExtrusionCache by inject()
+    private val ec: ExtrusionCache by inject()
     private val audioProcessor: AudioProcessor by inject()
+    private val videoExporter: VideoExporter by inject()
+
     private lateinit var fx: PostFX
 
-    private val resolution = 4
-    private val characters = " .:-=+*#%@"
-    private val step = 100f / characters.count() // Brightness step between LUT entries
-    // Create lookup table (LUT) that contains a pairs of
-    // IntRange (luminance) to Char (representing luminance)
-    private val lut = characters
-        .mapIndexed { index, char ->
-            (0 + index * step..(step * index + step).coerceAtMost(100f)) to char
+    val fixedFrameRate = 24f
+    val numX = 5
+    val numY = 5
+    val numZ = 6
+    val depth = 1920f
+
+    data class Rotator(
+        val rootationDirection: PVector,
+        val rotationFrequency: Float,
+        val rotationPhi: Float,
+        val offsetX: Float,
+        val offsetY: Float,
+        val offsetZ: Float,
+        val scale: Float,
+        val freqRange: ClosedFloatingPointRange<Float>,
+        val freqAmplitude: Float
+    )
+
+    val rotators: Array<Array<Array<Rotator>>> by lazy {
+        Array(numZ) {
+            Array(numX) {
+                Array(numY) {
+                    val freqStart = random(20f, 1000f)
+                    val freqBandWidth = random(100f, 500f)
+                    Rotator(
+                        rootationDirection = PVector(random(1f), random(1f), random(1f)),
+                        rotationFrequency = random(-0.1f, 0.1f),
+                        rotationPhi = random(0f, 2 * PConstants.PI),
+                        offsetX = random(-100f, 100f),
+                        offsetY = random(-50f, 50f),
+                        offsetZ = random(-100f, 100f),
+                        scale = random(0.4f, 0.7f),
+                        freqRange = (freqStart..freqStart + freqBandWidth),
+                        freqAmplitude = 1.5f
+                    )
+                }
+            }
         }
-    private val canvas by lazy { createGraphics(width / resolution, height / resolution, P3D) }
+    }
 
     override fun settings() {
-        size(1280, 720, PConstants.P3D)
+        size(1080, 1080, PConstants.P3D)
     }
 
     override fun setup() {
-        colorModeHsb()
+        randomSeed(420L)
+        noiseSeed(420L)
         fx = PostFX(this)
+        colorModeHsb()
+
+        videoExporter.prepare(
+            audioFilePath = "music/001clip02.wav",
+            movieFps = fixedFrameRate,
+            audioGain = 2f,
+            dryRun = false
+        ) {
+            drawSketch()
+        }
     }
 
-    override fun draw() = drawApplet()
+    override fun draw() = Unit
 
-    private fun PApplet.drawApplet() {
-        drawCanvas()
-        image(canvas, 0f, 0f)
+    private fun PApplet.drawSketch() {
+        val bgColor = 0x0f0f0f.withAlpha()
+        val fgColor = 0xffffff.withAlpha()
+        background(bgColor)
+        fill(bgColor)
+        stroke(fgColor)
+        strokeWeight(random(2f, 3f))
 
-        // Draws canvas with ASCII effect
-        pushPop {
-            background(0f, 0f, 10f)
-            textSize(resolution.toFloat())
-            noStroke()
+        translateCenter()
+        scale((angularTimeHz(1 / 10f, fixedFrameRate) % PConstants.TWO_PI).remap(0f, PConstants.TWO_PI, 1.2f, 1f))
+        rotateY(frameCount / 500f)
 
-            canvas.loadPixels()
+        for (z in 0 until numZ) {
+            for (x in 0 until numX) {
+                for (y in 0 until numY) {
+                    val rotator = rotators[z][x][y]
+                    pushPop {
+                        val centerZ = z * depth / numZ + rotator.offsetZ - depth / 2f
+                        val centerX = x * width / numX + rotator.offsetX - width / 2f
+                        val centerY = y * height / numY + rotator.offsetY - height / 2f
+                        translate(
+                            centerX + width / (numX * 2f),
+                            centerY + height / (numY * 2f),
+                            centerZ + depth / (numZ * 2f)
+                        )
+                        scale(
+                            rotator.scale * audioProcessor.getRange(rotator.freqRange)
+                                .remap(0f, 50f, 1f, rotator.freqAmplitude)
+                        )
 
-            for (y in 0 until canvas.height) {
-                for (x in 0 until canvas.width) {
-                    val bri = brightness(canvas.pixelAt(x, y))
-                    val textColor = 0xffffff.withAlpha()
-                    val ascii = lut.first { it.first.contains(bri) }.second
-                    fill(textColor)
-                    text(ascii, x.toFloat() * resolution, y.toFloat() * resolution)
+                        rotate(
+                            angularTimeHz(rotator.rotationFrequency, fixedFrameRate) + rotator.rotationPhi,
+                            rotator.rootationDirection.x,
+                            rotator.rootationDirection.y,
+                            rotator.rootationDirection.z
+                        )
+                        for (shape in ec.semLogo) {
+                            shape.disableStyle()
+                            shape(shape)
+                        }
+                    }
                 }
             }
         }
 
         fx.render()
-            .noise(
-                audioProcessor.getRange(20f..100f).remap(0f, 50f, 0.05f, 0.1f),
-                0.4f)
-            .rgbSplit(20f)
-            .compose()
-    }
-
-    // Draws raw content onto canvas
-    private fun drawCanvas() = canvas.draw {
-        clear()
-        colorModeHsb()
-
-        background(0)
-        fill(0xffffff.withAlpha())
-        strokeWeight(2f)
-        stroke(0x000000.withAlpha())
-
-        lights()
-        translateCenter()
-        rotateY(angularTimeS(12f))
-        pushPop {
-            scale(1f / resolution)
-            scale(
-                audioProcessor.getRange(80f..100f).remap(0f, 50f, 1f, 2f).coerceIn(1f, 2f)
-            )
-            pushPop {
-                translate(0f, 0f, 50f)
-                extrusionCache.getText("JOHNEY", 50).forEach {
-                    shape(it)
+            .apply {
+                bloom(0.5f, 40, 40f)
+                if (frameCount % 120 in (0..10)) {
+                    rgbSplit(random(50f))
                 }
-            }
-            pushPop {
-                translate(0f, 0f, -50f)
-                scale(-1f)
-                extrusionCache.semLogo.forEach {
-                    shape(it)
-                }
-            }
-        }
+                noise(
+                    audioProcessor.getRange(20f..100f).remap(0f, 50f, 0.05f, 0.09f),
+                    0.4f
+                )
+                rgbSplit(20f)
+            }.compose()
     }
 }

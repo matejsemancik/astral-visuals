@@ -20,6 +20,9 @@ class VideoExporter(
 ) {
 
     private var frameDuration: Float by Delegates.notNull()
+    private var dryRun: Boolean by Delegates.notNull()
+    private var audioGain: Float = 1f
+
     private lateinit var fileReader: BufferedReader
     private lateinit var drawLambda: PApplet.() -> Unit
     private var fileReaderLine: String? = null
@@ -31,23 +34,33 @@ class VideoExporter(
      * Note, that you still have to override the parent's [draw] method, but leave it empty in order for this to work
      * (super.draw() must not be called).
      */
-    fun prepare(audioFilePath: String, movieFps: Float, draw: PApplet.() -> Unit) {
-        parent.frameRate(1000f)
+    fun prepare(
+        audioFilePath: String,
+        movieFps: Float,
+        audioGain: Float = 1f,
+        dryRun: Boolean,
+        draw: PApplet.() -> Unit
+    ) {
+        this.dryRun = dryRun
+        this.frameDuration = 1f / movieFps
+        this.audioGain = audioGain
+
+        parent.frameRate(if (dryRun) movieFps else 1000f)
         parent.registerMethod("draw", this)
         drawLambda = draw
 
-        frameDuration = 1f / movieFps
+        if (!dryRun) {
+            audioProcessor.setMode(AudioProcessor.Mode.MOCK)
+            videoExport.setFrameRate(movieFps)
+            videoExport.setAudioFileName(audioFilePath)
 
-        audioProcessor.setMode(AudioProcessor.Mode.MOCK)
-        videoExport.setFrameRate(movieFps)
-        videoExport.setAudioFileName(audioFilePath)
+            println("Analyzing sound file ${parent.dataPath(audioFilePath)}")
+            fftSerializer.serialize(audioFilePath)
+            fileReader = parent.createReader(parent.dataPath("$audioFilePath.txt"))
+            println("Sound analysis done")
 
-        println("Analyzing sound file ${parent.dataPath(audioFilePath)}")
-        fftSerializer.serialize(audioFilePath)
-        fileReader = parent.createReader(parent.dataPath("$audioFilePath.txt"))
-        println("Sound analysis done")
-
-        videoExport.startMovie()
+            videoExport.startMovie()
+        }
     }
 
     /**
@@ -59,7 +72,12 @@ class VideoExporter(
      */
     fun draw() {
         // Keep the gain normalized during export
-        audioProcessor.gain = 1.0f
+        audioProcessor.gain = audioGain
+
+        if (dryRun) {
+            drawLambda(parent)
+            return
+        }
 
         fileReaderLine = try {
             fileReader.readLine()
