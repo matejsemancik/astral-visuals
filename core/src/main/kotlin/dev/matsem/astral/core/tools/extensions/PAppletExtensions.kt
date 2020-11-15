@@ -20,27 +20,14 @@ fun PApplet.longerDimension(): Int = max(width, height)
 /**
  * Generates saw signal with given frequency in range from 0f to 1f
  */
+@Deprecated("Use AnimationHandler to generate the signal")
 fun PApplet.saw(fHz: Float, offset: Int = 0): Float = ((millis() - offset) % (1000f * 1 / fHz)) / (1000f * 1 / fHz)
 
+@Deprecated("Use AnimationHandler to generate the value")
 fun PApplet.angularTimeS(periodSeconds: Float) = millis() / 1000f * PConstants.TWO_PI / periodSeconds
 
-/**
- * Returns time-based radian value for given [hz] frequency at any given time (based on sketch millis()).
- * Suitable for live environments.
- */
+@Deprecated("Use AnimationHandler to generate the value")
 fun PApplet.angularTimeHz(hz: Float) = millis() / 1000f * PConstants.TWO_PI / (1f / hz)
-
-/**
- * Returns frame-based radian value for given [hz] frequency at any given frame, based on parent's [frameRate].
- * Suitable for rendering.
- */
-fun PApplet.angularTimeHz(hz: Float, frameRate: Float) = PApplet.map(
-    frameCount.toFloat(),
-    0f,
-    frameRate,
-    0f,
-    PConstants.TWO_PI * hz
-)
 
 fun PApplet.translate(vector: PVector) = translate(vector.x, vector.y, vector.z)
 

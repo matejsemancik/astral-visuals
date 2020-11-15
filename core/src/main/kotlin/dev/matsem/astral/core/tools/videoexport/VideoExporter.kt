@@ -134,4 +134,9 @@ class VideoExporter(
             }
         }
     }
+
+    /**
+     * Returns the duration of the movie (so far) in milliseconds.
+     */
+    fun videoMillis(): Int = if (dryRun) parent.millis() else (videoExport.currentTime * 1000).toInt()
 }

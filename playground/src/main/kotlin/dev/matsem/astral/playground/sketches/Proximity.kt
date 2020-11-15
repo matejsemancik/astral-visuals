@@ -1,9 +1,12 @@
 package dev.matsem.astral.playground.sketches
 
 import ch.bildspur.postfx.builder.PostFX
+import dev.matsem.astral.core.tools.animations.AnimationHandler
+import dev.matsem.astral.core.tools.animations.radianHz
+import dev.matsem.astral.core.tools.animations.saw
 import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.extensions.angularTimeHz
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.translateCenter
@@ -16,19 +19,23 @@ import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
 
-class Proximity : PApplet(), KoinComponent {
+class Proximity : PApplet(), KoinComponent, AnimationHandler {
 
     private val ec: ExtrusionCache by inject()
     private val audioProcessor: AudioProcessor by inject()
     private val videoExporter: VideoExporter by inject()
+
+    override fun provideMillis(): Int {
+        return videoExporter.videoMillis()
+    }
 
     private lateinit var fx: PostFX
 
     val fixedFrameRate = 24f
     val numX = 5
     val numY = 5
-    val numZ = 6
-    val depth = 1920f
+    val numZ = 5
+    val depth = 1080f
 
     data class Rotator(
         val rootationDirection: PVector,
@@ -77,8 +84,8 @@ class Proximity : PApplet(), KoinComponent {
         videoExporter.prepare(
             audioFilePath = "music/001clip02.wav",
             movieFps = fixedFrameRate,
-            audioGain = 2f,
-            dryRun = false
+            audioGain = 1f,
+            dryRun = true
         ) {
             drawSketch()
         }
@@ -95,7 +102,7 @@ class Proximity : PApplet(), KoinComponent {
         strokeWeight(random(2f, 3f))
 
         translateCenter()
-        scale((angularTimeHz(1 / 10f, fixedFrameRate) % PConstants.TWO_PI).remap(0f, PConstants.TWO_PI, 1.2f, 1f))
+        scale(saw(1 / 5f).mapp(1.2f, 1f))
         rotateY(frameCount / 500f)
 
         for (z in 0 until numZ) {
@@ -117,7 +124,7 @@ class Proximity : PApplet(), KoinComponent {
                         )
 
                         rotate(
-                            angularTimeHz(rotator.rotationFrequency, fixedFrameRate) + rotator.rotationPhi,
+                            radianHz(rotator.rotationFrequency) + rotator.rotationPhi,
                             rotator.rootationDirection.x,
                             rotator.rootationDirection.y,
                             rotator.rootationDirection.z
