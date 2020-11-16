@@ -3,6 +3,7 @@ package dev.matsem.astral.playground.sketches
 import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianHz
+import dev.matsem.astral.core.tools.animations.radianSeconds
 import dev.matsem.astral.core.tools.animations.saw
 import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
@@ -32,10 +33,13 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
     private lateinit var fx: PostFX
 
     val fixedFrameRate = 24f
-    val numX = 5
+    val numX = 6
     val numY = 5
-    val numZ = 5
-    val depth = 1080f
+    val numZ = 6
+    val depth = 1920f
+
+    var scale = 1f
+    var targetScale = 1f
 
     data class Rotator(
         val rootationDirection: PVector,
@@ -72,7 +76,7 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
     }
 
     override fun settings() {
-        size(1080, 1080, PConstants.P3D)
+        size(1920, 1080, PConstants.P3D)
     }
 
     override fun setup() {
@@ -102,8 +106,10 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
         strokeWeight(random(2f, 3f))
 
         translateCenter()
-        scale(saw(1 / 5f).mapp(1.2f, 1f))
-        rotateY(frameCount / 500f)
+        targetScale = saw(1 / 10f).mapp(1f, 1.5f)
+        scale = lerp(scale, targetScale, 0.2f)
+        scale(scale)
+        rotateY(radianSeconds(60f))
 
         for (z in 0 until numZ) {
             for (x in 0 until numX) {
