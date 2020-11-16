@@ -34,19 +34,22 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
     private lateinit var fx: PostFX
 
     sealed class ExportConfig(
+        val width: Int,
+        val height: Int,
         val numX: Int,
         val numY: Int,
         val numZ: Int,
         val depth: Float
     ) {
-        object Landscape : ExportConfig(6, 5, 6, 1920f)
-        object Portrait : ExportConfig(5, 6, 5, 1920f)
-        object Square : ExportConfig(5, 5, 5, 1080f)
+        object Landscape : ExportConfig(1920, 1080,6, 5, 6, 1920f)
+        object Portrait : ExportConfig(1080, 1920,5, 7, 5, 1920f)
+        object Square : ExportConfig(1080, 1080, 5, 5, 5, 1080f)
     }
 
-    val exportConfig = ExportConfig.Landscape
-
+    val exportConfig = ExportConfig.Square
     val fixedFrameRate = 24f
+    val dryRun = false
+
     val numX = exportConfig.numX
     val numY = exportConfig.numY
     val numZ = exportConfig.numZ
@@ -92,7 +95,7 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
     }
 
     override fun settings() {
-        size(1920, 1080, PConstants.P3D)
+        size(exportConfig.width, exportConfig.height, PConstants.P3D)
     }
 
     override fun setup() {
@@ -107,7 +110,7 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
             audioFilePath = "music/001clip02.wav",
             movieFps = fixedFrameRate,
             audioGain = 2f,
-            dryRun = false
+            dryRun = dryRun
         ) {
             drawSketch()
         }
@@ -173,7 +176,7 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
                     rgbSplit(random(50f))
                 }
                 noise(
-                    audioProcessor.getRange(20f..100f).remap(0f, 50f, 0.05f, 0.09f),
+                    audioProcessor.getRange(20f..100f).remap(0f, 50f, 0.05f, 0.13f),
                     0.4f
                 )
                 rgbSplit(20f)
