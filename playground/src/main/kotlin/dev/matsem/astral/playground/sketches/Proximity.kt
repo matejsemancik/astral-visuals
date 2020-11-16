@@ -9,6 +9,7 @@ import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.extensions.pushPop
+import dev.matsem.astral.core.tools.extensions.quantize
 import dev.matsem.astral.core.tools.extensions.remap
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.withAlpha
@@ -40,6 +41,8 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
 
     var scale = 1f
     var targetScale = 1f
+    var yRotationPhi = 0f
+    var targetYRotationPhi = 0f
 
     data class Rotator(
         val rootationDirection: PVector,
@@ -106,10 +109,14 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
         strokeWeight(random(2f, 3f))
 
         translateCenter()
+
         targetScale = saw(1 / 10f).mapp(1f, 1.5f)
         scale = lerp(scale, targetScale, 0.2f)
+        targetYRotationPhi = radianSeconds(30f).quantize(PConstants.PI)
+        yRotationPhi = lerp(yRotationPhi, targetYRotationPhi, 0.08f)
+
         scale(scale)
-        rotateY(radianSeconds(60f))
+        rotateY(radianSeconds(60f) + yRotationPhi)
 
         for (z in 0 until numZ) {
             for (x in 0 until numX) {
