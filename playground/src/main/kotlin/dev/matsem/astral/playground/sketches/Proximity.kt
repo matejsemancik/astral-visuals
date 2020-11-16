@@ -33,11 +33,24 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
 
     private lateinit var fx: PostFX
 
+    sealed class ExportConfig(
+        val numX: Int,
+        val numY: Int,
+        val numZ: Int,
+        val depth: Float
+    ) {
+        object Landscape : ExportConfig(6, 5, 6, 1920f)
+        object Portrait : ExportConfig(5, 6, 5, 1920f)
+        object Square : ExportConfig(5, 5, 5, 1080f)
+    }
+
+    val exportConfig = ExportConfig.Landscape
+
     val fixedFrameRate = 24f
-    val numX = 6
-    val numY = 5
-    val numZ = 6
-    val depth = 1920f
+    val numX = exportConfig.numX
+    val numY = exportConfig.numY
+    val numZ = exportConfig.numZ
+    val depth = exportConfig.depth
 
     var scale = 1f
     var targetScale = 1f
@@ -83,16 +96,18 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
     }
 
     override fun setup() {
+        // Use the same seed for consistency between multiple exports
         randomSeed(420L)
         noiseSeed(420L)
+
         fx = PostFX(this)
         colorModeHsb()
 
         videoExporter.prepare(
             audioFilePath = "music/001clip02.wav",
             movieFps = fixedFrameRate,
-            audioGain = 1f,
-            dryRun = true
+            audioGain = 2f,
+            dryRun = false
         ) {
             drawSketch()
         }
