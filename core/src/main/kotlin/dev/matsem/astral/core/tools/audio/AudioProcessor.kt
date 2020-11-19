@@ -100,10 +100,10 @@ class AudioProcessor constructor(private val lineIn: AudioInput) : AudioListener
      * Calculates average amplitude of FFT samples in given frequency [range].
      */
     fun getRange(range: ClosedFloatingPointRange<Float>): Float {
-        return when(mode) {
+        return when (mode) {
             Mode.LIVE -> fft.calcAvg(range.start, range.endInclusive) * gain
             Mode.MOCK -> {
-                val values = mutableListOf<Float>()
+                val values = mutableListOf<Float>(0f)
                 for (i in 0 until mockLeft.size) {
                     if (range.contains(fft.getAverageCenterFrequency(i))) {
                         values.add((mockLeft[i] + mockRight[i]) / 2f)
@@ -119,7 +119,7 @@ class AudioProcessor constructor(private val lineIn: AudioInput) : AudioListener
      * Returns FFT average of band under index [i]. [i] should be in range 0 to [FFT_BANDWIDTH].
      */
     fun getFftAvg(i: Int): Float {
-        return when(mode) {
+        return when (mode) {
             Mode.LIVE -> fft.getAvg(i) * gain
             Mode.MOCK -> {
                 val l = mockLeft[i]
@@ -135,7 +135,6 @@ class AudioProcessor constructor(private val lineIn: AudioInput) : AudioListener
     fun mockFft(left: List<Float>, right: List<Float>) {
         mockLeft = ArrayList(left)
         mockRight = ArrayList(right)
-        beatDetect.detect(left.toFloatArray())
     }
 
     /**
