@@ -48,7 +48,7 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
 
     val exportConfig = ExportConfig.Square
     val fixedFrameRate = 24f
-    val dryRun = false
+    val dryRun = true
 
     val numX = exportConfig.numX
     val numY = exportConfig.numY
@@ -107,7 +107,7 @@ class Proximity : PApplet(), KoinComponent, AnimationHandler {
         colorModeHsb()
 
         videoExporter.prepare(
-            audioFilePath = "music/001clip02.wav",
+            audioFilePath = "music/proximity-clip.wav",
             movieFps = fixedFrameRate,
             audioGain = 2f,
             dryRun = dryRun
