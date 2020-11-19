@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals.legacy.boxes
+package dev.matsem.astral.playground.sketches.gravity
 
 import org.jbox2d.collision.shapes.ChainShape
 import org.jbox2d.common.Vec2

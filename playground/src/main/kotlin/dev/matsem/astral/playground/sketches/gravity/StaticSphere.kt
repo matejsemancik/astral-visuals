@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals.legacy.boxes
+package dev.matsem.astral.playground.sketches.gravity
 
 import org.jbox2d.collision.shapes.CircleShape
 import org.jbox2d.dynamics.Body

@@ -1,25 +1,24 @@
-package dev.matsem.astral.visuals.legacy.boxes
+package dev.matsem.astral.playground.sketches.gravity
 
+import dev.matsem.astral.core.tools.animations.AnimationHandler
+import dev.matsem.astral.core.tools.animations.radianSeconds
 import dev.matsem.astral.core.tools.audio.AudioProcessor
-import dev.matsem.astral.core.tools.extensions.angularTimeS
 import dev.matsem.astral.core.tools.extensions.centerX
 import dev.matsem.astral.core.tools.extensions.centerY
 import dev.matsem.astral.core.tools.extensions.shorterDimension
 import dev.matsem.astral.core.tools.extensions.threshold
+import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.core.tools.galaxy.Galaxy
 import dev.matsem.astral.core.tools.midi.MidiAutomator
-import dev.matsem.astral.visuals.legacy.BaseSketch
-import dev.matsem.astral.visuals.legacy.SketchLoader
+import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
-import processing.core.PApplet.cos
-import processing.core.PApplet.radians
-import processing.core.PApplet.sin
 import shiffman.box2d.Box2DProcessing
 
-class BoxesSketch : BaseSketch() {
+class Gravity : PApplet(), KoinComponent, AnimationHandler {
 
-    override val sketch: SketchLoader by inject()
+    override fun provideMillis(): Int = millis()
+
     private val audioProcessor: AudioProcessor by inject()
     private val galaxy: Galaxy by inject()
     private val box2d: Box2DProcessing by inject()
@@ -57,12 +56,10 @@ class BoxesSketch : BaseSketch() {
     private val transXPeriodSlider = galaxy.createPot(6, 34, 15f, 120f, 30f).lerp(0.01f)
     private val transYPeriodSlider = galaxy.createPot(6, 35, 15f, 120f, 30f).lerp(0.01f)
 
-    private val staticSphere = with(sketch) {
-        StaticSphere(sketch, box2d, 0f, 0f).apply {
-            fgColor = this@BoxesSketch.fgColor
-            accentColor = this@BoxesSketch.accentColor
-            radius = shorterDimension() / 4f
-        }
+    private val staticSphere = StaticSphere(this, box2d, 0f, 0f).apply {
+        fgColor = 0xffffff.withAlpha()
+        accentColor = 0xffffff.withAlpha()
+        radius = shorterDimension() / 4f
     }
 
     private val bodies = arrayListOf<Box>()
@@ -79,10 +76,6 @@ class BoxesSketch : BaseSketch() {
     private var transX = 0f
     private var transY = 0f
 
-    override fun onBecameActive() = with(sketch) {
-        sphereDetail(sphereDetailPot.value.toInt())
-    }
-
     override fun setup() {
         automator.setupWithGalaxy(
             channel = 6,
@@ -94,15 +87,13 @@ class BoxesSketch : BaseSketch() {
         )
     }
 
-    private fun addBox() = with(sketch) {
-        bodies.add(
-            Box(sketch, box2d, random(-centerX(), centerX()), random(-centerY(), centerY())).apply {
-                accentColor = this@BoxesSketch.accentColor
-                fgColor = this@BoxesSketch.fgColor
-                size = random(15f, 30f)
-            }
-        )
-    }
+    private fun addBox() = bodies.add(
+        Box(this, box2d, random(-centerX(), centerX()), random(-centerY(), centerY())).apply {
+            accentColor = 0xffffff.withAlpha()
+            fgColor = 0xffffff.withAlpha()
+            size = random(15f, 30f)
+        }
+    )
 
     private fun destroyBox() {
         val randomBox = bodies.random()
@@ -110,7 +101,7 @@ class BoxesSketch : BaseSketch() {
         bodies.remove(randomBox)
     }
 
-    override fun draw() = with(sketch) {
+    override fun draw() {
         automator.update()
         if (keyPressed) {
             when (key) {
@@ -141,15 +132,15 @@ class BoxesSketch : BaseSketch() {
         starVz *= 0.95f
         starRotationZ += starVz
 
-        background(bgColor)
+        background(0x000000.withAlpha())
 
         rotX += joystick.y * .04f
         rotY += joystick.x * .04f
         rotZ += joystick.z * .04f
 
         if (transButton.isPressed) {
-            transX = sin(angularTimeS(transXPeriodSlider.value)) * shorterDimension() / 3f
-            transY = cos(angularTimeS(transYPeriodSlider.value)) * shorterDimension() / 6f
+            transX = sin(radianSeconds(transXPeriodSlider.value)) * shorterDimension() / 3f
+            transY = cos(radianSeconds(transYPeriodSlider.value)) * shorterDimension() / 6f
         } else {
             transX = 0f
             transY = 0f
@@ -158,9 +149,9 @@ class BoxesSketch : BaseSketch() {
         if (rotationAutoBtn.isPressed) {
             pushMatrix()
             translate(centerX() + transX, centerY() + transY)
-            rotateY(angularTimeS(16f))
+            rotateY(radianSeconds(16f))
             pushMatrix()
-            rotateX(PApplet.map(sin(angularTimeS(30f)), -1f, 1f, radians(-180f), radians(180f)))
+            rotateX(PApplet.map(sin(radianSeconds(30f)), -1f, 1f, radians(-180f), radians(180f)))
             pushMatrix()
             rotateZ(0f)
         } else {
@@ -175,8 +166,8 @@ class BoxesSketch : BaseSketch() {
 
         staticSphere.apply {
             radius = baseDiameterPot.value + amp
-            accentColor = this@BoxesSketch.accentColor
-            fgColor = this@BoxesSketch.fgColor
+            accentColor = 0xffffff.withAlpha()
+            fgColor = 0xffffff.withAlpha()
         }
 
         sphereDetail(sphereDetailPot.value.toInt())
@@ -200,8 +191,8 @@ class BoxesSketch : BaseSketch() {
 
             it.value.attract(staticSphere.x, staticSphere.y, sphereGravityPot.value)
 
-            it.value.accentColor = accentColor
-            it.value.fgColor = fgColor
+            it.value.accentColor = 0xffffff.withAlpha()
+            it.value.fgColor = 0xffffff.withAlpha()
             it.value.draw()
         }
 
@@ -210,5 +201,9 @@ class BoxesSketch : BaseSketch() {
         popMatrix()
 
         box2d.step()
+    }
+
+    override fun mouseClicked() {
+        addBox()
     }
 }

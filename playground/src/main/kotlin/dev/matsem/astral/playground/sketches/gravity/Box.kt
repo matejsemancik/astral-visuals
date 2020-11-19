@@ -1,4 +1,4 @@
-package dev.matsem.astral.visuals.legacy.boxes
+package dev.matsem.astral.playground.sketches.gravity
 
 import dev.matsem.astral.core.tools.extensions.toPVector
 import dev.matsem.astral.core.tools.extensions.toVec2
