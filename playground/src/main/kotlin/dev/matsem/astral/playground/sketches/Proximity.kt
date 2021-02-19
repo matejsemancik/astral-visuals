@@ -21,6 +21,12 @@ import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector
 
+/**
+ * Visual for SEM001 release: Proximity / 40W by Johney.
+ * https://semfree.bandcamp.com/album/proximity-40w
+ *
+ * Was also used to generate artwork for the first version of Soul Ex Machina slipmats.
+ */
 class Proximity : PApplet(), KoinComponent, AnimationHandler {
 
     private val ec: ExtrusionCache by inject()
