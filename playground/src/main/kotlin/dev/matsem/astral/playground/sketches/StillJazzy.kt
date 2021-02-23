@@ -7,6 +7,7 @@ import dev.matsem.astral.core.tools.animations.saw
 import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.longerDimension
+import dev.matsem.astral.core.tools.extensions.midiRange
 import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.quantize
 import dev.matsem.astral.core.tools.extensions.remap
@@ -131,7 +132,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
                 strokeWeight(it.strokeWeight)
                 sphereDetail(it.sphereDetail)
                 translate(it.vector)
-                rotateX(radianSeconds(it.rotationSpeed).quantize(0.4f) * it.rotationVector.x)
+                rotateX(radianSeconds(it.rotationSpeed).quantize(0.3f) * it.rotationVector.x)
                 rotateY(radianSeconds(it.rotationSpeed).quantize(0.2f) * it.rotationVector.y)
                 rotateZ(radianSeconds(it.rotationSpeed).quantize(0.1f) * it.rotationVector.z)
                 sphere(it.radius + audioProcessor.getRange(it.audioRange))
@@ -144,6 +145,26 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             noise(0.1f, 0.1f)
             compose()
         }
+
+        // region Pixel sorting
+
+        loadPixels()
+        val briThreshold = kontrol.knob1.midiRange(10f, 255f)
+        var window = kontrol.knob2.midiRange(1f, longerDimension().toFloat()).toInt()
+        var nextIndex = 0
+        for (i in pixels.indices) {
+            if (i < nextIndex) {
+                continue
+            }
+            val brightness = brightness(pixels[i])
+            if (brightness > briThreshold) {
+                nextIndex = (i + window).coerceAtMost(pixels.size)
+                pixels.sort(fromIndex = i, toIndex = nextIndex - 1)
+            }
+        }
+        updatePixels()
+
+        // endregion
     }
 
     override fun mouseClicked() {
