@@ -62,10 +62,10 @@ fun PApplet.pushPop(block: PApplet.() -> Unit) {
     pop()
 }
 
-fun PApplet.drawShape(closeMode: Int, block: PApplet.() -> Unit) {
-    beginShape()
+fun PApplet.drawShape(kind: Int? = null, closeMode: Int? = null, block: PApplet.() -> Unit) {
+    kind?.let { beginShape(it) } ?: beginShape()
     this.block()
-    endShape(closeMode)
+    closeMode?.let { endShape(it) } ?: endShape()
 }
 
 fun PApplet.colorModeHsb() = colorMode(
