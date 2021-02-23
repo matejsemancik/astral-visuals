@@ -141,7 +141,6 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         fx.render().apply {
             bloom(0.3f, 100, 10f)
             bloom(0.3f, 100, 10f)
-//            rgbSplit(40f)
             noise(0.1f, 0.1f)
             compose()
         }
