@@ -5,9 +5,12 @@ import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
 import dev.matsem.astral.core.tools.animations.saw
 import dev.matsem.astral.core.tools.audio.AudioProcessor
+import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
+import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
+import dev.matsem.astral.core.tools.audio.beatcounter.OnSnare
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.longerDimension
-import dev.matsem.astral.core.tools.extensions.midiRange
+import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.quantize
 import dev.matsem.astral.core.tools.extensions.remap
@@ -16,7 +19,9 @@ import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.core.tools.kontrol.KontrolF1
 import dev.matsem.astral.core.tools.kontrol.onTriggerPad
-import dev.matsem.astral.core.tools.shapes.ExtrusionCache
+import dev.matsem.astral.core.tools.videoexport.VideoExporter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
@@ -28,15 +33,25 @@ import kotlin.random.Random.Default.nextBoolean
  */
 class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
+    private val coroutineScope = GlobalScope
+
     private lateinit var fx: PostFX
     private val kontrol: KontrolF1 by inject()
-    private val ec: ExtrusionCache by inject()
     private val audioProcessor: AudioProcessor by inject()
+    private val beatCounter: BeatCounter by inject()
+    private val videoExporter: VideoExporter by inject()
 
     lateinit var lines: List<Line>
     lateinit var spheres: List<Sphere>
 
-    override fun provideMillis(): Int = millis()
+    private var psThreshold = 10f
+    private var psWindow = 1f
+    private var psLerpSpeed = 0.8f
+    private var yRotationOffsetTarget = 0f
+    private var yRotationOffset = 0f
+    private var yRotationOffsetLerpSpeed = 0.9f
+
+    override fun provideMillis(): Int = videoExporter.videoMillis()
 
     override fun settings() {
         size(1080, 1080, P3D)
@@ -48,11 +63,55 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         surface.setResizable(true)
         fx = PostFX(this)
         kontrol.connect()
+        noiseSeed(420L)
+        randomSeed(420L)
         generateScene()
 
         kontrol.onTriggerPad(0, 0) {
-            generateScene()
+            glitchSequence()
         }
+
+        kontrol.onTriggerPad(0, 1) {
+            twist()
+        }
+
+        beatCounter.addListener(OnKick, 3) {
+            glitchSequence()
+        }
+
+        beatCounter.addListener(OnSnare, 5) {
+            twist()
+        }
+
+        videoExporter.prepare(
+            audioFilePath = "music/sem002-clip.mp3",
+            movieFps = 24f,
+            audioGain = 0.5f,
+            dryRun = false
+        ) {
+            drawSketch()
+        }
+    }
+
+    private fun glitch() {
+        psThreshold = random(10f, 90f)
+        psWindow = random(100f, 1080f)
+        psLerpSpeed = random(0.5f, 0.96f)
+    }
+
+    private fun glitchSequence() = coroutineScope.launch {
+        coroutineScope.launch {
+            glitch()
+            kotlinx.coroutines.delay(100L)
+            glitch()
+            kotlinx.coroutines.delay(200L)
+            glitch()
+        }
+    }
+
+    private fun twist() {
+        yRotationOffsetLerpSpeed = 0.9f
+        yRotationOffsetTarget = random(0f, TWO_PI)
     }
 
     private fun generateScene() {
@@ -97,9 +156,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         }
     }
 
-    override fun draw() {
-        drawSketch()
-    }
+    override fun draw() = Unit
 
     private fun PApplet.drawSketch() {
         background(0x000000.withAlpha())
@@ -109,11 +166,16 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         colorModeHsb()
 
         translateCenter()
-        val noiseX =
-            noise(millis() / 10000f).remap(0f, 1f, -PI * 0.1f, PI * 0.1f) + saw(1 / 30f).remap(0f, 1f, 0f, TWO_PI)
-        val noiseY = noise(millis() / 10000f + 1f).remap(0f, 1f, PI * 0.1f, -PI * 0.1f) + PI / 2f
-        rotateY(noiseX)
-        rotateX(noiseY)
+        yRotationOffset = lerp(yRotationOffset, yRotationOffsetTarget, yRotationOffsetLerpSpeed)
+        val sceneRotationY = noise(millis() / 10000f).mapp(-PI * 0.1f, PI * 0.1f) +
+                saw(fHz = 1 / 30f).mapp(0f, TWO_PI) +
+                yRotationOffset
+
+        val sceneRotationX = noise(millis() / 10000f + 1f).mapp(PI * 0.1f, -PI * 0.1f) +
+                PI / 2f
+
+        rotateY(sceneRotationY)
+        rotateX(sceneRotationX)
 
         lines.forEach {
             pushPop {
@@ -148,27 +210,23 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
         // region Pixel sorting
 
+        psWindow = lerp(psWindow, 1f, psLerpSpeed)
+
         loadPixels()
-        val briThreshold = kontrol.knob1.midiRange(10f, 255f)
-        var window = kontrol.knob2.midiRange(1f, longerDimension().toFloat()).toInt()
         var nextIndex = 0
         for (i in pixels.indices) {
             if (i < nextIndex) {
                 continue
             }
             val brightness = brightness(pixels[i])
-            if (brightness > briThreshold) {
-                nextIndex = (i + window).coerceAtMost(pixels.size)
+            if (brightness > psThreshold) {
+                nextIndex = (i + psWindow.toInt()).coerceAtMost(pixels.size)
                 pixels.sort(fromIndex = i, toIndex = nextIndex - 1)
             }
         }
         updatePixels()
 
         // endregion
-    }
-
-    override fun mouseClicked() {
-        generateScene()
     }
 }
 
