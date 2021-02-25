@@ -4,7 +4,8 @@ build/
 out/
 *.iml
 local.properties
-visuals/data/midi
-visuals/data/movies
-visuals/data/music
+data/midi/
+data/music/
 *.log
+ffmpeg.txt
+ffmpeg-audio.txt
