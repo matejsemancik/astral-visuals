@@ -29,4 +29,5 @@ tasks {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-Xinline-classes")
+    useIR = true
 }
