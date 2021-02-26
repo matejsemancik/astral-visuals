@@ -14,6 +14,7 @@ import dev.matsem.astral.core.tools.extensions.mapp
 import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.quantize
 import dev.matsem.astral.core.tools.extensions.remap
+import dev.matsem.astral.core.tools.extensions.shorterDimension
 import dev.matsem.astral.core.tools.extensions.translate
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.withAlpha
@@ -34,6 +35,14 @@ import kotlin.random.Random.Default.nextBoolean
  * Visual for SEM002 release by Afterlife and Dizztrickt.
  */
 class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
+
+    sealed class ExportConfig(val fileName: String, val width: Int, val height: Int) {
+        object Square : ExportConfig("sem002_loop_sqr.mp4", 1080, 1080)
+        object Landscape : ExportConfig("sem002_loop_land.mp4", 1920, 1080)
+        object Portrait : ExportConfig("sem002_loop_port.mp4", 1080, 1920)
+    }
+
+    private val exportConfig = ExportConfig.Portrait
 
     private val coroutineScope = GlobalScope
 
@@ -58,7 +67,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
     override fun provideMillis(): Int = videoExporter.videoMillis()
 
     override fun settings() {
-        size(1080, 1080, P3D)
+        size(exportConfig.width, exportConfig.height, P3D)
     }
 
     override fun setup() {
@@ -74,12 +83,13 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         generateScene()
 
         kontrol.onTriggerPad(0, 0) { glitchSequence() }
-        kontrol.onTriggerPad(0, 1) { twist()}
-        beatCounter.addListener(OnKick, 3) { glitchSequence() }
-        beatCounter.addListener(OnSnare, 5) { twist() }
+        kontrol.onTriggerPad(0, 1) { twist() }
+        beatCounter.addListener(OnKick, 5) { glitchSequence() }
+        beatCounter.addListener(OnSnare, 4) { twist() }
 
         videoExporter.prepare(
             audioFilePath = "music/sem002-clip.mp3",
+            outputVideoFileName = exportConfig.fileName,
             movieFps = 24f,
             audioGain = 0.5f,
             dryRun = false
@@ -90,8 +100,8 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
     private fun glitch() {
         psThreshold = random(10f, 90f)
-        psWindow = random(100f, 1080f)
-        psLerpSpeed = random(0.5f, 0.96f)
+        psWindow = random(100f, longerDimension().toFloat())
+        psLerpSpeed = random(0.5f, 0.90f)
     }
 
     private fun glitchSequence() = coroutineScope.launch {
@@ -112,7 +122,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
     private fun generateScene() {
         lines = List(1000) {
             Line(
-                vector = PVector.random3D().mult(random(0f, longerDimension().toFloat())),
+                vector = PVector.random3D().mult(random(0f, shorterDimension().toFloat())),
                 strokeWeight = random(6f, 20f),
                 length = random(0f, 200f),
                 speed = random(10f, 30f),
@@ -120,7 +130,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             )
         } + List(100) {
             Line(
-                vector = PVector.random3D().mult(random(0f, longerDimension().toFloat())),
+                vector = PVector.random3D().mult(random(0f, shorterDimension().toFloat())),
                 strokeWeight = random(2f, 6f),
                 length = random(0f, 200f),
                 speed = random(5f, 20f),
@@ -130,7 +140,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
         spheres = List(10) {
             Sphere(
-                vector = PVector.random3D().mult(random(0f, longerDimension() * 2f)),
+                vector = PVector.random3D().mult(random(0f, shorterDimension() * 2f)),
                 radius = random(40f, 120f),
                 sphereDetail = random(3f, 6f).toInt(),
                 strokeWeight = random(2f, 3f),
@@ -140,7 +150,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             )
         } + List(100) {
             Sphere(
-                vector = PVector.random3D().mult(random(0f, longerDimension() * 2f)),
+                vector = PVector.random3D().mult(random(0f, shorterDimension() * 2f)),
                 radius = random(20f, 40f),
                 sphereDetail = random(1f, 3f).toInt(),
                 strokeWeight = random(2f, 3f),
@@ -168,8 +178,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
                 saw(fHz = 1 / 30f).mapp(0f, TWO_PI) +
                 yRotationOffset
 
-        val sceneRotationX = noise(millis() / 10000f + 1f).mapp(PI * 0.1f, -PI * 0.1f) +
-                PI / 2f
+        val sceneRotationX = noise(millis() / 10000f + 1f).mapp(PI * 0.1f, -PI * 0.1f) + PI / 2f
 
         rotateY(sceneRotationY)
         rotateX(sceneRotationX)
@@ -178,7 +187,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             pushPop {
                 strokeWeight(it.strokeWeight)
                 stroke(0xffffff.withAlpha(it.alpha.remap(0f, 1f, 0f, 255f).toInt()))
-                translate(0f, 0f, -1000f)
+                translate(0f, 0f, -800f)
                 translate(it.vector.x, it.vector.y, it.vector.z)
                 translate(0f, 0f, saw(1f / it.speed) * 1000f)
                 line(0f, 0f, 0f, 0f, 0f, 0f + it.length)
@@ -215,8 +224,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             bloom(0.3f, 100, 10f)
             bloom(0.3f, 100, 10f)
             noise(0.1f, 0.1f)
-            compose()
-        }
+        }.compose()
 
         // region Pixel sorting
 
