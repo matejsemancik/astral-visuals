@@ -1,10 +1,12 @@
 package dev.matsem.astral.core.tools.videoexport
 
 import com.hamoid.VideoExport
+import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.audio.AudioProcessor
 import dev.matsem.astral.core.tools.audio.BeatDetectData
 import processing.core.PApplet
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import kotlin.properties.Delegates
 
@@ -19,6 +21,11 @@ class VideoExporter(
     private val audioProcessor: AudioProcessor
 ) {
 
+    companion object {
+        const val EXPORT_PATH = "data/videoexport"
+        const val VIDEO_FILE_EXTENSION = ".mp4"
+    }
+
     private var frameDuration: Float by Delegates.notNull()
     private var dryRun: Boolean by Delegates.notNull()
     private var audioGain: Float = 1f
@@ -30,15 +37,23 @@ class VideoExporter(
     /**
      * Initialization method. When called, prepares the video exporter for movie export and video
      * will be exported starting from the first frame.
+     *
      * Call in the sketch setup() method and move your draw logic to [draw] lambda.
      * Note, that you still have to override the parent's [draw] method, but leave it empty in order for this to work
      * (super.draw() must not be called).
+     *
+     * When using [AnimationHandler], don't forget to provide it with
+     * exporter's [videoMillis] instead of [PApplet.millis].
+     *
+     * Video will be exported in [EXPORT_PATH] = <project-dir>/data/videoexport
+     * directory using provided [outputVideoFileName].
      */
     fun prepare(
         audioFilePath: String,
         movieFps: Float,
-        audioGain: Float = 1f,
         dryRun: Boolean,
+        audioGain: Float = 1f,
+        outputVideoFileName: String = "export.mp4",
         draw: PApplet.() -> Unit
     ) {
         this.dryRun = dryRun
@@ -59,6 +74,8 @@ class VideoExporter(
             fileReader = parent.createReader(parent.dataPath("$audioFilePath.txt"))
             println("Sound analysis done")
 
+            File(EXPORT_PATH).mkdirs()
+            videoExport.setMovieFileName("$EXPORT_PATH/${outputVideoFileName.withFileExtension()}")
             videoExport.startMovie()
         }
     }
@@ -139,4 +156,13 @@ class VideoExporter(
      * Returns the duration of the movie (so far) in milliseconds.
      */
     fun videoMillis(): Int = if (dryRun) parent.millis() else (videoExport.currentTime * 1000).toInt()
+
+    /**
+     * Adds [VIDEO_FILE_EXTENSION] to file name if file name without extension
+     * was provided.
+     */
+    private fun String.withFileExtension() = when {
+        this.endsWith(VIDEO_FILE_EXTENSION) -> this
+        else -> "$this$VIDEO_FILE_EXTENSION"
+    }
 }

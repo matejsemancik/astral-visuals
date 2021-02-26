@@ -6,6 +6,7 @@ out/
 local.properties
 data/midi/
 data/music/
+data/videoexport/
 *.log
 ffmpeg.txt
 ffmpeg-audio.txt
