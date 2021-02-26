@@ -19,12 +19,14 @@ import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.core.tools.kontrol.KontrolF1
 import dev.matsem.astral.core.tools.kontrol.onTriggerPad
+import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import dev.matsem.astral.core.tools.videoexport.VideoExporter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import processing.core.PApplet
+import processing.core.PShape
 import processing.core.PVector
 import kotlin.random.Random.Default.nextBoolean
 
@@ -40,9 +42,11 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
     private val audioProcessor: AudioProcessor by inject()
     private val beatCounter: BeatCounter by inject()
     private val videoExporter: VideoExporter by inject()
+    private val ec: ExtrusionCache by inject()
 
     lateinit var lines: List<Line>
     lateinit var spheres: List<Sphere>
+    lateinit var logo: Logo
 
     private var psThreshold = 10f
     private var psWindow = 1f
@@ -63,25 +67,16 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         surface.setResizable(true)
         fx = PostFX(this)
         kontrol.connect()
-        noiseSeed(420L)
-        randomSeed(420L)
+        val seed = 424L // With SEM Logo
+//        val seed = 420L // Without SEM logo
+        noiseSeed(seed)
+        randomSeed(seed)
         generateScene()
 
-        kontrol.onTriggerPad(0, 0) {
-            glitchSequence()
-        }
-
-        kontrol.onTriggerPad(0, 1) {
-            twist()
-        }
-
-        beatCounter.addListener(OnKick, 3) {
-            glitchSequence()
-        }
-
-        beatCounter.addListener(OnSnare, 5) {
-            twist()
-        }
+        kontrol.onTriggerPad(0, 0) { glitchSequence() }
+        kontrol.onTriggerPad(0, 1) { twist()}
+        beatCounter.addListener(OnKick, 3) { glitchSequence() }
+        beatCounter.addListener(OnSnare, 5) { twist() }
 
         videoExporter.prepare(
             audioFilePath = "music/sem002-clip.mp3",
@@ -111,7 +106,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
     private fun twist() {
         yRotationOffsetLerpSpeed = 0.9f
-        yRotationOffsetTarget = random(0f, TWO_PI)
+        yRotationOffsetTarget = random(0f, TWO_PI * 2f)
     }
 
     private fun generateScene() {
@@ -154,6 +149,10 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
                 audioRange = (2000f..random(3000f, 10000f))
             )
         }
+
+        logo = Logo(
+            ec.semLogo.toList()
+        )
     }
 
     override fun draw() = Unit
@@ -161,8 +160,6 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
     private fun PApplet.drawSketch() {
         background(0x000000.withAlpha())
         directionalLight(0f, 0f, 100f, 0f, -1f, 0f)
-        fill(0x111111.withAlpha())
-        stroke(0xffffff.withAlpha())
         colorModeHsb()
 
         translateCenter()
@@ -190,6 +187,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
         spheres.forEach {
             pushPop {
+                fill(0x111111.withAlpha())
                 stroke(0xffffff.withAlpha())
                 strokeWeight(it.strokeWeight)
                 sphereDetail(it.sphereDetail)
@@ -198,6 +196,18 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
                 rotateY(radianSeconds(it.rotationSpeed).quantize(0.2f) * it.rotationVector.y)
                 rotateZ(radianSeconds(it.rotationSpeed).quantize(0.1f) * it.rotationVector.z)
                 sphere(it.radius + audioProcessor.getRange(it.audioRange))
+            }
+        }
+
+        pushPop {
+            scale(2f)
+            rotateX(PI / 2f)
+            noFill()
+            stroke(0xffffff.withAlpha())
+            strokeWeight(8f)
+            for (shape in logo.shapes) {
+                shape.disableStyle()
+                shape(shape)
             }
         }
 
@@ -229,6 +239,10 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         // endregion
     }
 }
+
+data class Logo(
+    val shapes: List<PShape>
+)
 
 data class Line(
     val vector: PVector,
