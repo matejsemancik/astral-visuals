@@ -38,8 +38,8 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
     sealed class ExportConfig(val fileName: String, val width: Int, val height: Int) {
         object Square : ExportConfig("sem002_loop_sqr.mp4", 1080, 1080)
-        object Landscape : ExportConfig("sem002_loop_land.mp4", 1920, 1080)
-        object Portrait : ExportConfig("sem002_loop_port.mp4", 1080, 1920)
+        object Landscape : ExportConfig("sem002_loop_land.mp4", 1280, 720)
+        object Portrait : ExportConfig("sem002_loop_port.mp4", 720, 1280)
     }
 
     private val exportConfig = ExportConfig.Portrait
@@ -73,11 +73,9 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
     override fun setup() {
         colorModeHsb()
         surface.setTitle("Still Jazzy")
-        surface.setResizable(true)
         fx = PostFX(this)
         kontrol.connect()
-        val seed = 424L // With SEM Logo
-//        val seed = 420L // Without SEM logo
+        val seed = 424L
         noiseSeed(seed)
         randomSeed(seed)
         generateScene()
@@ -187,7 +185,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             pushPop {
                 strokeWeight(it.strokeWeight)
                 stroke(0xffffff.withAlpha(it.alpha.remap(0f, 1f, 0f, 255f).toInt()))
-                translate(0f, 0f, -800f)
+                translate(0f, 0f, -longerDimension() / 2f)
                 translate(it.vector.x, it.vector.y, it.vector.z)
                 translate(0f, 0f, saw(1f / it.speed) * 1000f)
                 line(0f, 0f, 0f, 0f, 0f, 0f + it.length)
