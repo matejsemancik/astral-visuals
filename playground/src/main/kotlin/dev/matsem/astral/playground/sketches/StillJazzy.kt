@@ -90,7 +90,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             outputVideoFileName = exportConfig.fileName,
             movieFps = 24f,
             audioGain = 0.5f,
-            dryRun = false
+            dryRun = true
         ) {
             drawSketch()
         }
