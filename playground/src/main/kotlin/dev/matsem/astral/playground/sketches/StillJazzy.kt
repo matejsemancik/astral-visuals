@@ -36,10 +36,10 @@ import kotlin.random.Random.Default.nextBoolean
  */
 class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
-    sealed class ExportConfig(val fileName: String, val width: Int, val height: Int) {
-        object Square : ExportConfig("sem002_loop_sqr.mp4", 1080, 1080)
-        object Landscape : ExportConfig("sem002_loop_land.mp4", 1280, 720)
-        object Portrait : ExportConfig("sem002_loop_port.mp4", 720, 1280)
+    sealed class ExportConfig(val fileName: String, val width: Int, val height: Int, val drawScale: Float) {
+        object Square : ExportConfig("sem002_loop_sqr.mp4", 1080, 1080, 1f)
+        object Landscape : ExportConfig("sem002_loop_land.mp4", 1920, 1080, 1f)
+        object Portrait : ExportConfig("sem002_loop_port.mp4", 1080, 1920, 1f)
     }
 
     private val exportConfig = ExportConfig.Portrait
@@ -90,7 +90,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             outputVideoFileName = exportConfig.fileName,
             movieFps = 24f,
             audioGain = 0.5f,
-            dryRun = true
+            dryRun = false
         ) {
             drawSketch()
         }
@@ -98,7 +98,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
     private fun glitch() {
         psThreshold = random(10f, 90f)
-        psWindow = random(100f, longerDimension().toFloat())
+        psWindow = random(100f * exportConfig.drawScale, longerDimension().toFloat())
         psLerpSpeed = random(0.5f, 0.90f)
     }
 
@@ -121,16 +121,16 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         lines = List(1000) {
             Line(
                 vector = PVector.random3D().mult(random(0f, shorterDimension().toFloat())),
-                strokeWeight = random(6f, 20f),
-                length = random(0f, 200f),
+                strokeWeight = random(6f, 20f) * exportConfig.drawScale,
+                length = random(0f, 200f) * exportConfig.drawScale,
                 speed = random(10f, 30f),
                 alpha = 0.08f
             )
         } + List(100) {
             Line(
                 vector = PVector.random3D().mult(random(0f, shorterDimension().toFloat())),
-                strokeWeight = random(2f, 6f),
-                length = random(0f, 200f),
+                strokeWeight = random(2f, 6f) * exportConfig.drawScale,
+                length = random(0f, 200f) * exportConfig.drawScale,
                 speed = random(5f, 20f),
                 alpha = 1f
             )
@@ -139,9 +139,9 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         spheres = List(10) {
             Sphere(
                 vector = PVector.random3D().mult(random(0f, shorterDimension() * 2f)),
-                radius = random(40f, 120f),
+                radius = random(40f, 120f) * exportConfig.drawScale,
                 sphereDetail = random(3f, 6f).toInt(),
-                strokeWeight = random(2f, 3f),
+                strokeWeight = random(2f, 3f) * exportConfig.drawScale,
                 rotationVector = PVector.random3D(),
                 rotationSpeed = random(5f, 10f) * (if (nextBoolean()) 1f else -1f),
                 audioRange = (20f..random(200f, 2000f))
@@ -149,9 +149,9 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         } + List(100) {
             Sphere(
                 vector = PVector.random3D().mult(random(0f, shorterDimension() * 2f)),
-                radius = random(20f, 40f),
+                radius = random(20f, 40f) * exportConfig.drawScale,
                 sphereDetail = random(1f, 3f).toInt(),
-                strokeWeight = random(2f, 3f),
+                strokeWeight = random(2f, 3f) * exportConfig.drawScale,
                 rotationVector = PVector.random3D(),
                 rotationSpeed = random(5f, 10f) * (if (nextBoolean()) 1f else -1f),
                 audioRange = (2000f..random(3000f, 10000f))
@@ -207,11 +207,11 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         }
 
         pushPop {
-            scale(2f)
+            scale(2f * exportConfig.drawScale)
             rotateX(PI / 2f)
             noFill()
             stroke(0xffffff.withAlpha())
-            strokeWeight(8f)
+            strokeWeight(8f * exportConfig.drawScale)
             for (shape in logo.shapes) {
                 shape.disableStyle()
                 shape(shape)
@@ -219,9 +219,9 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
         }
 
         fx.render().apply {
-            bloom(0.3f, 100, 10f)
-            bloom(0.3f, 100, 10f)
-            noise(0.1f, 0.1f)
+            bloom(0.3f, 100 * exportConfig.drawScale.toInt(), 10f)
+            bloom(0.3f, 100 * exportConfig.drawScale.toInt(), 10f)
+            noise(0.1f * exportConfig.drawScale, 0.1f)
         }.compose()
 
         // region Pixel sorting
