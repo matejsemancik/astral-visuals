@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.0"
-    kotlin("plugin.serialization") version "1.4.0"
+    kotlin("jvm") version "1.4.31"
+    kotlin("plugin.serialization") version "1.4.31"
 }
 
 group = ProjectSettings.group
@@ -29,4 +29,5 @@ tasks {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-Xinline-classes")
+    useIR = true
 }

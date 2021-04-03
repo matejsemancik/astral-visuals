@@ -13,7 +13,6 @@ import dev.matsem.astral.core.tools.midi.MidiFileParser
 import dev.matsem.astral.core.tools.midi.MidiPlayer
 import dev.matsem.astral.core.tools.midi.MidiRecorder
 import dev.matsem.astral.core.tools.osc.OscManager
-import dev.matsem.astral.core.tools.pixelsort.PixelSorter
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import dev.matsem.astral.core.tools.videoexport.FFTSerializer
 import dev.matsem.astral.core.tools.videoexport.VideoExporter
@@ -43,9 +42,6 @@ val coreModule = module {
     // Extrusion
     single { extruder.extruder(get()) }
     single { ExtrusionCache(get(), get()) }
-
-    // Effects
-    single { PixelSorter() }
 
     // VideoExporter
     single { VideoExport(get()) }

@@ -1,7 +1,7 @@
 package dev.matsem.astral.playground
 
 import dev.matsem.astral.core.di.coreModule
-import dev.matsem.astral.playground.sketches.Proximity
+import dev.matsem.astral.playground.sketches.StillJazzy
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.inject
@@ -27,7 +27,7 @@ class PlaygroundApp : KoinComponent {
     fun run(processingArgs: Array<String>) {
         startKoin {
             printLogger(Level.ERROR)
-            modules(coreModule + playgroundModule { Proximity() })
+            modules(coreModule + playgroundModule { StillJazzy() })
         }
 
         PApplet.runSketch(processingArgs + arrayOf("ProcessingPlayground"), sketch)

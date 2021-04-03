@@ -14,9 +14,6 @@ import dev.matsem.astral.visuals.layers.TextOverlayLayer
 import dev.matsem.astral.visuals.layers.debris.DebrisLayer
 import dev.matsem.astral.visuals.layers.galaxy.GalaxyLayer
 import dev.matsem.astral.visuals.layers.stars.StarsLayer
-import dev.matsem.astral.playground.sketches.gravity.BoxesSketch
-import dev.matsem.astral.visuals.legacy.cubes.CubesSketch
-import dev.matsem.astral.visuals.legacy.patterns.PatternsSketch
 import dev.matsem.astral.visuals.tools.tapper.Tapper
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -27,10 +24,6 @@ fun visualsModule(provideSketch: () -> PApplet) = module {
 
     // BPM
     single { Tapper(get()) }
-
-    factory { PatternsSketch() }
-    factory { BoxesSketch() }
-    factory { CubesSketch() }
 
     single { Mixer(get()) }
     single { Effector(get(), get()) }

@@ -16,6 +16,8 @@ operator fun PVector.minusAssign(anotherVector: PVector) {
     sub(anotherVector)
 }
 
+operator fun PVector.plus(anotherVector: PVector): PVector = add(anotherVector)
+
 fun PVector.toVec2() = Vec2(x, y)
 
 fun PVector.isInRadius(threshold: Float): Boolean = x.absoluteValue <= threshold && y.absoluteValue <= threshold
