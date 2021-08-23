@@ -1,0 +1,9 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+
+    <g>
+        <title>Layer 1</title>
+        <path id="svg_1"
+              d="m0,100l0,100l100,0l-100,100l0,100l100,0l0,-100l300,0l0,-100l-300,0l0,-100l300,0l0,-100l-300,0"
+              fill-rule="evenodd"/>
+    </g>
+</svg>
