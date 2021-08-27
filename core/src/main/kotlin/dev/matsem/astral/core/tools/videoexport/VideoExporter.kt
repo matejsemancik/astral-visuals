@@ -45,7 +45,7 @@ class VideoExporter(
      * When using [AnimationHandler], don't forget to provide it with
      * exporter's [videoMillis] instead of [PApplet.millis].
      *
-     * Video will be exported in [EXPORT_PATH] = <project-dir>/data/videoexport
+     * Video will be exported at [EXPORT_PATH] = <project-dir>/data/videoexport
      * directory using provided [outputVideoFileName].
      */
     fun prepare(
