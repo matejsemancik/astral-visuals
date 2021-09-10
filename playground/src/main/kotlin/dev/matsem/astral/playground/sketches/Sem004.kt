@@ -8,12 +8,7 @@ import dev.matsem.astral.core.tools.audio.beatcounter.BeatCounter
 import dev.matsem.astral.core.tools.audio.beatcounter.OnHat
 import dev.matsem.astral.core.tools.audio.beatcounter.OnKick
 import dev.matsem.astral.core.tools.audio.beatcounter.OnSnare
-import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.core.tools.extensions.mapSin
-import dev.matsem.astral.core.tools.extensions.pushPop
-import dev.matsem.astral.core.tools.extensions.resizeRatioAware
-import dev.matsem.astral.core.tools.extensions.translateCenter
-import dev.matsem.astral.core.tools.extensions.withAlpha
+import dev.matsem.astral.core.tools.extensions.*
 import dev.matsem.astral.core.tools.videoexport.VideoExporter
 import org.koin.core.KoinComponent
 import org.koin.core.inject
