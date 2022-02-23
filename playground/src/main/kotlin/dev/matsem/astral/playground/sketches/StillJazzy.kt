@@ -22,7 +22,9 @@ import dev.matsem.astral.core.tools.kontrol.KontrolF1
 import dev.matsem.astral.core.tools.kontrol.onTriggerPad
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import dev.matsem.astral.core.tools.videoexport.VideoExporter
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -44,7 +46,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
 
     private val exportConfig = ExportConfig.Portrait
 
-    private val coroutineScope = MainScope()
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     private lateinit var fx: PostFX
     private val kontrol: KontrolF1 by inject()
@@ -90,7 +92,7 @@ class StillJazzy : PApplet(), AnimationHandler, KoinComponent {
             outputVideoFileName = exportConfig.fileName,
             movieFps = 24f,
             audioGain = 0.5f,
-            dryRun = true
+            dryRun = false
         ) {
             drawSketch()
         }
