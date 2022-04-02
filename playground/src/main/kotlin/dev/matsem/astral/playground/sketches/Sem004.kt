@@ -73,7 +73,7 @@ class Sem004 : PApplet(), AnimationHandler, KoinComponent {
         videoExporter.prepare(
             audioFilePath = exportConfig.audioFile,
             movieFps = 24f,
-            dryRun = false,
+            dryRun = true,
             audioGain = 1f,
             outputVideoFileName = exportConfig.fileName
         ) {
