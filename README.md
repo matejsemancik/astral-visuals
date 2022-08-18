@@ -57,7 +57,7 @@ You can run the project with Gradle `run` task. Be sure to include the `--sketch
 ```
 
 Note: Due to the fragileness of Processing dependencies (namely JogAmp), the project currently works only with some JDK versions, specifically `11.0.11-zulu`. You can find `.sdkmanrc` file in project folder
-that sets up the corrent SDK for you if you use [SDKMAN!](https://sdkman.io/). (`11.0.12` does not work yet, causing [this](https://github.com/processing/processing4/issues/249) issue).
+that sets up the current SDK for you if you use [SDKMAN!](https://sdkman.io/). (`11.0.12` does not work yet, causing [this](https://github.com/processing/processing4/issues/249) issue).
 
 ## Remote control
 Currently, the project supports 3 remote control options:

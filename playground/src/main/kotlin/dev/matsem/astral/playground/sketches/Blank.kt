@@ -5,9 +5,9 @@ import org.koin.core.KoinComponent
 import processing.core.PApplet
 import processing.core.PConstants
 
-// Processing4 Beta6
+// Processing 4.0.1
 // Can't load library: /Users/matsem/data/processing-proj/astral-visuals/natives/macosx-universal//gluegen_rt
-// https://github.com/processing/processing4/issues/370
+// https://github.com/processing/processing4/issues/537
 class Blank : PApplet(), KoinComponent {
 
     override fun settings() {

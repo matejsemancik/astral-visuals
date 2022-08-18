@@ -13,6 +13,8 @@ class PlaygroundApp : KoinComponent {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
+            // https://github.com/processing/processing4/issues/537 This somehow works but does not solve the native lib issue with other processing libraries
+            // System.setProperty("java.library.path", "/Applications/Processing.app/Contents/Java/core/library/macos-x86_64")
             PlaygroundApp().run(args)
         }
     }
