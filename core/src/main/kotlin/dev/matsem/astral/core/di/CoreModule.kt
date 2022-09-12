@@ -23,30 +23,37 @@ import shiffman.box2d.Box2DProcessing
 
 val coreModule = module {
     single { KontrolF1() }
-    single { Galaxy(get()) }
+    single { Galaxy(parent = get()) }
 
-    single { MidiFileParser(get()) }
-    factory { MidiRecorder(get()) }
-    factory { MidiPlayer(get()) }
-    factory { MidiAutomator(get(), get(), get()) }
-    single { OscManager(get(), OscManager.INPUT_PORT, OscManager.OUTPUT_IP, OscManager.OUTPUT_PORT) }
+    single { MidiFileParser(sketch = get()) }
+    factory { MidiRecorder(sketch = get()) }
+    factory { MidiPlayer(sketch = get()) }
+    factory { MidiAutomator(midiRecorder = get(), midiPlayer = get(), galaxy = get()) }
+    single {
+        OscManager(
+            sketch = get(),
+            inputPort = OscManager.INPUT_PORT,
+            outputIp = OscManager.OUTPUT_IP,
+            outputPort = OscManager.OUTPUT_PORT
+        )
+    }
 
     // Audio
     single { Minim(get() as PApplet) }
     single { (get() as Minim).lineOut }
     single { (get() as Minim).lineIn }
     single { Sink().apply { patch(get() as AudioOutput) } }
-    single { AudioProcessor(get()) }
-    factory { BeatCounter(get(), get()) }
+    single { AudioProcessor(lineIn = get()) }
+    factory { BeatCounter(parent = get(), audioProcessor = get()) }
 
     // Extrusion
     single { extruder.extruder(get()) }
-    single { ExtrusionCache(get(), get()) }
+    single { ExtrusionCache(sketch = get(), ex = get()) }
 
     // VideoExporter
     single { VideoExport(get()) }
-    single { FFTSerializer(get(), get()) }
-    factory { VideoExporter(get(), get(), get(), get()) }
+    single { FFTSerializer(parent = get(), minim = get()) }
+    factory { VideoExporter(parent = get(), videoExport = get(), fftSerializer = get(), audioProcessor = get()) }
 
     factory {
         Box2DProcessing(get()).apply {

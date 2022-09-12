@@ -1,7 +1,8 @@
 object Dependencies {
-    const val koin = "org.koin:koin-core:2.1.5"
-    const val serializationCore = "org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC"
-    const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4"
+    const val koin = "org.koin:koin-core:${Versions.koin}"
+    const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serializationJson}"
+    const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+
     val processingLibs = listOf(
         "minim",
         "themidibus",
@@ -13,7 +14,6 @@ object Dependencies {
         "peasycam",
         "PostFX",
         "oscP5",
-        "ControlP5",
         "blobDetection"
     )
 }

@@ -1,3 +1,5 @@
+import java.util.*
+
 plugins {
     kotlin("jvm")
     application
@@ -5,9 +7,16 @@ plugins {
 
 apply<dev.matsem.astral.CommonDependencies>()
 
-@Suppress("UnstableApiUsage")
 application {
-    mainClassName = "dev.matsem.astral.visuals.VisualsApp"
+    val props = Properties().apply {
+        load(file("${rootDir}/local.properties").inputStream())
+    }
+    val nativesDir = props["processing.core.natives"]
+
+    mainClass.set("dev.matsem.astral.visuals.VisualsApp")
+    applicationDefaultJvmArgs = listOf(
+        "-Djava.library.path=$nativesDir"
+    )
 }
 
 repositories {
@@ -24,9 +33,9 @@ version = ProjectSettings.version
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 }

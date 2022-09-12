@@ -40,20 +40,19 @@ class ExtrusionCache(
             endShape(PConstants.CLOSE)
         }
 
-        val depth = 50
         mutableListOf<PShape>().apply {
-            this += ex.extrude(upper, depth, "box")
-            this += ex.extrude(lower, depth, "box")
-            forEach { it.translate(-50f, -50f, -depth / 2f) }
+            this += ex.extrude(upper, 100, "box")
+            this += ex.extrude(lower, 100, "box")
+            forEach { it.translate(-50f, -50f) }
         }.toTypedArray()
     }
 
     private val textCache = mutableMapOf<String, Array<PShape>>()
 
-    fun getText(text: String, fontSize: Int = 48, depth: Int = 20): Array<PShape> {
+    fun getText(text: String): Array<PShape> {
         return textCache.getOrPut(text) {
 
-            val rShape = RG.getText(text, Files.Font.FFF_FORWARD, fontSize, PApplet.CENTER)
+            val rShape = RG.getText(text, Files.Font.FFF_FORWARD, 48, PApplet.CENTER)
 
             RG.setPolygonizer(RG.UNIFORMSTEP)
             RG.setPolygonizerStep(1f)
@@ -61,7 +60,6 @@ class ExtrusionCache(
             val letters = rShape.children
 
             letters
-                .asSequence()
                 .map { it.points }
                 .map { points ->
                     sketch.createShape().apply {
@@ -72,9 +70,7 @@ class ExtrusionCache(
                         endShape(PApplet.CLOSE)
                     }
                 }
-                .flatMap { ex.extrude(it, depth, "box").toList() }
-                .onEach { it.translate(0f, fontSize / 2f, -depth / 2f) }
-                .toList()
+                .flatMap { ex.extrude(it, 20, "box").toList() }
                 .toTypedArray()
         }
     }

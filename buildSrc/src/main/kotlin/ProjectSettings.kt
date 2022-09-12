@@ -1,4 +1,4 @@
 object ProjectSettings {
-    val version = "2.0.0"
-    val group = "dev.matsem"
+    const val version = "2.1.0"
+    const val group = "dev.matsem"
 }
