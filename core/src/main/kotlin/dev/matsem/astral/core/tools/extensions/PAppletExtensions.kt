@@ -75,3 +75,9 @@ fun PApplet.colorModeHsb() = colorMode(
     ColorConfig.BRIGHTNESS_MAX,
     ColorConfig.ALPHA_MAX
 )
+
+val PApplet.widthF: Float
+    get() = width.toFloat()
+
+val PApplet.heightF: Float
+    get() = height.toFloat()
