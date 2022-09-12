@@ -16,18 +16,20 @@ The `:visuals` module is meant to be used in live environment at the parties. Th
 This project depends on local [Processing 4](https://processing.org) installation, so go ahead and install it if you haven't already. Then create a `local.properties` file in project's root directory and configure the core library and contributed libraries' paths:
 
 ```
-processingLibsDir=/path/to/your/processing/libraries/dir
-processingCoreDir=/path/to/core/processing/libraries
+processing.core.jars=/path/to/your/processing/libraries/dir
+processing.core.natives=/path/to/your/processing/libraries/dir/<os-architecture>
+processing.libs.jars=/path/to/core/processing/libraries
 ```
 
 On macOS it might look like this:
 
 ```
-processingLibsDir=/Users/username/Documents/Processing/libraries
-processingCoreDir=/Applications/Processing.app/Contents/Java/core/library
+processing.core.jars=/Applications/Processing.app/Contents/Java/core/library
+processing.core.natives=/Applications/Processing.app/Contents/Java/core/library/macos-x86_64
+processing.libs.jars=/Users/matsem/Documents/Processing/libraries
 ```
 
-The Gradle buildscript will look for Processing dependencies at these two paths. Dependencies are defined in CommonDependencies gradle plugin. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `processingLibsDir` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
+The Gradle buildscript will look for Processing dependencies at these two paths. Dependencies are defined in CommonDependencies gradle plugin. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `processing.libs.jars` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
 
 Current list of library dependencies is
 
@@ -55,6 +57,8 @@ You can run the project with Gradle `run` task. Be sure to include the `--sketch
 ./gradlew playground:run --args='--sketch-path=/path/to/project/'
 ./gradlew visuals:run --args='--sketch-path=/path/to/project/'
 ```
+
+There are also IntelliJ Run configurations in `.run` folder which you can use to run the app from IDE. Just be sure to edit their configuration to match your setup. 
 
 Note: Due to the fragileness of Processing dependencies (namely JogAmp), the project currently works only with some JDK versions, specifically `11.0.11-zulu`. You can find `.sdkmanrc` file in project folder
 that sets up the current SDK for you if you use [SDKMAN!](https://sdkman.io/). (`11.0.12` does not work yet, causing [this](https://github.com/processing/processing4/issues/249) issue).
@@ -92,4 +96,4 @@ private var fader1: Float by oscFaderDelegate("/1/fader1", defaultValue = 0.5f)
 Most of the delegated properties support value assign, so, if for example you create the fader variable and at some point in time you assign the value into it, the corresponding control in TouchOSC app will reflect that change.
 
 ## Known bugs after Processing4 migration
-- movie library does not work
+- movie library does not work (issues with linking native libs)

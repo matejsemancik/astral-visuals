@@ -1,3 +1,5 @@
+import java.util.*
+
 plugins {
     kotlin("jvm")
     application
@@ -5,9 +7,16 @@ plugins {
 
 apply<dev.matsem.astral.CommonDependencies>()
 
-@Suppress("UnstableApiUsage")
 application {
-    mainClassName = "dev.matsem.astral.playground.PlaygroundApp"
+    val props = Properties().apply {
+        load(file("${rootDir}/local.properties").inputStream())
+    }
+    val nativesDir = props["processing.core.natives"]
+
+    mainClass.set("dev.matsem.astral.playground.PlaygroundApp")
+    applicationDefaultJvmArgs = listOf(
+        "-Djava.library.path=$nativesDir"
+    )
 }
 
 repositories {

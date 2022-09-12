@@ -17,8 +17,8 @@ internal fun Project.configureCommonDependencies() {
     val props = Properties().apply {
         load(file("${rootDir}/local.properties").inputStream())
     }
-    val processingCoreDir = props["processingCoreDir"]
-    val processingLibsDir = props["processingLibsDir"]
+    val processingCoreDir = props["processing.core.jars"]
+    val processingLibsDir = props["processing.libs.jars"]
 
     dependencies {
         add("implementation", kotlin("bom"))
