@@ -11,12 +11,13 @@ application {
     val props = Properties().apply {
         load(file("${rootDir}/local.properties").inputStream())
     }
-    val nativesDir = props["processing.core.natives"]
+    val nativesDir = props["processing.core.natives.rpi"]
 
     mainClass.set("dev.matsem.astral.raspberrypi.RaspberryApp")
     applicationDefaultJvmArgs = listOf(
         "-Djava.library.path=$nativesDir"
     )
+    applicationName = "visuals"
 }
 
 repositories {
@@ -38,4 +39,12 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "11"
     }
+}
+
+tasks.getByName<Zip>("distZip") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.getByName<Sync>("installDist") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
