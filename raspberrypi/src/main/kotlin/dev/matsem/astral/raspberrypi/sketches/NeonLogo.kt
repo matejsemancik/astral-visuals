@@ -38,14 +38,17 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     override fun provideMillis(): Int = millis()
 
     override fun settings() {
-//        fullScreen(PConstants.P3D)
-        size(1024, 768, PConstants.P3D)
+        fullScreen(PConstants.P3D)
+//        size(1024, 768, PConstants.P3D)
     }
 
     private lateinit var fx: PostFX
     private val ex: extruder by inject()
     private lateinit var font: PFont
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
+    private val mainColor = 0x00ffc8.withAlpha()
+    private val bgColor = 0x000000
 
     private val logoToScreenScale = 0.35f
     private val shapeDepth = 100
@@ -55,20 +58,33 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     private val fps = 15f
     private lateinit var starsCanvas: PGraphics
     private lateinit var stars: List<PVector>
-
     private val logoPosition = PVector(0f, 0f)
     private val logoPositionTarget = PVector(0f, 0f)
     private val textPosition = PVector(0f, 0f)
     private val textPositionTarget = PVector(0f, 0f)
     private var lerpSpeed = 0.2f
+    private val renderStyles = listOf(
+        RenderStyle(fillColor = mainColor, strokeColor = bgColor, strokeWidth = 10f),
+        RenderStyle(fillColor = bgColor, strokeColor = mainColor, strokeWidth = 10f),
+        RenderStyle(fillColor = null, strokeColor = mainColor, strokeWidth = 10f)
+    )
+    private var renderStyle = renderStyles.first()
 
-    private val mainColor = 0x00ffc8.withAlpha()
+    private val logoActiveIntervalMs = 10_000L
+    private val textActiveIntervalMs = 30_000L
+    private val renderStyleSwitchIntervalMs = 5 * 60 * 1000L
 
     data class Chunk(
         val originalShape: RShape,
         val extrudedShape: List<PShape>,
         val shapeWidth: Float,
         val shapeHeight: Float
+    )
+
+    data class RenderStyle(
+        val fillColor: Int?,
+        val strokeColor: Int,
+        val strokeWidth: Float
     )
 
     private lateinit var chunks: List<Chunk>
@@ -128,11 +144,11 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
             while (isActive) {
                 logoPositionTarget.set(0f, 0f)
                 textPositionTarget.set(widthF, 0f)
-                kotlinx.coroutines.delay(30_000L)
+                kotlinx.coroutines.delay(logoActiveIntervalMs)
 
                 logoPositionTarget.set(-widthF * 0.4f, 0f)
-                textPositionTarget.set(-widthF * 0.2f, 0f)
-                kotlinx.coroutines.delay(30_000L)
+                textPositionTarget.set(-widthF * 0.15f, 0f)
+                kotlinx.coroutines.delay(textActiveIntervalMs)
             }
         }
     }
@@ -152,12 +168,16 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         logoPosition.lerp(logoPositionTarget, lerpSpeed)
         textPosition.lerp(textPositionTarget, lerpSpeed)
 
+        if (millis() % renderStyleSwitchIntervalMs in 0 until 1000) {
+            renderStyle = renderStyles.random()
+        }
+
         // endregion
 
         // region Starfield
 
         starsCanvas.draw {
-            fill(0x000000.withAlpha(32))
+            fill(bgColor.withAlpha(32))
             rect(0f, 0f, widthF, heightF)
 
             pushPop {
@@ -188,9 +208,13 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         pushPop {
             translateCenter()
             translate(logoPosition)
-            strokeWeight(10f)
-            stroke(0)
-            fill(mainColor)
+            strokeWeight(renderStyle.strokeWidth)
+            stroke(renderStyle.strokeColor)
+            renderStyle.fillColor?.let {
+                fill(it)
+            } ?: run {
+                noFill()
+            }
 
             for (chunk in chunks) {
                 pushPop {
