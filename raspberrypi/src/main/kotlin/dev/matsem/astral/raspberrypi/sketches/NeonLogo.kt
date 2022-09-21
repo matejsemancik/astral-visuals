@@ -28,6 +28,7 @@ import processing.core.PFont
 import processing.core.PGraphics
 import processing.core.PShape
 import processing.core.PVector
+import java.io.File
 
 /**
  * Uses geomerative library to convert the futuredlogo.svg into 2D shape. Extruder library is then used to extrude the
@@ -37,15 +38,12 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
     override fun provideMillis(): Int = millis()
 
-    override fun settings() {
-        fullScreen(PConstants.P3D)
-//        size(1024, 768, PConstants.P3D)
-    }
-
     private lateinit var fx: PostFX
     private val ex: extruder by inject()
     private lateinit var font: PFont
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private lateinit var textFile: File
+    private lateinit var displayedText: String
 
     private val mainColor = 0x00ffc8.withAlpha()
     private val bgColor = 0x000000
@@ -70,9 +68,10 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     )
     private var renderStyle = renderStyles.first()
 
-    private val logoActiveIntervalMs = 10_000L
-    private val textActiveIntervalMs = 30_000L
+    private val logoActiveIntervalMs = 5_000L
+    private val textActiveIntervalMs = 60_000L
     private val renderStyleSwitchIntervalMs = 5 * 60 * 1000L
+    private val textFileReadIntervalMs = 5_000L
 
     data class Chunk(
         val originalShape: RShape,
@@ -88,6 +87,10 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     )
 
     private lateinit var chunks: List<Chunk>
+    override fun settings() {
+        fullScreen(PConstants.P3D)
+//        size(1024, 768, PConstants.P3D)
+    }
     override fun setup() {
         colorModeHsb()
         surface.setTitle("Futured")
@@ -138,6 +141,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         }.take(starCount).toList()
 
         font = createFont(Files.Font.JETBRAINS_MONO, height / 20f, false)
+        textFile = dataFile("other/lineup.txt")
         fx = PostFX(this)
 
         coroutineScope.launch {
@@ -149,6 +153,13 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
                 logoPositionTarget.set(-widthF * 0.4f, 0f)
                 textPositionTarget.set(-widthF * 0.15f, 0f)
                 kotlinx.coroutines.delay(textActiveIntervalMs)
+            }
+        }
+
+        coroutineScope.launch(Dispatchers.IO) {
+            while(isActive) {
+                displayedText = textFile.readText().trimIndent()
+                kotlinx.coroutines.delay(textFileReadIntervalMs)
             }
         }
     }
@@ -236,14 +247,6 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
         // region Info text
 
-        val text = """
-            07:00pm matsem
-            08:30pm attempt
-            10:00pm SEBA
-            11:30pm NEED FOR MIRRORS
-            01:00am sbu & rough:result
-        """.trimIndent()
-
         pushPop {
             translateCenter()
             translate(textPosition)
@@ -251,7 +254,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
             textAlign(LEFT, CENTER)
             noStroke()
             fill(mainColor)
-            text(text, 0f, 0f)
+            text(displayedText, 0f, 0f)
         }
 
         // endregion
