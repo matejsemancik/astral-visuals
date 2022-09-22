@@ -150,6 +150,8 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         textFile = desktopFile(LineupFile)
         fx = PostFX(this)
 
+        makeFiles()
+
         coroutineScope.launch {
             while (isActive) {
                 logoPositionTarget.set(0f, 0f)
@@ -174,6 +176,30 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
                 kotlinx.coroutines.delay(fileReadIntervalMs)
             }
+        }
+    }
+
+    private fun makeFiles() {
+        val textFile = desktopFile(LineupFile)
+        val propsFile = desktopFile(PropsFile)
+        if (textFile.exists().not()) {
+            textFile.createNewFile()
+            textFile.writeText(
+                """
+                    ~/Desktop/lineup.txt
+                """.trimIndent()
+            )
+        }
+
+        if (propsFile.exists().not()) {
+            propsFile.createNewFile()
+            propsFile.writeText(
+                """
+                    visuals.logo.style.duration_ms=5000
+                    visuals.logo.duration_ms=5000
+                    visuals.text.duration_ms=5000
+                """.trimIndent()
+            )
         }
     }
 
