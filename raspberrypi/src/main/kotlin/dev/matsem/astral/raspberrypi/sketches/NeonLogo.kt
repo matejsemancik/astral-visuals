@@ -29,6 +29,7 @@ import processing.core.PGraphics
 import processing.core.PShape
 import processing.core.PVector
 import java.io.File
+import java.util.*
 
 /**
  * Uses geomerative library to convert the futuredlogo.svg into 2D shape. Extruder library is then used to extrude the
@@ -45,15 +46,15 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     private lateinit var textFile: File
     private lateinit var displayedText: String
 
-    private val mainColor = 0x00ffc8.withAlpha()
-    private val bgColor = 0x000000
+//    private val mainColor = 0x00ffc8.withAlpha()
+//    private val bgColor = 0x000000
 
     private val logoToScreenScale = 0.35f
     private val shapeDepth = 100
     private var sclOff = 0f
     private var rotYOff = 0f
     private val starCount = 3000
-    private val fps = 15f
+    private val fps = 20f
     private lateinit var starsCanvas: PGraphics
     private lateinit var stars: List<PVector>
     private val logoPosition = PVector(0f, 0f)
@@ -61,17 +62,23 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     private val textPosition = PVector(0f, 0f)
     private val textPositionTarget = PVector(0f, 0f)
     private var lerpSpeed = 0.2f
-    private val renderStyles = listOf(
-        RenderStyle(fillColor = mainColor, strokeColor = bgColor, strokeWidth = 10f),
-        RenderStyle(fillColor = bgColor, strokeColor = mainColor, strokeWidth = 10f),
-        RenderStyle(fillColor = null, strokeColor = mainColor, strokeWidth = 10f)
+    private val renderStyles = arrayOf(
+        RenderStyle(fillColor = 0x00ffc8, strokeColor = 0x000000, strokeWeight = 10f),
+        RenderStyle(fillColor = 0x000000, strokeColor = 0x00ffc8, strokeWeight = 10f),
+        RenderStyle(fillColor = null, strokeColor = 0x00ffc8, strokeWeight = 10f)
     )
     private var renderStyle = renderStyles.first()
 
-    private val logoActiveIntervalMs = 35_000L
-    private val textActiveIntervalMs = 60_000L
-    private val renderStyleSwitchIntervalMs = 5 * 60 * 1000L
-    private val textFileReadIntervalMs = 5_000L
+    private val props: Properties = Properties()
+    private var logoActiveIntervalMs = 1000L
+    private var textActiveIntervalMs = 1000L
+    private var renderStyleSwitchIntervalMs = 1000L
+    private val fileReadIntervalMs = 5_000L
+
+    companion object {
+        const val LineupFile = "lineup.txt"
+        const val PropsFile = "render.properties"
+    }
 
     data class Chunk(
         val originalShape: RShape,
@@ -83,19 +90,21 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     data class RenderStyle(
         val fillColor: Int?,
         val strokeColor: Int,
-        val strokeWidth: Float
+        val strokeWeight: Float
     )
 
     private lateinit var chunks: List<Chunk>
     override fun settings() {
-        fullScreen(PConstants.P3D)
-//        size(1024, 768, PConstants.P3D)
+//        fullScreen(PConstants.P3D)
+        size(1024, 768, PConstants.P3D)
     }
+
     override fun setup() {
         colorModeHsb()
         surface.setTitle("Futured")
         surface.setResizable(true)
         surface.hideCursor()
+        surface.setAlwaysOnTop(true)
         frameRate(fps)
 
         RG.init(this)
@@ -124,7 +133,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
                         }
                         .flatMap { ex.extrude(it, 100, "box").toList() }
                         .onEach {
-                            it.disableStyle()
+                            it.enableStyle()
                             it.translate(-rshape.width / 2f, -rshape.height / 2f, -shapeDepth / 2f)
                         }
                         .toList()
@@ -141,7 +150,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         }.take(starCount).toList()
 
         font = createFont(Files.Font.JETBRAINS_MONO, height / 20f, false)
-        textFile = desktopFile("lineup.txt")
+        textFile = desktopFile(LineupFile)
         fx = PostFX(this)
 
         coroutineScope.launch {
@@ -157,15 +166,23 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         }
 
         coroutineScope.launch(Dispatchers.IO) {
-            while(isActive) {
+            while (isActive) {
                 displayedText = textFile.readText().trimIndent()
-                kotlinx.coroutines.delay(textFileReadIntervalMs)
+
+                props.load(desktopFile(PropsFile).inputStream())
+                logoActiveIntervalMs = props["visuals.logo.duration_ms"].toString().toLongOrNull() ?: 35_000L
+                textActiveIntervalMs = props["visuals.text.duration_ms"].toString().toLongOrNull() ?: 60_000L
+                renderStyleSwitchIntervalMs =
+                    props["visuals.logo.style.duration_ms"].toString().toLongOrNull() ?: 120_000L
+
+                kotlinx.coroutines.delay(fileReadIntervalMs)
             }
         }
     }
 
     override fun draw() {
         background(0)
+        ortho()
 
         // Update props
 
@@ -188,12 +205,12 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         // region Starfield
 
         starsCanvas.draw {
-            fill(bgColor.withAlpha(32))
+            fill(0x000000.withAlpha(32))
             rect(0f, 0f, widthF, heightF)
 
             pushPop {
                 noStroke()
-                fill(mainColor.withAlpha(128))
+                fill(0x00ffc8.withAlpha(128))
                 translateCenter()
 
                 stars.forEach {
@@ -212,20 +229,13 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
         // endregion
 
-        ortho()
-
         // region Logo
 
         pushPop {
             translateCenter()
             translate(logoPosition)
-            strokeWeight(renderStyle.strokeWidth)
-            stroke(renderStyle.strokeColor)
-            renderStyle.fillColor?.let {
-                fill(it)
-            } ?: run {
-                noFill()
-            }
+
+            val renderStyle = renderStyle
 
             for (chunk in chunks) {
                 pushPop {
@@ -237,6 +247,15 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
                     rotateX(PI * 0.1f * sin(radianSeconds(60f)))
                     rotateY(-radianSeconds(30f) + rotYOff)
                     chunk.extrudedShape.forEach {
+                        it.setFill(true)
+                        if (renderStyle.fillColor != null) {
+                            it.setFill(renderStyle.fillColor.withAlpha())
+                        } else {
+                            it.setFill(0x00000000)
+                        }
+                        it.setStroke(true)
+                        it.setStroke(renderStyle.strokeColor.withAlpha())
+                        it.setStrokeWeight(renderStyle.strokeWeight)
                         shape(it)
                     }
                 }
@@ -253,7 +272,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
             textFont(font)
             textAlign(LEFT, CENTER)
             noStroke()
-            fill(mainColor)
+            fill(0x00ffc8.withAlpha())
             text(displayedText, 0f, 0f)
         }
 
