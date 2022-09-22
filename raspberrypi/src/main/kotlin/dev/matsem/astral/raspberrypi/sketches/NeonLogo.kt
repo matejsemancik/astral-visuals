@@ -68,7 +68,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     )
     private var renderStyle = renderStyles.first()
 
-    private val logoActiveIntervalMs = 5_000L
+    private val logoActiveIntervalMs = 35_000L
     private val textActiveIntervalMs = 60_000L
     private val renderStyleSwitchIntervalMs = 5 * 60 * 1000L
     private val textFileReadIntervalMs = 5_000L
@@ -141,7 +141,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
         }.take(starCount).toList()
 
         font = createFont(Files.Font.JETBRAINS_MONO, height / 20f, false)
-        textFile = dataFile("other/lineup.txt")
+        textFile = desktopFile("lineup.txt")
         fx = PostFX(this)
 
         coroutineScope.launch {
