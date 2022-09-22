@@ -46,9 +46,6 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
     private lateinit var textFile: File
     private lateinit var displayedText: String
 
-//    private val mainColor = 0x00ffc8.withAlpha()
-//    private val bgColor = 0x000000
-
     private val logoToScreenScale = 0.35f
     private val shapeDepth = 100
     private var sclOff = 0f
@@ -95,8 +92,8 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
     private lateinit var chunks: List<Chunk>
     override fun settings() {
-//        fullScreen(PConstants.P3D)
-        size(1024, 768, PConstants.P3D)
+        fullScreen(PConstants.P3D)
+//        size(1024, 768, PConstants.P3D)
     }
 
     override fun setup() {
