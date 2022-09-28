@@ -41,7 +41,7 @@ internal fun Project.configureCommonDependencies() {
                 fileTree(
                     mapOf(
                         "dir" to "$processingLibsDir/$libName/library",
-                        "include" to listOf("*.jar")
+                        "include" to listOf("*.jar", "shader/*.glsl")
                     )
                 )
             )
