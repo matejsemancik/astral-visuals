@@ -32,8 +32,13 @@ import java.io.File
 import java.util.*
 
 /**
- * Uses geomerative library to convert the futuredlogo.svg into 2D shape. Extruder library is then used to extrude the
+ * The standalone raspberry pi sketch.
+ *
+ * Uses geomerative library to convert an SVG logo into 2D shape. Extruder library is then used to extrude the
  * logo into 3D shape. Renders with oldskool playstation-one-like effect using PostFX shaders.
+ *
+ * This sketch creates lineup.txt and render.properties files on your desktop. Use them to display text and modify render
+ * settings of the scene. The files are watched and the sketch content will be updated upon modification of these files.
  */
 class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
