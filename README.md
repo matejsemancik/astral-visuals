@@ -5,19 +5,24 @@ Just some Processing sketches. Source code for visuals we use at [Soul Ex Machin
 
 ![](demo-gif.gif)
 
-The project is divided into 3 modules, `:core` module cointains the core stuff like audio processing, tools, remote control handlers, extensions, etc. Then there are two application modules - the `:playground` and `:visuals` module.
+The project is divided into multiple modules.
 
-The `:playground` module serves as, well... playground. You can quickly create a new sketch and play around. I'm using the [Koin](https://insert-koin.io/) DI framework, so you can inject here whatever is defined in the `CoreModule`. Have a look around.
+The `:core` module contains the core stuff like audio processing, tools, remote control handlers, extensions, etc.
+
+The `:playground` module serves as, well... playground. Used to quickly create a new sketch and play around. I'm using the [Koin](https://insert-koin.io/) DI framework, so you can inject here whatever is defined in the `CoreModule`. Have a look around.
 
 The `:visuals` module is meant to be used in live environment at the parties. There is an abstraction layer in form of `Mixer` and `Layer`s, which allows me to blend multiple scenes together. Also, have a look around, proceed at your own risk, ignore `legacy` package 😅 (I like to change things, API is generally unstable).
+
+The `:raspberrypi` module contains standalone RPi application that can be distributed using the [Application Gradle plugin](https://docs.gradle.org/current/userguide/application_plugin.html).
 
 ## How to build
 
 This project depends on local [Processing 4](https://processing.org) installation, so go ahead and install it if you haven't already. Then create a `local.properties` file in project's root directory and configure the core library and contributed libraries' paths:
 
 ```
-processing.core.jars=/path/to/your/processing/libraries/dir
-processing.core.natives=/path/to/your/processing/libraries/dir/<os-architecture>
+processing.core.jars=/path/to/core/processing/libraries
+processing.core.natives=/path/to/core/processing/libraries/<os-architecture>
+processing.core.natives.rpi=/path/to/core/processing/libraries/<os-architecture>
 processing.libs.jars=/path/to/core/processing/libraries
 ```
 
@@ -26,8 +31,11 @@ On macOS it might look like this:
 ```
 processing.core.jars=/Applications/Processing.app/Contents/Java/core/library
 processing.core.natives=/Applications/Processing.app/Contents/Java/core/library/macos-x86_64
+processing.core.natives.rpi=/Applications/Processing.app/Contents/Java/core/library/linux-aarch64
 processing.libs.jars=/Users/matsem/Documents/Processing/libraries
 ```
+Note the difference between `processing.core.natives` and `processing.core.natives.rpi`.
+The Raspberry Pi libs have to be configured if you wish to use the `:raspberrypi` module.
 
 The Gradle buildscript will look for Processing dependencies at these two paths. Dependencies are defined in CommonDependencies gradle plugin. Open it up, and you can notice that this project depends on some 3rd party libraries, which need to be installed at `processing.libs.jars` path. Open your Processing library manager (Sketch > Import Library > Add library) and install whatever libraries are specified in the `build.gradle` file.
 
@@ -48,6 +56,11 @@ val processingLibs = listOf(
     "blobDetection" // library to find "blobs" on image
 )
 ```
+
+
+### :raspberrypi module
+The Raspberry Pi app can be installed using `./gradlew raspberrypi:installDist` task and zipped using `./gradlew raspberrypi:distZip` task.
+See the [Application Plugin](https://docs.gradle.org/current/userguide/application_plugin.html) docs for more info.
 
 ## How to run
 
