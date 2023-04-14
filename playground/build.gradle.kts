@@ -33,9 +33,9 @@ version = ProjectSettings.version
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = ProjectSettings.jvmTarget
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = ProjectSettings.jvmTarget
     }
 }

@@ -62,6 +62,10 @@ val processingLibs = listOf(
 The Raspberry Pi app can be installed using `./gradlew raspberrypi:installDist` task and zipped using `./gradlew raspberrypi:distZip` task.
 See the [Application Plugin](https://docs.gradle.org/current/userguide/application_plugin.html) docs for more info.
 
+### JDK
+
+Project must be built using JDK 17. You can use [SDKMAN!](https://sdkman.io/) with provided `.sdkmanrc` file to use correct JDK version.
+
 ## How to run
 
 You can run the project with Gradle `run` task. Be sure to include the `--sketch-path` argument so sketches can properly resolve the data folder containing resources needed by some Sketches.
@@ -71,10 +75,7 @@ You can run the project with Gradle `run` task. Be sure to include the `--sketch
 ./gradlew visuals:run --args='--sketch-path=/path/to/project/'
 ```
 
-There are also IntelliJ Run configurations in `.run` folder which you can use to run the app from IDE. Just be sure to edit their configuration to match your setup. 
-
-Note: Due to the fragileness of Processing dependencies (namely JogAmp), the project currently works only with some JDK versions, specifically `11.0.11-zulu`. You can find `.sdkmanrc` file in project folder
-that sets up the current SDK for you if you use [SDKMAN!](https://sdkman.io/). (`11.0.12` does not work yet, causing [this](https://github.com/processing/processing4/issues/249) issue).
+There are also IntelliJ Run configurations in `.run` folder which you can use to run the app from IDE. Just be sure to edit their configuration to match your setup.
 
 ## Remote control
 Currently, the project supports 3 remote control options:
@@ -108,5 +109,15 @@ private var fader1: Float by oscFaderDelegate("/1/fader1", defaultValue = 0.5f)
 
 Most of the delegated properties support value assign, so, if for example you create the fader variable and at some point in time you assign the value into it, the corresponding control in TouchOSC app will reflect that change.
 
-## Known bugs after Processing4 migration
-- movie library does not work (issues with linking native libs)
+## Troubleshooting
+
+### App crashes on sketches which are using `movie` library
+
+Movie library stopped working after migration to Processing 4. Related issue: [#56](https://github.com/matejsemancik/astral-visuals/issues/56)
+
+### App crashes with `Instance creation error : could not create instance for [Single:'dev.matsem.astral.core.tools.audio.AudioProcessor']`
+
+It's probably one of these things:
+- Your system has no audio input devices. Make sure to have at least one audio input device, as it's required by audio processing toolchain.
+- Your system has no audio input devices compatible with `minim` library. (Might happen on newer macOS versions). Happens on my M2 Pro Mac. You can use a virtual audio input device to mitigate this.
+- If you're on macOS, make sure to grant microphone permissions for your Processing installation. The simplest way to do this is to run some Processing sample from `sound` library. The system will ask you to grant microphone permission.

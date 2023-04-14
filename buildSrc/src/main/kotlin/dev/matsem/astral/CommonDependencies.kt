@@ -21,8 +21,6 @@ internal fun Project.configureCommonDependencies() {
     val processingLibsDir = props["processing.libs.jars"]
 
     dependencies {
-        add("implementation", kotlin("bom"))
-        add("implementation", kotlin("stdlib-jdk8"))
         add("implementation", Dependencies.koin)
         add("implementation", Dependencies.coroutines)
         add(
