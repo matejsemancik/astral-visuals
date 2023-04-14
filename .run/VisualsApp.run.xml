@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="VisualsApp" type="JetRunConfigurationType" nameIsGenerated="true">
-    <option name="ALTERNATIVE_JRE_PATH" value="azul-11" />
+    <option name="ALTERNATIVE_JRE_PATH" value="temurin-17" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="dev.matsem.astral.visuals.VisualsApp" />
     <module name="astral-visuals.visuals.main" />
     <option name="PROGRAM_PARAMETERS" value="--sketch-path=$PROJECT_DIR$" />
     <shortenClasspath name="NONE" />
-    <option name="VM_PARAMETERS" value="-Djava.library.path=/Applications/Processing.app/Contents/Java/core/library/macos-x86_64" />
+    <option name="VM_PARAMETERS" value="-Djava.library.path=/Applications/Processing.app/Contents/Java/core/library/macos-aarch64" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
