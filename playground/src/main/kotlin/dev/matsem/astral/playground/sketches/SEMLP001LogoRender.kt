@@ -17,7 +17,7 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
 
     companion object {
         private const val Fps = 24f
-        private const val Export = false
+        private const val ExportMode = true
         private const val ExportDurationSec = 30
         private const val LogoFull = "3d/semlogo_full.obj"
     }
@@ -28,7 +28,7 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
 
     private var exportMillis: Int = 0
     override fun provideMillis(): Int {
-        return if (Export) {
+        return if (ExportMode) {
             exportMillis
         } else {
             millis()
@@ -42,6 +42,9 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
     override fun setup() {
         colorModeHsb()
         surface.setTitle("SEMLP001 Logo Render")
+        if (!ExportMode) {
+            frameRate(Fps)
+        }
 
         logoInner = loadShape(LogoFull).apply {
             // Model normalize
@@ -73,7 +76,6 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
         }
 
         fx = PostFX(this)
-        frameRate(Fps)
     }
 
     override fun draw() {
@@ -143,8 +145,8 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
             }
         }.compose()
 
-        if (Export) {
-            saveFrame("export/########.tif")
+        if (ExportMode) {
+            saveFrame("data/export/########.png")
             exportMillis += (1000 / Fps).toInt()
             if (provideMillis() > ExportDurationSec * 1000) {
                 exit()
