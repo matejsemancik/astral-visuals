@@ -1,6 +1,7 @@
 package dev.matsem.astral.core.tools.animations
 
 import processing.core.PConstants
+import processing.core.PConstants.TWO_PI
 
 /**
  * Provides access to various time-based animation functions, based on elapsed time since program run.
@@ -27,7 +28,7 @@ fun AnimationHandler.saw(fHz: Float, offset: Int = 0): Float =
  * You could use the returned value to create a periodic motion, for instance by feeding
  * the returned value into the sin() function, and using the result to drive the rotation of an object.
  */
-fun AnimationHandler.radianSeconds(periodSeconds: Float) = provideMillis() / 1000f * PConstants.TWO_PI / periodSeconds
+fun AnimationHandler.radianSeconds(periodSeconds: Float) = (provideMillis() / 1000f * PConstants.TWO_PI / periodSeconds) % PConstants.TWO_PI
 
 /**
  * Generates sweep from 0f..TWO_PI at frequency given by [hz].
