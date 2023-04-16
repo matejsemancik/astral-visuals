@@ -23,6 +23,7 @@ internal fun Project.configureCommonDependencies() {
     dependencies {
         add("implementation", Dependencies.koin)
         add("implementation", Dependencies.coroutines)
+        add("implementation", Dependencies.orxEasing)
         add(
             "implementation",
             fileTree(
