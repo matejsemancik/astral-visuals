@@ -3,10 +3,7 @@ package dev.matsem.astral.playground.sketches
 import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
-import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.core.tools.extensions.pushPop
-import dev.matsem.astral.core.tools.extensions.shorterDimension
-import dev.matsem.astral.core.tools.extensions.translateCenter
+import dev.matsem.astral.core.tools.extensions.*
 import org.koin.core.KoinComponent
 import org.openrndr.extra.easing.easeCubicInOut
 import org.openrndr.extra.easing.easeSineInOut
@@ -22,7 +19,7 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
     companion object {
         private const val Fps = 24f
         private const val ExportMode = false
-        private const val ExportDurationSec = 30
+        private const val ExportDurationSec = 60
         private const val LogoFull = "3d/semlogo_full.obj"
         private const val TextRotationIntervalSec = 20f
         private const val LogoRotationIntervalSec = 6f
@@ -31,6 +28,8 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
     private lateinit var fx: PostFX
     private lateinit var logoInner: PShape
     private lateinit var logoOuter: PShape
+    private var _glitch = 0f
+    private var glitch = 0f
 
     private var exportMillis: Int = 0
     override fun provideMillis(): Int {
@@ -47,6 +46,7 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
 
     override fun setup() {
         colorModeHsb()
+        noiseSeed(123)
         surface.setTitle("SEMLP001 Logo Render")
         if (!ExportMode) {
             frameRate(Fps)
@@ -103,9 +103,18 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
         pointLight(0f, 0f, 100f, width / 2f, height / 2f, 0f)
         directionalLight(0f, 0f, 80f, 1f, 0f, -0.5f)
 //        noLights()
+//        lights()
 
         translateCenter()
         scale(0.8f)
+        _glitch = noise(provideMillis() * 0.005f).mapp(-30f, 30f).let {
+            when {
+                it in -20f..15f -> 0f
+                else -> it
+            }
+        }
+        glitch = lerp(glitch, _glitch, 0.7f)
+        translate(glitch, -glitch)
 
         val rotationInner = easeCubicInOut(
             t = radianSeconds(LogoRotationIntervalSec).toDouble(),
