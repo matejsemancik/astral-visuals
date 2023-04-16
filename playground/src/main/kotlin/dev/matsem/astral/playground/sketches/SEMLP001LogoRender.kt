@@ -3,9 +3,13 @@ package dev.matsem.astral.playground.sketches
 import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
-import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.pushPop
+import dev.matsem.astral.core.tools.extensions.shorterDimension
+import dev.matsem.astral.core.tools.extensions.translateCenter
 import org.koin.core.KoinComponent
-import org.openrndr.extra.easing.*
+import org.openrndr.extra.easing.easeCubicInOut
+import org.openrndr.extra.easing.easeSineInOut
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PShape
@@ -17,9 +21,11 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
 
     companion object {
         private const val Fps = 24f
-        private const val ExportMode = true
+        private const val ExportMode = false
         private const val ExportDurationSec = 30
         private const val LogoFull = "3d/semlogo_full.obj"
+        private const val TextRotationIntervalSec = 20f
+        private const val LogoRotationIntervalSec = 6f
     }
 
     private lateinit var fx: PostFX
@@ -84,29 +90,32 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
 
     private fun PApplet.drawSketch() {
         ortho()
-        background(0f, 0f, 0f)
+        background(0f, 0f, 0f, 0f)
+
+        // Lighting experiments
 //        ambientLight(0f, 0f, 100f)
 //        directionalLight(20f, 0f, 100f, 0f, 0f, -1f)
 //        spotLight(128f, 100f, 100f, width/2f, height/2f, 400f, 0f, 0f, -1f, PI, 2f)
 //        pointLight(0f, 0f, 60f, 0f, height / 2f, -200f)
 //        pointLight(0f, 0f, 60f, widthF, height / 2f, -200f)
 //        pointLight(0f, 0f, 100f, width / 2f, height / 2f, 400f)
+
         pointLight(0f, 0f, 100f, width / 2f, height / 2f, 0f)
         directionalLight(0f, 0f, 80f, 1f, 0f, -0.5f)
+//        noLights()
 
         translateCenter()
         scale(0.8f)
 
-        val intervalSeconds = 6f
         val rotationInner = easeCubicInOut(
-            t = radianSeconds(intervalSeconds).toDouble(),
+            t = radianSeconds(LogoRotationIntervalSec).toDouble(),
             b = 0.0,
             c = TWO_PI.toDouble(),
             d = TWO_PI.toDouble()
         ).toFloat()
 
         val rotationOuter = easeSineInOut(
-            t = radianSeconds(intervalSeconds).toDouble(),
+            t = radianSeconds(LogoRotationIntervalSec).toDouble(),
             b = 0.0,
             c = TWO_PI.toDouble(),
             d = TWO_PI.toDouble()
@@ -126,7 +135,7 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
             pushPop {
                 rotateY(-radians(30f))
                 rotateX(radians(20f))
-                rotateZ(-radianSeconds(20f))
+                rotateZ(-radianSeconds(TextRotationIntervalSec))
                 shape(logoOuter)
             }
         }
@@ -135,18 +144,14 @@ class SEMLP001LogoRender : PApplet(), AnimationHandler, KoinComponent {
             if (!mousePressed) {
                 rgbSplit(80f)
                 grayScale()
-                bloom(
-                    0.5f,
-                    80,
-                    100f
-                )
+                bloom(0.5f, 80, 100f)
                 noise(0.2f, 0.1f)
                 pixelate(shorterDimension() / 1.5f)
             }
         }.compose()
 
         if (ExportMode) {
-            saveFrame("data/export/########.png")
+            saveFrame("data/export/########.tif")
             exportMillis += (1000 / Fps).toInt()
             if (provideMillis() > ExportDurationSec * 1000) {
                 exit()
