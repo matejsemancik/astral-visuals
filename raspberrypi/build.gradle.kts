@@ -20,6 +20,20 @@ application {
     applicationName = "visuals"
 }
 
+distributions {
+    main {
+        contents {
+            val props = Properties().apply {
+                load(file("${rootDir}/local.properties").inputStream())
+            }
+            val nativesDir = props["processing.core.natives.rpi"].toString()
+            from(file(nativesDir)) {
+                into("bin/natives/linux-aarch64")
+            }
+        }
+    }
+}
+
 repositories {
     mavenCentral()
     jcenter()

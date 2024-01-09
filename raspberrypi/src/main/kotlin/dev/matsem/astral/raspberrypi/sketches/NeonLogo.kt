@@ -4,15 +4,7 @@ import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.Files
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
-import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.core.tools.extensions.draw
-import dev.matsem.astral.core.tools.extensions.heightF
-import dev.matsem.astral.core.tools.extensions.pushPop
-import dev.matsem.astral.core.tools.extensions.shorterDimension
-import dev.matsem.astral.core.tools.extensions.translate
-import dev.matsem.astral.core.tools.extensions.translateCenter
-import dev.matsem.astral.core.tools.extensions.widthF
-import dev.matsem.astral.core.tools.extensions.withAlpha
+import dev.matsem.astral.core.tools.extensions.*
 import extruder.extruder
 import geomerative.RG
 import geomerative.RShape
@@ -22,12 +14,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import processing.core.PApplet
-import processing.core.PConstants
-import processing.core.PFont
-import processing.core.PGraphics
-import processing.core.PShape
-import processing.core.PVector
+import processing.core.*
 import java.io.File
 import java.util.*
 
@@ -103,7 +90,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
     override fun setup() {
         colorModeHsb()
-        surface.setTitle("Futured")
+        surface.setTitle("SEM_Party")
         surface.setResizable(true)
         surface.hideCursor()
         surface.setAlwaysOnTop(true)
@@ -191,7 +178,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
             textFile.createNewFile()
             textFile.writeText(
                 """
-                    ~/Desktop/lineup.txt
+                    Edit ~/Desktop/lineup.txt bruv
                 """.trimIndent()
             )
         }
