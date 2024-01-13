@@ -175,7 +175,7 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
                         width / chunk.shapeWidth * logoToScreenScale + sclOff
                     )
 
-                    rotateX(PI * 0.1f * sin(radianSeconds(60f)))
+                    rotateX(PI * 0.2f * sin(radianSeconds(60f)))
                     rotateY(-radianSeconds(30f) + rotYOff)
                     chunk.extrudedShape.forEach {
                         it.setFill(true)
