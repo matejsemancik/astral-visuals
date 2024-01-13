@@ -40,9 +40,10 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private var logoToScreenScale = 0.5f
-    private val shapeDepth = 120
+    private val shapeDepth = 100
     private var sclOff = 0f
-    private var rotYOff = 0f
+    private var rotationYPeriod = 30f
+    private var rotationXPeriod = 60f
     private val fps = 20f
     private val renderStyles = arrayOf(
         RenderStyle(fillColor = 0xffffff, strokeColor = 0x000000, strokeWeight = 20f),
@@ -75,8 +76,8 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
 
     private lateinit var chunks: List<Chunk>
     override fun settings() {
-//        fullScreen(PConstants.P3D)
-        size(1024, 768, PConstants.P3D)
+        fullScreen(PConstants.P3D)
+//        size(1024, 768, PConstants.P3D)
     }
 
     override fun setup() {
@@ -122,31 +123,37 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
 
         fx = PostFX(this)
 
-        makeFiles()
-
+        makeProps()
         coroutineScope.launch(Dispatchers.IO) {
             while (isActive) {
                 props.load(desktopFile(PropsFile).inputStream())
-                renderStyleSwitchIntervalMs =
-                    props["visuals.logo.style.duration_ms"].toString().toLongOrNull() ?: 120_000L
-                logoToScreenScale = props["visuals.logo.scale_ratio"].toString().toFloatOrNull() ?: 0.5f
-
+                readProps(props)
                 kotlinx.coroutines.delay(fileReadIntervalMs)
             }
         }
     }
 
-    private fun makeFiles() {
+    private fun makeProps() {
         val propsFile = desktopFile(PropsFile)
         if (propsFile.exists().not()) {
             propsFile.createNewFile()
             propsFile.writeText(
                 """
-                    visuals.logo.style.duration_ms=5000
+                    visuals.logo.style.duration_ms=30000
                     visuals.logo.scale_ratio=0.50
+                    visuals.logo.rotation.y.period_sec=12
+                    visuals.logo.rotation.x.period_sec=53
                 """.trimIndent()
             )
         }
+    }
+
+    private fun readProps(props: Properties) {
+        renderStyleSwitchIntervalMs =
+            props["visuals.logo.style.duration_ms"].toString().toLongOrNull() ?: 120_000L
+        logoToScreenScale = props["visuals.logo.scale_ratio"].toString().toFloatOrNull() ?: 0.5f
+        rotationYPeriod = props["visuals.logo.rotation.y.period_sec"].toString().toFloatOrNull() ?: 60f
+        rotationXPeriod = props["visuals.logo.rotation.x.period_sec"].toString().toFloatOrNull() ?: 20f
     }
 
     override fun draw() {
@@ -175,8 +182,8 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
                         width / chunk.shapeWidth * logoToScreenScale + sclOff
                     )
 
-                    rotateX(PI * 0.2f * sin(radianSeconds(60f)))
-                    rotateY(-radianSeconds(30f) + rotYOff)
+                    rotateX(PI * 0.2f * sin(radianSeconds(rotationXPeriod)))
+                    rotateY(-radianSeconds(rotationYPeriod))
                     chunk.extrudedShape.forEach {
                         it.setFill(true)
                         if (renderStyle.fillColor != null) {
