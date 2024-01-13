@@ -7,11 +7,12 @@ plugins {
 
 apply<dev.matsem.astral.CommonDependencies>()
 
+// Plugin for running locally on development machine
 application {
     val props = Properties().apply {
         load(file("${rootDir}/local.properties").inputStream())
     }
-    val nativesDir = props["processing.core.natives.rpi"]
+    val nativesDir = props["processing.core.natives"]
 
     mainClass.set("dev.matsem.astral.raspberrypi.RaspberryApp")
     applicationDefaultJvmArgs = listOf(
