@@ -9,8 +9,8 @@ import dev.matsem.astral.core.tools.osc.OscManager
 import dev.matsem.astral.core.tools.osc.oscLabelIndicatorDelegate
 import dev.matsem.astral.core.tools.osc.oscPushButtonDelegate
 import dev.matsem.astral.visuals.Layer
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import processing.core.PApplet
 import processing.core.PGraphics
 import java.time.Duration

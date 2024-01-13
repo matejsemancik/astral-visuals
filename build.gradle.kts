@@ -10,7 +10,6 @@ version = ProjectSettings.version
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 tasks {

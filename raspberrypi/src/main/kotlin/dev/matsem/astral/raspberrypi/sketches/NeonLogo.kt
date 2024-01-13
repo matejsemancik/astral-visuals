@@ -4,7 +4,15 @@ import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.Files
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
-import dev.matsem.astral.core.tools.extensions.*
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.draw
+import dev.matsem.astral.core.tools.extensions.heightF
+import dev.matsem.astral.core.tools.extensions.pushPop
+import dev.matsem.astral.core.tools.extensions.shorterDimension
+import dev.matsem.astral.core.tools.extensions.translate
+import dev.matsem.astral.core.tools.extensions.translateCenter
+import dev.matsem.astral.core.tools.extensions.widthF
+import dev.matsem.astral.core.tools.extensions.withAlpha
 import extruder.extruder
 import geomerative.RG
 import geomerative.RShape
@@ -12,9 +20,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
-import org.koin.core.inject
-import processing.core.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import processing.core.PApplet
+import processing.core.PConstants
+import processing.core.PFont
+import processing.core.PGraphics
+import processing.core.PShape
+import processing.core.PVector
 import java.io.File
 import java.util.*
 

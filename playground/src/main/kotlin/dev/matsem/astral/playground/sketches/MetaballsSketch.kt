@@ -2,7 +2,7 @@ package dev.matsem.astral.playground.sketches
 
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
 import dev.matsem.astral.core.tools.extensions.withAlpha
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector

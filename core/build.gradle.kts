@@ -7,7 +7,6 @@ apply<dev.matsem.astral.CommonDependencies>()
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {

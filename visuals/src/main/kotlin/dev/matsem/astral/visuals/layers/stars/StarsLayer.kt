@@ -9,8 +9,8 @@ import dev.matsem.astral.visuals.ColorHandler
 import dev.matsem.astral.visuals.Colorizer
 import dev.matsem.astral.visuals.Layer
 import dev.matsem.astral.visuals.layers.stars.star.Starfield2
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import processing.core.PApplet
 import processing.core.PGraphics
 

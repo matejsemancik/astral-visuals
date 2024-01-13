@@ -2,9 +2,9 @@ package dev.matsem.astral.raspberrypi
 
 import dev.matsem.astral.core.di.coreModule
 import dev.matsem.astral.raspberrypi.sketches.NeonLogo
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.context.startKoin
-import org.koin.core.inject
 import org.koin.core.logger.Level
 import processing.core.PApplet
 

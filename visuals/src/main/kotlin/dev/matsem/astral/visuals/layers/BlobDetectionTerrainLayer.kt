@@ -28,8 +28,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import peasy.PeasyCam
 import processing.core.PApplet
 import processing.core.PConstants
@@ -115,7 +115,10 @@ class BlobDetectionTerrainLayer : Layer(), KoinComponent, CoroutineScope, OscHan
         colorModeHsb()
 
         oscil.frequency.lastValue = oscilFreq.mapp(0f, 0.5f)
-        elevation = oscil.value.mapSin(-1f, 1f) * elevScale.mapp(0f, 600f) + audioProcessor.getRange(20f..200f) * oscilAudioGain.mapp(0f, 2f)
+        elevation = oscil.value.mapSin(-1f, 1f) * elevScale.mapp(
+            0f,
+            600f
+        ) + audioProcessor.getRange(20f..200f) * oscilAudioGain.mapp(0f, 2f)
         generateMap()
         computeBlobs()
         pushPop {

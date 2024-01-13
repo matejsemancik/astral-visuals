@@ -2,9 +2,9 @@ package dev.matsem.astral.playground
 
 import dev.matsem.astral.core.di.coreModule
 import dev.matsem.astral.playground.sketches.SEMLP001LogoRender
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.context.startKoin
-import org.koin.core.inject
 import org.koin.core.logger.Level
 import processing.core.PApplet
 

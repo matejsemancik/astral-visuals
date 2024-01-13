@@ -2,9 +2,9 @@ package dev.matsem.astral.visuals
 
 import dev.matsem.astral.core.di.coreModule
 import dev.matsem.astral.visuals.di.visualsModule
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.context.startKoin
-import org.koin.core.inject
 import org.koin.core.logger.Level
 import processing.core.PApplet
 
