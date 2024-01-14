@@ -4,6 +4,7 @@ import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.longerDimension
 import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.shorterDimension
 import dev.matsem.astral.core.tools.extensions.translateCenter
@@ -44,7 +45,7 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
     private var sclOff = 0f
     private var rotationYPeriod = 30f
     private var rotationXPeriod = 60f
-    private val fps = 20f
+    private val fps = 24f
     private val renderStyles = arrayOf(
         RenderStyle(fillColor = 0xffffff, strokeColor = 0x000000, strokeWeight = 20f),
         RenderStyle(fillColor = 0x000000, strokeColor = 0xffffff, strokeWeight = 20f),
@@ -56,6 +57,9 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
     private val props: Properties = Properties()
     private var renderStyleSwitchIntervalMs = 1000L
     private val fileReadIntervalMs = 5_000L
+
+    private var cageRotationYPeriod = 120f
+    private var cageRotationXPeriod = 200f
 
     companion object {
         const val PropsFile = "render.properties"
@@ -76,8 +80,8 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
 
     private lateinit var chunks: List<Chunk>
     override fun settings() {
-        fullScreen(PConstants.P3D)
-//        size(1024, 768, PConstants.P3D)
+//        fullScreen(PConstants.P3D)
+        size(1024, 768, PConstants.P3D)
     }
 
     override fun setup() {
@@ -143,6 +147,8 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
                     visuals.logo.scale_ratio=0.50
                     visuals.logo.rotation.y.period_sec=12
                     visuals.logo.rotation.x.period_sec=53
+                    visuals.cage.rotation.y.period_sec=120
+                    visuals.cage.rotation.x.period_sec=200
                 """.trimIndent()
             )
         }
@@ -154,6 +160,8 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
         logoToScreenScale = props["visuals.logo.scale_ratio"].toString().toFloatOrNull() ?: 0.5f
         rotationYPeriod = props["visuals.logo.rotation.y.period_sec"].toString().toFloatOrNull() ?: 60f
         rotationXPeriod = props["visuals.logo.rotation.x.period_sec"].toString().toFloatOrNull() ?: 20f
+        cageRotationYPeriod = props["visuals.cage.rotation.y.period_sec"].toString().toFloatOrNull() ?: 120f
+        cageRotationXPeriod = props["visuals.cage.rotation.x.period_sec"].toString().toFloatOrNull() ?: 200f
     }
 
     override fun draw() {
@@ -201,6 +209,29 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
         }
 
         // endregion
+
+        pushPop {
+            translateCenter()
+            pushPop {
+                for(i in 0 until 6) {
+                    rotateY(radianSeconds(cageRotationYPeriod))
+                    noFill()
+                    strokeWeight(10f)
+                    stroke(0xff0000.withAlpha())
+                    circle(0f, 0f, longerDimension() * 1.2f)
+                }
+            }
+
+            pushPop {
+                for(i in 0 until 6) {
+                    rotateX(radianSeconds(cageRotationXPeriod))
+                    noFill()
+                    strokeWeight(2f)
+                    stroke(0xff0000.withAlpha())
+                    circle(0f, 0f, longerDimension() * 1.5f)
+                }
+            }
+        }
 
         fx.render().apply {
             pixelate(shorterDimension() / 2.4f)
