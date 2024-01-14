@@ -183,7 +183,7 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
                     )
 
                     rotateX(PI * 0.2f * sin(radianSeconds(rotationXPeriod)))
-                    rotateY(-radianSeconds(rotationYPeriod))
+                    rotateY(radianSeconds(rotationYPeriod))
                     chunk.extrudedShape.forEach {
                         it.setFill(true)
                         if (renderStyle.fillColor != null) {
