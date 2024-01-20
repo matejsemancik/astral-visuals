@@ -47,10 +47,11 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
     private var rotationXPeriod = 60f
     private val fps = 24f
     private val renderStyles = arrayOf(
-        RenderStyle(fillColor = 0xffffff, strokeColor = 0x000000, strokeWeight = 20f),
+        RenderStyle(fillColor = 0xffffff, strokeColor = 0xff0000, strokeWeight = 20f),
+        RenderStyle(fillColor = 0xff0000, strokeColor = 0xffffff, strokeWeight = 20f),
         RenderStyle(fillColor = 0x000000, strokeColor = 0xffffff, strokeWeight = 20f),
         RenderStyle(fillColor = null, strokeColor = 0xff0000, strokeWeight = 20f),
-        RenderStyle(fillColor = 0xff0000, strokeColor = 0x000000, strokeWeight = 20f)
+        RenderStyle(fillColor = 0xff0000, strokeColor = 0xffffff, strokeWeight = 20f)
     )
     private var renderStyle = renderStyles.first()
 
@@ -80,7 +81,7 @@ class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
 
     private lateinit var chunks: List<Chunk>
     override fun settings() {
-//        fullScreen(PConstants.P3D)
+//        fullScreen(PConstants.P3D, 2)
         size(1024, 768, PConstants.P3D)
     }
 
