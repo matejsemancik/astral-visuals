@@ -1,7 +1,14 @@
 package dev.matsem.astral.playground.sketches
 
-import dev.matsem.astral.core.tools.extensions.*
-import org.koin.core.KoinComponent
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.draw
+import dev.matsem.astral.core.tools.extensions.mapSin
+import dev.matsem.astral.core.tools.extensions.pixelAt
+import dev.matsem.astral.core.tools.extensions.pushPop
+import dev.matsem.astral.core.tools.extensions.shorterDimension
+import dev.matsem.astral.core.tools.extensions.translateCenter
+import dev.matsem.astral.core.tools.extensions.withAlpha
+import org.koin.core.component.KoinComponent
 import processing.core.PApplet
 
 class PlanetMoon : PApplet(), KoinComponent {

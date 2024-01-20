@@ -3,8 +3,12 @@ package dev.matsem.astral.playground.sketches
 import ch.bildspur.postfx.builder.PostFX
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
-import dev.matsem.astral.core.tools.extensions.*
-import org.koin.core.KoinComponent
+import dev.matsem.astral.core.tools.extensions.colorModeHsb
+import dev.matsem.astral.core.tools.extensions.mapp
+import dev.matsem.astral.core.tools.extensions.pushPop
+import dev.matsem.astral.core.tools.extensions.shorterDimension
+import dev.matsem.astral.core.tools.extensions.translateCenter
+import org.koin.core.component.KoinComponent
 import org.openrndr.extra.easing.easeCubicInOut
 import org.openrndr.extra.easing.easeSineInOut
 import processing.core.PApplet

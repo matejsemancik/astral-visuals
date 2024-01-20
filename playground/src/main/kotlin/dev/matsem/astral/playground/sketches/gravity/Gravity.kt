@@ -10,8 +10,8 @@ import dev.matsem.astral.core.tools.extensions.threshold
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.core.tools.galaxy.Galaxy
 import dev.matsem.astral.core.tools.midi.MidiAutomator
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import processing.core.PApplet
 import shiffman.box2d.Box2DProcessing
 

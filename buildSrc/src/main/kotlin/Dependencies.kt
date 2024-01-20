@@ -1,5 +1,5 @@
 object Dependencies {
-    const val koin = "org.koin:koin-core:${Versions.koin}"
+    const val koin = "io.insert-koin:koin-core:${Versions.koin}"
     const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serializationJson}"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
     const val orxEasing = "org.openrndr.extra:orx-easing:${Versions.orx}"

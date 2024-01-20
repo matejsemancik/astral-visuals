@@ -1,17 +1,13 @@
 package dev.matsem.astral.raspberrypi.sketches
 
 import ch.bildspur.postfx.builder.PostFX
-import dev.matsem.astral.core.Files
 import dev.matsem.astral.core.tools.animations.AnimationHandler
 import dev.matsem.astral.core.tools.animations.radianSeconds
 import dev.matsem.astral.core.tools.extensions.colorModeHsb
-import dev.matsem.astral.core.tools.extensions.draw
-import dev.matsem.astral.core.tools.extensions.heightF
+import dev.matsem.astral.core.tools.extensions.longerDimension
 import dev.matsem.astral.core.tools.extensions.pushPop
 import dev.matsem.astral.core.tools.extensions.shorterDimension
-import dev.matsem.astral.core.tools.extensions.translate
 import dev.matsem.astral.core.tools.extensions.translateCenter
-import dev.matsem.astral.core.tools.extensions.widthF
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import extruder.extruder
 import geomerative.RG
@@ -24,11 +20,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import processing.core.PApplet
 import processing.core.PConstants
-import processing.core.PFont
-import processing.core.PGraphics
 import processing.core.PShape
-import processing.core.PVector
-import java.io.File
 import java.util.*
 
 /**
@@ -40,45 +32,37 @@ import java.util.*
  * This sketch creates lineup.txt and render.properties files on your desktop. Use them to display text and modify render
  * settings of the scene. The files are watched and the sketch content will be updated upon modification of these files.
  */
-class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
+class NeonLogoFraktal : PApplet(), AnimationHandler, KoinComponent {
 
     override fun provideMillis(): Int = millis()
 
     private lateinit var fx: PostFX
     private val ex: extruder by inject()
-    private lateinit var font: PFont
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private lateinit var textFile: File
-    private lateinit var displayedText: String
 
-    private val logoToScreenScale = 0.35f
+    private var logoToScreenScale = 0.5f
     private val shapeDepth = 100
     private var sclOff = 0f
-    private var rotYOff = 0f
-    private val starCount = 3000
-    private val fps = 20f
-    private lateinit var starsCanvas: PGraphics
-    private lateinit var stars: List<PVector>
-    private val logoPosition = PVector(0f, 0f)
-    private val logoPositionTarget = PVector(0f, 0f)
-    private val textPosition = PVector(0f, 0f)
-    private val textPositionTarget = PVector(0f, 0f)
-    private var lerpSpeed = 0.2f
+    private var rotationYPeriod = 30f
+    private var rotationXPeriod = 60f
+    private val fps = 24f
     private val renderStyles = arrayOf(
-        RenderStyle(fillColor = 0x00ffc8, strokeColor = 0x000000, strokeWeight = 10f),
-        RenderStyle(fillColor = 0x000000, strokeColor = 0x00ffc8, strokeWeight = 10f),
-        RenderStyle(fillColor = null, strokeColor = 0x00ffc8, strokeWeight = 10f)
+        RenderStyle(fillColor = 0xffffff, strokeColor = 0xff0000, strokeWeight = 20f),
+        RenderStyle(fillColor = 0xff0000, strokeColor = 0xffffff, strokeWeight = 20f),
+        RenderStyle(fillColor = 0x000000, strokeColor = 0xffffff, strokeWeight = 20f),
+        RenderStyle(fillColor = null, strokeColor = 0xff0000, strokeWeight = 20f),
+        RenderStyle(fillColor = 0xff0000, strokeColor = 0xffffff, strokeWeight = 20f)
     )
     private var renderStyle = renderStyles.first()
 
     private val props: Properties = Properties()
-    private var logoActiveIntervalMs = 1000L
-    private var textActiveIntervalMs = 1000L
     private var renderStyleSwitchIntervalMs = 1000L
     private val fileReadIntervalMs = 5_000L
 
+    private var cageRotationYPeriod = 120f
+    private var cageRotationXPeriod = 200f
+
     companion object {
-        const val LineupFile = "lineup.txt"
         const val PropsFile = "render.properties"
     }
 
@@ -97,8 +81,8 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
     private lateinit var chunks: List<Chunk>
     override fun settings() {
-        fullScreen(PConstants.P3D)
-//        size(1024, 768, PConstants.P3D)
+//        fullScreen(PConstants.P3D, 2)
+        size(1024, 768, PConstants.P3D)
     }
 
     override fun setup() {
@@ -133,7 +117,7 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
                                 endShape(PApplet.CLOSE)
                             }
                         }
-                        .flatMap { ex.extrude(it, 100, "box").toList() }
+                        .flatMap { ex.extrude(it, shapeDepth, "box").toList() }
                         .onEach {
                             it.enableStyle()
                             it.translate(-rshape.width / 2f, -rshape.height / 2f, -shapeDepth / 2f)
@@ -142,117 +126,53 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
                 )
             }
 
-        starsCanvas = createGraphics(width, height, PConstants.P3D)
-        stars = generateSequence {
-            PVector(
-                random(-width.toFloat(), width.toFloat()),
-                random(-width.toFloat(), width.toFloat()),
-                random(-width.toFloat(), width.toFloat())
-            )
-        }.take(starCount).toList()
-
-        font = createFont(Files.Font.JETBRAINS_MONO, height / 20f, false)
-        textFile = desktopFile(LineupFile)
         fx = PostFX(this)
 
-        makeFiles()
-
-        coroutineScope.launch {
-            while (isActive) {
-                logoPositionTarget.set(0f, 0f)
-                textPositionTarget.set(widthF, 0f)
-                kotlinx.coroutines.delay(logoActiveIntervalMs)
-
-                logoPositionTarget.set(-widthF * 0.4f, 0f)
-                textPositionTarget.set(-widthF * 0.15f, 0f)
-                kotlinx.coroutines.delay(textActiveIntervalMs)
-            }
-        }
-
+        makeProps()
         coroutineScope.launch(Dispatchers.IO) {
             while (isActive) {
-                displayedText = textFile.readText().trimIndent()
-
                 props.load(desktopFile(PropsFile).inputStream())
-                logoActiveIntervalMs = props["visuals.logo.duration_ms"].toString().toLongOrNull() ?: 35_000L
-                textActiveIntervalMs = props["visuals.text.duration_ms"].toString().toLongOrNull() ?: 60_000L
-                renderStyleSwitchIntervalMs =
-                    props["visuals.logo.style.duration_ms"].toString().toLongOrNull() ?: 120_000L
-
+                readProps(props)
                 kotlinx.coroutines.delay(fileReadIntervalMs)
             }
         }
     }
 
-    private fun makeFiles() {
-        val textFile = desktopFile(LineupFile)
+    private fun makeProps() {
         val propsFile = desktopFile(PropsFile)
-        if (textFile.exists().not()) {
-            textFile.createNewFile()
-            textFile.writeText(
-                """
-                    Edit ~/Desktop/lineup.txt bruv
-                """.trimIndent()
-            )
-        }
-
         if (propsFile.exists().not()) {
             propsFile.createNewFile()
             propsFile.writeText(
                 """
-                    visuals.logo.style.duration_ms=5000
-                    visuals.logo.duration_ms=5000
-                    visuals.text.duration_ms=5000
+                    visuals.logo.style.duration_ms=30000
+                    visuals.logo.scale_ratio=0.50
+                    visuals.logo.rotation.y.period_sec=12
+                    visuals.logo.rotation.x.period_sec=53
+                    visuals.cage.rotation.y.period_sec=120
+                    visuals.cage.rotation.x.period_sec=200
                 """.trimIndent()
             )
         }
+    }
+
+    private fun readProps(props: Properties) {
+        renderStyleSwitchIntervalMs =
+            props["visuals.logo.style.duration_ms"].toString().toLongOrNull() ?: 120_000L
+        logoToScreenScale = props["visuals.logo.scale_ratio"].toString().toFloatOrNull() ?: 0.5f
+        rotationYPeriod = props["visuals.logo.rotation.y.period_sec"].toString().toFloatOrNull() ?: 60f
+        rotationXPeriod = props["visuals.logo.rotation.x.period_sec"].toString().toFloatOrNull() ?: 20f
+        cageRotationYPeriod = props["visuals.cage.rotation.y.period_sec"].toString().toFloatOrNull() ?: 120f
+        cageRotationXPeriod = props["visuals.cage.rotation.x.period_sec"].toString().toFloatOrNull() ?: 200f
     }
 
     override fun draw() {
         background(0)
         ortho()
 
-        // Update props
-
-        stars.forEach {
-            it.z += 2f
-            if (it.z > width) {
-                it.z = random(-width.toFloat(), 0f)
-            }
-        }
-
-        logoPosition.lerp(logoPositionTarget, lerpSpeed)
-        textPosition.lerp(textPositionTarget, lerpSpeed)
+        // region Update props
 
         if (millis() % renderStyleSwitchIntervalMs in 0 until 1000) {
             renderStyle = renderStyles.random()
-        }
-
-        // endregion
-
-        // region Starfield
-
-        starsCanvas.draw {
-            fill(0x000000.withAlpha(32))
-            rect(0f, 0f, widthF, heightF)
-
-            pushPop {
-                noStroke()
-                fill(0x00ffc8.withAlpha(128))
-                translateCenter()
-
-                stars.forEach {
-                    pushPop {
-                        translate(it.x, it.y, it.z)
-                        circle(0f, 0f, 3f)
-                    }
-                }
-            }
-        }
-
-        pushPop {
-            translate(0f, 0f, -400f)
-            image(starsCanvas, 0f, 0f)
         }
 
         // endregion
@@ -261,7 +181,6 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
         pushPop {
             translateCenter()
-            translate(logoPosition)
 
             val renderStyle = renderStyle
 
@@ -272,8 +191,8 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
                         width / chunk.shapeWidth * logoToScreenScale + sclOff
                     )
 
-                    rotateX(PI * 0.1f * sin(radianSeconds(60f)))
-                    rotateY(-radianSeconds(30f) + rotYOff)
+                    rotateX(PI * 0.2f * sin(radianSeconds(rotationXPeriod)))
+                    rotateY(radianSeconds(rotationYPeriod))
                     chunk.extrudedShape.forEach {
                         it.setFill(true)
                         if (renderStyle.fillColor != null) {
@@ -292,22 +211,30 @@ class NeonLogo : PApplet(), AnimationHandler, KoinComponent {
 
         // endregion
 
-        // region Info text
-
         pushPop {
             translateCenter()
-            translate(textPosition)
-            textFont(font)
-            textAlign(LEFT, CENTER)
-            noStroke()
-            fill(0x00ffc8.withAlpha())
-            text(displayedText, 0f, 0f)
+            pushPop {
+                for(i in 0 until 6) {
+                    rotateY(radianSeconds(cageRotationYPeriod))
+                    noFill()
+                    strokeWeight(10f)
+                    stroke(0xff0000.withAlpha())
+                    circle(0f, 0f, longerDimension() * 1.2f)
+                }
+            }
+
+            pushPop {
+                for(i in 0 until 6) {
+                    rotateX(radianSeconds(cageRotationXPeriod))
+                    noFill()
+                    strokeWeight(2f)
+                    stroke(0xff0000.withAlpha())
+                    circle(0f, 0f, longerDimension() * 1.5f)
+                }
+            }
         }
 
-        // endregion
-
         fx.render().apply {
-            noise(0.3f, 0.1f)
             pixelate(shorterDimension() / 2.4f)
         }.compose()
     }

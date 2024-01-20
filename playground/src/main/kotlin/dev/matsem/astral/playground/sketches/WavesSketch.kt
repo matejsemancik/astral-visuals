@@ -7,8 +7,8 @@ import dev.matsem.astral.core.tools.extensions.midiRange
 import dev.matsem.astral.core.tools.extensions.saw
 import dev.matsem.astral.core.tools.kontrol.KontrolF1
 import dev.matsem.astral.core.tools.kontrol.onTogglePad
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import processing.core.PApplet
 import processing.core.PConstants
 

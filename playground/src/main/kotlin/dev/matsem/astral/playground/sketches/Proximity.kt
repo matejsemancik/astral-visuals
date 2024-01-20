@@ -15,8 +15,8 @@ import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.core.tools.shapes.ExtrusionCache
 import dev.matsem.astral.core.tools.videoexport.VideoExporter
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import processing.core.PApplet
 import processing.core.PConstants
 import processing.core.PVector

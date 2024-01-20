@@ -1,10 +1,10 @@
 package dev.matsem.astral.raspberrypi
 
 import dev.matsem.astral.core.di.coreModule
-import dev.matsem.astral.raspberrypi.sketches.NeonLogo
-import org.koin.core.KoinComponent
+import dev.matsem.astral.raspberrypi.sketches.NeonLogoFraktal
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.context.startKoin
-import org.koin.core.inject
 import org.koin.core.logger.Level
 import processing.core.PApplet
 
@@ -27,7 +27,7 @@ class RaspberryApp : KoinComponent {
     fun run(processingArgs: Array<String>) {
         startKoin {
             printLogger(Level.ERROR)
-            modules(coreModule + raspberryModule { NeonLogo() })
+            modules(coreModule + raspberryModule { NeonLogoFraktal() })
         }
 
         PApplet.runSketch(processingArgs + arrayOf("RaspberryVisuals"), sketch)

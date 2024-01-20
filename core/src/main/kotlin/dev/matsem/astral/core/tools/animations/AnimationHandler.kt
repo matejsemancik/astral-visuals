@@ -1,7 +1,6 @@
 package dev.matsem.astral.core.tools.animations
 
 import processing.core.PConstants
-import processing.core.PConstants.TWO_PI
 
 /**
  * Provides access to various time-based animation functions, based on elapsed time since program run.

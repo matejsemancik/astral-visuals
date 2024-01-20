@@ -4,7 +4,6 @@ import Dependencies
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.kotlin
 import java.util.*
 
 open class CommonDependencies : Plugin<Project> {

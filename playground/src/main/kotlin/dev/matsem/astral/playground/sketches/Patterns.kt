@@ -6,8 +6,8 @@ import dev.matsem.astral.core.tools.extensions.longerDimension
 import dev.matsem.astral.core.tools.extensions.translateCenter
 import dev.matsem.astral.core.tools.extensions.withAlpha
 import dev.matsem.astral.core.tools.galaxy.Galaxy
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import processing.core.PApplet
 
 class Patterns : PApplet(), KoinComponent, AnimationHandler {
